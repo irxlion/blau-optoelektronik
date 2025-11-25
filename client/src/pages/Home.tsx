@@ -16,36 +16,36 @@ export default function Home() {
 
   const products = t({
     de: [
-    {
-      title: "Machine Vision",
-      description: "Hochpräzise Lasermodule für industrielle Bildverarbeitung mit optimaler Genauigkeit und Messgeschwindigkeit.",
-      image: "/product-machine-vision.jpg",
-      href: "/produkte/machine-vision",
-    },
-    {
-      title: "Linienlaser",
-      description: "Präzise Positionierung durch hochwertige Linienlaser für anspruchsvolle Anwendungen.",
-      image: "/product-line-laser.jpg",
-      href: "/produkte/linienlaser",
-    },
-    {
-      title: "Punktlaser",
-      description: "Punktlaser-Module mit rundem oder elliptischem Strahlprofil für vielfältige Einsatzbereiche.",
-      image: "/product-point-laser.jpg",
-      href: "/produkte/punktlaser",
-    },
-    {
-      title: "Powelllinsen",
-      description: "Asphärische Powelllinsen in Eigenproduktion - mehrere hundert Einheiten pro Woche.",
-      image: "/product-powell-lens.jpg",
-      href: "/produkte/powelllinsen",
-    },
-    {
-      title: "OEM Module",
-      description: "Kundenspezifische Mechaniken, Optik und Elektronik nach Ihren Anforderungen, auch in Kleinserien.",
-      image: "/product-oem-module.jpg",
-      href: "/produkte/oem-module",
-    },
+      {
+        title: "Machine Vision",
+        description: "Hochpräzise Lasermodule für industrielle Bildverarbeitung mit optimaler Genauigkeit und Messgeschwindigkeit.",
+        image: "/product-machine-vision.jpg",
+        href: "/produkte/machine-vision",
+      },
+      {
+        title: "Linienlaser",
+        description: "Präzise Positionierung durch hochwertige Linienlaser für anspruchsvolle Anwendungen.",
+        image: "/product-line-laser.jpg",
+        href: "/produkte/linienlaser",
+      },
+      {
+        title: "Punktlaser",
+        description: "Punktlaser-Module mit rundem oder elliptischem Strahlprofil für vielfältige Einsatzbereiche.",
+        image: "/product-point-laser.jpg",
+        href: "/produkte/punktlaser",
+      },
+      {
+        title: "Powelllinsen",
+        description: "Asphärische Powelllinsen in Eigenproduktion - mehrere hundert Einheiten pro Woche.",
+        image: "/product-powell-lens.jpg",
+        href: "/produkte/powelllinsen",
+      },
+      {
+        title: "OEM Module",
+        description: "Kundenspezifische Mechaniken, Optik und Elektronik nach Ihren Anforderungen, auch in Kleinserien.",
+        image: "/product-oem-module.jpg",
+        href: "/produkte/oem-module",
+      },
     ],
     en: [
       {
@@ -83,26 +83,26 @@ export default function Home() {
 
   const features = t({
     de: [
-    {
-      icon: Award,
-      title: "30+ Jahre Erfahrung",
-      description: "Bewährte Expertise in der Entwicklung und Fertigung von Optoelektronik",
-    },
-    {
-      icon: Zap,
-      title: "Höchste Präzision",
-      description: "Modernste Fertigungstechnologie für maximale Genauigkeit",
-    },
-    {
-      icon: Users,
-      title: "Kundenspezifisch",
-      description: "Individuelle Lösungen nach Ihren exakten Anforderungen",
-    },
-    {
-      icon: Globe,
-      title: "Made in Germany",
-      description: "Entwicklung und Produktion am Standort Deutschland",
-    },
+      {
+        icon: Award,
+        title: "30+ Jahre Erfahrung",
+        description: "Bewährte Expertise in der Entwicklung und Fertigung von Optoelektronik",
+      },
+      {
+        icon: Zap,
+        title: "Höchste Präzision",
+        description: "Modernste Fertigungstechnologie für maximale Genauigkeit",
+      },
+      {
+        icon: Users,
+        title: "Kundenspezifisch",
+        description: "Individuelle Lösungen nach Ihren exakten Anforderungen",
+      },
+      {
+        icon: Globe,
+        title: "Made in Germany",
+        description: "Entwicklung und Produktion am Standort Deutschland",
+      },
     ],
     en: [
       {
@@ -305,13 +305,13 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <div className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-4" style={{color: 'oklch(0.98 0 0)', backgroundColor: 'oklab(0.35 -0.0507142 -0.108757 / 0.9)'}}>
+              <div className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-4" style={{ color: 'oklch(0.98 0 0)', backgroundColor: 'oklab(0.35 -0.0507142 -0.108757 / 0.9)' }}>
                 {featuredCopy.pill}
               </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-accent-foreground">
                 {featuredCopy.headingStrong} <span className="text-muted-foreground">{featuredCopy.headingLight}</span> {featuredCopy.headingHighlight}
               </h2>
-              <h3 className="text-3xl font-bold text-secondary mb-6" style={{color: 'oklch(0.98 0 0)'}}>{featuredCopy.subheading}</h3>
+              <h3 className="text-3xl font-bold text-secondary mb-6" style={{ color: 'oklch(0.98 0 0)' }}>{featuredCopy.subheading}</h3>
               <p className="text-lg text-muted-foreground mb-6">{featuredCopy.description}</p>
               <Link href="/produkte/mvpulse">
                 <Button size="lg" className="bg-primary hover:bg-primary/90">

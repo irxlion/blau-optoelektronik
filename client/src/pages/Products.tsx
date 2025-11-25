@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
+import { ChevronRight, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { getProducts } from "@/data/products";
+import { fetchProducts } from "@/lib/api";
+import { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -11,12 +12,33 @@ export default function Products() {
   const { language } = useLanguage();
   const isEnglish = language === "en";
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [productsData, setProductsData] = useState<{ de: Product[]; en: Product[] } | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const allProducts = useMemo(() => getProducts(language), [language]);
+  useEffect(() => {
+    fetchProducts()
+      .then(setProductsData)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const allProducts = useMemo(() => {
+    if (!productsData) return [];
+    return productsData[language];
+  }, [productsData, language]);
+
   const categories = useMemo(() => Array.from(new Set(allProducts.map((p) => p.category))), [allProducts]);
 
   const filteredProducts =
     selectedCategory === "all" ? allProducts : allProducts.filter((p) => p.category === selectedCategory);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

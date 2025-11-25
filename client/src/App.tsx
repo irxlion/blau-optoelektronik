@@ -20,10 +20,15 @@ import Datenschutz from "./pages/Datenschutz";
 import Impressum from "./pages/Impressum";
 import AGB from "./pages/AGB";
 
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/produkte" component={Products} />
       <Route path="/produkte/:id" component={ProductDetail} />
       <Route path="/kontakt" component={Contact} />
@@ -51,17 +56,17 @@ function App() {
   return (
     <ErrorBoundary>
       <LanguageProvider>
-      <ThemeProvider
-        defaultTheme="light"
+        <ThemeProvider
+          defaultTheme="light"
         // switchable
-      >
-        <TooltipProvider>
-          <Toaster />
-          <ScrollProgress />
-          <ScrollToTop />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+        >
+          <TooltipProvider>
+            <Toaster />
+            <ScrollProgress />
+            <ScrollToTop />
+            <Router />
+          </TooltipProvider>
+        </ThemeProvider>
       </LanguageProvider>
     </ErrorBoundary>
   );

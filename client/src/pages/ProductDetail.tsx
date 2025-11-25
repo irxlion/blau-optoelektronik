@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "wouter";
-import { ArrowLeft, Download, Check, ChevronRight } from "lucide-react";
+import { ArrowLeft, Download, Check, ChevronRight, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getProductById } from "@/data/products";
+import { fetchProducts } from "@/lib/api";
+import { Product } from "@/data/products";
 import SEO from "@/components/SEO";
 import NotFound from "./NotFound";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -15,8 +16,27 @@ export default function ProductDetail() {
   const productId = params.id;
   const { language } = useLanguage();
   const isEnglish = language === "en";
-  const product = productId ? getProductById(productId, language) : undefined;
+  const [product, setProduct] = useState<Product | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+
+  useEffect(() => {
+    fetchProducts()
+      .then((data) => {
+        const found = data[language].find((p) => p.id === productId);
+        setProduct(found);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [productId, language]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   if (!product) {
     return <NotFound />;
@@ -93,11 +113,10 @@ export default function ProductDetail() {
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
-                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                        selectedImage === idx
+                      className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedImage === idx
                           ? "border-primary"
                           : "border-transparent hover:border-muted-foreground/30"
-                      }`}
+                        }`}
                     >
                       <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
                     </button>
