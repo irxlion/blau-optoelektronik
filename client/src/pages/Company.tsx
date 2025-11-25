@@ -2,9 +2,14 @@ import { ChevronRight, Target, Lightbulb, Award, Users, Factory, TrendingUp } fr
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Company() {
-  const timeline = [
+  const { language, t } = useLanguage();
+  const isEnglish = language === "en";
+
+  const timeline = t({
+    de: [
     {
       year: "1990",
       title: "Gründung",
@@ -35,9 +40,43 @@ export default function Company() {
       title: "Zukunft",
       description: "Kontinuierliche Innovation und Entwicklung neuer optoelektronischer Lösungen."
     }
-  ];
+    ],
+    en: [
+      {
+        year: "1990",
+        title: "Foundation",
+        description: "BLAU Optoelectronics is founded with a focus on laser modules for medical technology."
+      },
+      {
+        year: "2000",
+        title: "Expansion",
+        description: "Portfolio expands to include industrial imaging systems."
+      },
+      {
+        year: "2010",
+        title: "Innovation",
+        description: "Development of proprietary optical sensor technologies and PSD sensors."
+      },
+      {
+        year: "2019",
+        title: "Powell lenses",
+        description: "Start of in-house Powell lens production with several hundred units per week."
+      },
+      {
+        year: "2023",
+        title: "MVpulse launch",
+        description: "Introduction of the groundbreaking MVpulse laser module combining eye safety and high power."
+      },
+      {
+        year: "2025",
+        title: "Future",
+        description: "Ongoing innovation and development of next-generation optoelectronic solutions."
+      }
+    ]
+  });
 
-  const values = [
+  const values = t({
+    de: [
     {
       icon: Target,
       title: "Präzision",
@@ -58,14 +97,45 @@ export default function Company() {
       title: "Partnerschaft",
       description: "Enge Zusammenarbeit mit unseren Kunden für individuelle Lösungen."
     }
-  ];
+    ],
+    en: [
+      {
+        icon: Target,
+        title: "Precision",
+        description: "Maximum accuracy in every detail of our products and processes."
+      },
+      {
+        icon: Lightbulb,
+        title: "Innovation",
+        description: "Continuous improvement and research for forward-looking solutions."
+      },
+      {
+        icon: Award,
+        title: "Quality",
+        description: "Made in Germany – engineering and production to the highest standards."
+      },
+      {
+        icon: Users,
+        title: "Partnership",
+        description: "Close collaboration with our customers for truly bespoke solutions."
+      }
+    ]
+  });
 
-  const stats = [
+  const stats = t({
+    de: [
     { number: "30+", label: "Jahre Erfahrung" },
     { number: "500+", label: "Powelllinsen/Woche" },
     { number: "100%", label: "Made in Germany" },
     { number: "24h", label: "Antwortzeit" }
-  ];
+    ],
+    en: [
+      { number: "30+", label: "Years of experience" },
+      { number: "500+", label: "Powell lenses/week" },
+      { number: "100%", label: "Made in Germany" },
+      { number: "24h", label: "Response time" }
+    ]
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -78,13 +148,15 @@ export default function Company() {
             <div className="flex items-center gap-2 text-sm mb-4 opacity-90">
               <span>Home</span>
               <ChevronRight className="h-4 w-4" />
-              <span>Unternehmen</span>
+              <span>{isEnglish ? "Company" : "Unternehmen"}</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Über BLAU Optoelektronik
+              {isEnglish ? "About BLAU Optoelectronics" : "Über BLAU Optoelektronik"}
             </h1>
             <p className="text-xl opacity-90">
-              Seit über 30 Jahren entwickeln und fertigen wir hochpräzise optoelektronische Komponenten und Systeme Made in Germany.
+              {isEnglish
+                ? "For more than 30 years we have been developing and manufacturing high-precision optoelectronic components and systems made in Germany."
+                : "Seit über 30 Jahren entwickeln und fertigen wir hochpräzise optoelektronische Komponenten und Systeme Made in Germany."}
             </p>
           </div>
         </div>
@@ -96,8 +168,8 @@ export default function Company() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, idx) => (
               <div key={idx} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-black mb-2">{stat.number}</div>
-                <div className="text-black">{stat.label}</div>
+                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.number}</div>
+                <div className="text-primary font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -109,15 +181,23 @@ export default function Company() {
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl font-bold mb-6 text-foreground">Unsere Mission</h2>
+              <h2 className="text-4xl font-bold mb-6 text-foreground">
+                {isEnglish ? "Our mission" : "Unsere Mission"}
+              </h2>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                BLAU Optoelektronik steht für höchste Präzision und Innovation in der Optoelektronik. Unser Ziel ist es, unseren Kunden die besten Lösungen für ihre anspruchsvollsten Anwendungen zu bieten.
+                {isEnglish
+                  ? "BLAU Optoelectronics stands for maximum precision and innovation. Our goal is to provide customers with the best solutions for their most demanding applications."
+                  : "BLAU Optoelektronik steht für höchste Präzision und Innovation in der Optoelektronik. Unser Ziel ist es, unseren Kunden die besten Lösungen für ihre anspruchsvollsten Anwendungen zu bieten."}
               </p>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                Durch enge Zusammenarbeit mit unseren Kunden entwickeln wir maßgeschneiderte Produkte, die exakt auf ihre Bedürfnisse zugeschnitten sind. Dabei setzen wir auf modernste Technologien und jahrzehntelange Erfahrung.
+                {isEnglish
+                  ? "By working closely with our customers we develop tailor-made products that match their needs exactly, relying on cutting-edge technology and decades of experience."
+                  : "Durch enge Zusammenarbeit mit unseren Kunden entwickeln wir maßgeschneiderte Produkte, die exakt auf ihre Bedürfnisse zugeschnitten sind. Dabei setzen wir auf modernste Technologien und jahrzehntelange Erfahrung."}
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Made in Germany bedeutet für uns nicht nur ein Qualitätsversprechen, sondern auch Verantwortung für nachhaltige Produktion und langfristige Partnerschaften.
+                {isEnglish
+                  ? "Made in Germany is more than a promise of quality – it is our commitment to sustainable production and long-term partnerships."
+                  : "Made in Germany bedeutet für uns nicht nur ein Qualitätsversprechen, sondern auch Verantwortung für nachhaltige Produktion und langfristige Partnerschaften."}
               </p>
             </div>
             <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
@@ -136,9 +216,11 @@ export default function Company() {
       <section className="py-20 bg-muted">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 text-foreground">Unsere Werte</h2>
+            <h2 className="text-4xl font-bold mb-4 text-foreground">
+              {isEnglish ? "Our values" : "Unsere Werte"}
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Was uns antreibt und auszeichnet
+              {isEnglish ? "What drives and distinguishes us" : "Was uns antreibt und auszeichnet"}
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -164,9 +246,11 @@ export default function Company() {
       <section className="py-20">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4 text-foreground">Unsere Geschichte</h2>
+            <h2 className="text-4xl font-bold mb-4 text-foreground">
+              {isEnglish ? "Our story" : "Unsere Geschichte"}
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Über 30 Jahre Innovation und Wachstum
+              {isEnglish ? "More than 30 years of innovation and growth" : "Über 30 Jahre Innovation und Wachstum"}
             </p>
           </div>
           <div className="max-w-4xl mx-auto">
@@ -207,12 +291,18 @@ export default function Company() {
                 <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
                   <Factory className="h-8 w-8 text-secondary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-card-foreground">Fertigung & Standort</h3>
+                <h3 className="text-2xl font-bold mb-4 text-card-foreground">
+                  {isEnglish ? "Manufacturing & location" : "Fertigung & Standort"}
+                </h3>
                 <p className="text-muted-foreground mb-4 leading-relaxed">
-                  Unsere moderne Produktionsstätte in Deutschland ermöglicht uns höchste Qualitätsstandards und kurze Lieferzeiten. Mit modernsten Fertigungsanlagen und erfahrenen Fachkräften garantieren wir Präzision in jedem Detail.
+                  {isEnglish
+                    ? "Our modern production site in Germany allows us to meet the highest quality standards with short lead times. Advanced equipment and experienced specialists guarantee precision in every detail."
+                    : "Unsere moderne Produktionsstätte in Deutschland ermöglicht uns höchste Qualitätsstandards und kurze Lieferzeiten. Mit modernsten Fertigungsanlagen und erfahrenen Fachkräften garantieren wir Präzision in jedem Detail."}
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  Von der Entwicklung über die Prototypenfertigung bis zur Serienfertigung - alles aus einer Hand am Standort Deutschland.
+                  {isEnglish
+                    ? "From development to prototyping and series production – everything from a single source in Germany."
+                    : "Von der Entwicklung über die Prototypenfertigung bis zur Serienfertigung - alles aus einer Hand am Standort Deutschland."}
                 </p>
               </CardContent>
             </Card>
@@ -222,12 +312,18 @@ export default function Company() {
                 <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
                   <TrendingUp className="h-8 w-8 text-secondary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-card-foreground">Innovation & Zukunft</h3>
+                <h3 className="text-2xl font-bold mb-4 text-card-foreground">
+                  {isEnglish ? "Innovation & future" : "Innovation & Zukunft"}
+                </h3>
                 <p className="text-muted-foreground mb-4 leading-relaxed">
-                  Kontinuierliche Forschung und Entwicklung sind der Schlüssel zu unserem Erfolg. Wir investieren in neue Technologien und arbeiten an zukunftsweisenden Lösungen für die Herausforderungen von morgen.
+                  {isEnglish
+                    ? "Continuous research and development are key to our success. We invest in new technologies and work on future-ready solutions for tomorrow’s challenges."
+                    : "Kontinuierliche Forschung und Entwicklung sind der Schlüssel zu unserem Erfolg. Wir investieren in neue Technologien und arbeiten an zukunftsweisenden Lösungen für die Herausforderungen von morgen."}
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  Unsere Innovationspipeline umfasst neue Lasermodule, verbesserte Sensortechnologien und erweiterte Anwendungsmöglichkeiten für die Optoelektronik.
+                  {isEnglish
+                    ? "Our innovation pipeline includes new laser modules, enhanced sensing technologies and extended applications for optoelectronics."
+                    : "Unsere Innovationspipeline umfasst neue Lasermodule, verbesserte Sensortechnologien und erweiterte Anwendungsmöglichkeiten für die Optoelektronik."}
                 </p>
               </CardContent>
             </Card>

@@ -8,9 +8,14 @@ import ParallaxSection from "@/components/ParallaxSection";
 import AnimatedIcon from "@/components/AnimatedIcon";
 import SEO from "@/components/SEO";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Home() {
-  const products = [
+  const { language, t } = useLanguage();
+  const isEnglish = language === "en";
+
+  const products = t({
+    de: [
     {
       title: "Machine Vision",
       description: "Hochpräzise Lasermodule für industrielle Bildverarbeitung mit optimaler Genauigkeit und Messgeschwindigkeit.",
@@ -41,9 +46,43 @@ export default function Home() {
       image: "/product-oem-module.jpg",
       href: "/produkte/oem-module",
     },
-  ];
+    ],
+    en: [
+      {
+        title: "Machine Vision",
+        description: "High-precision laser modules for industrial imaging with outstanding accuracy and measurement speed.",
+        image: "/product-machine-vision.jpg",
+        href: "/produkte/machine-vision",
+      },
+      {
+        title: "Line Lasers",
+        description: "High-quality line lasers for precise positioning in demanding applications.",
+        image: "/product-line-laser.jpg",
+        href: "/produkte/linienlaser",
+      },
+      {
+        title: "Point Lasers",
+        description: "Point laser modules with round or elliptical beam profiles for versatile use cases.",
+        image: "/product-point-laser.jpg",
+        href: "/produkte/punktlaser",
+      },
+      {
+        title: "Powell Lenses",
+        description: "In-house manufactured aspheric Powell lenses – several hundred units per week.",
+        image: "/product-powell-lens.jpg",
+        href: "/produkte/powelllinsen",
+      },
+      {
+        title: "OEM Modules",
+        description: "Custom mechanics, optics and electronics tailored to your specifications, even for small batches.",
+        image: "/product-oem-module.jpg",
+        href: "/produkte/oem-module",
+      },
+    ],
+  });
 
-  const features = [
+  const features = t({
+    de: [
     {
       icon: Award,
       title: "30+ Jahre Erfahrung",
@@ -64,13 +103,123 @@ export default function Home() {
       title: "Made in Germany",
       description: "Entwicklung und Produktion am Standort Deutschland",
     },
-  ];
+    ],
+    en: [
+      {
+        icon: Award,
+        title: "30+ years of experience",
+        description: "Proven expertise in designing and manufacturing optoelectronics",
+      },
+      {
+        icon: Zap,
+        title: "Maximum precision",
+        description: "State-of-the-art production technology for ultimate accuracy",
+      },
+      {
+        icon: Users,
+        title: "Customized",
+        description: "Tailor-made solutions that match your exact requirements",
+      },
+      {
+        icon: Globe,
+        title: "Made in Germany",
+        description: "Development and production at our German headquarters",
+      },
+    ],
+  });
+
+  const heroCopy = t({
+    de: {
+      label: "Präzision in Licht und Optik",
+      title: "Optoelektronische Lösungen für höchste Ansprüche",
+      description:
+        "Seit über 30 Jahren entwickeln und fertigen wir hochpräzise Lasermodule, optische Sensoren und kundenspezifische Optoelektronik für Industrie, Medizintechnik und Forschung.",
+      primaryCta: "Produkte entdecken",
+      secondaryCta: "Kontakt aufnehmen",
+      seoTitle: "BLAU Optoelektronik - Präzise optoelektronische Lösungen",
+      seoDescription:
+        "Seit über 30 Jahren entwickeln und fertigen wir hochpräzise Lasermodule, optische Sensoren und kundenspezifische Optoelektronik für Industrie, Medizintechnik und Forschung. Made in Germany.",
+    },
+    en: {
+      label: "Precision in light and optics",
+      title: "Optoelectronic solutions for the highest demands",
+      description:
+        "For more than 30 years we have been developing and manufacturing high-precision laser modules, optical sensors and custom optoelectronic systems for industry, medical technology and research.",
+      primaryCta: "Explore products",
+      secondaryCta: "Contact us",
+      seoTitle: "BLAU Optoelectronics – Precision optoelectronic solutions",
+      seoDescription:
+        "For more than 30 years we have been building high-precision laser modules, optical sensors and custom optoelectronics for industry, medical technology and research – made in Germany.",
+    },
+  });
+
+  const featuredCopy = t({
+    de: {
+      pill: "Neues aus der Fertigung",
+      headingStrong: "Augensicherheit",
+      headingLight: "und",
+      headingHighlight: "Hohe Leistung?",
+      subheading: "MVpulse!",
+      description:
+        "Unser MVpulse-Lasermodul verbindet zwei Kriterien der industriellen Bildverarbeitung: Viel Licht mit Ausgangsleistungen bis 100 mW und Augensicherheit nach Laserklasse 2.",
+      button: "Zum MVpulse",
+    },
+    en: {
+      pill: "Manufacturing update",
+      headingStrong: "Eye safety",
+      headingLight: "and",
+      headingHighlight: "high performance?",
+      subheading: "MVpulse!",
+      description:
+        "Our MVpulse laser module combines two crucial criteria for industrial imaging: plenty of light with output power up to 100 mW and laser class 2 eye safety.",
+      button: "Discover MVpulse",
+    },
+  });
+
+  const productSectionCopy = t({
+    de: {
+      heading: "Unsere Produktkategorien",
+      description: "Hochpräzise optoelektronische Komponenten für anspruchsvolle Anwendungen",
+    },
+    en: {
+      heading: "Our product categories",
+      description: "High-precision optoelectronic components for demanding applications",
+    },
+  });
+
+  const featuresSectionCopy = t({
+    de: {
+      heading: "Warum BLAU Optoelektronik?",
+      description: "Ihr Partner für präzise optoelektronische Lösungen",
+    },
+    en: {
+      heading: "Why BLAU Optoelektronik?",
+      description: "Your partner for precise optoelectronic solutions",
+    },
+  });
+
+  const ctaCopy = t({
+    de: {
+      heading: "Bereit für Ihre individuelle Lösung?",
+      description:
+        "Kontaktieren Sie uns für eine persönliche Beratung zu Ihrem Projekt. Unser Expertenteam steht Ihnen zur Verfügung.",
+      button: "Jetzt Kontakt aufnehmen",
+    },
+    en: {
+      heading: "Ready for your custom solution?",
+      description:
+        "Reach out for personal consulting on your project. Our team of experts is here to support you.",
+      button: "Talk to us today",
+    },
+  });
 
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "BLAU Optoelektronik",
-    description: "Hochpräzise optoelektronische Lösungen Made in Germany",
+    description: isEnglish
+      ? "High-precision optoelectronic solutions made in Germany"
+      : "Hochpräzise optoelektronische Lösungen Made in Germany",
     url: "https://www.blau-optoelektronik.de",
     logo: "https://www.blau-optoelektronik.de/logo-blau.png",
     contactPoint: {
@@ -83,11 +232,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <SEO
-        title="BLAU Optoelektronik - Präzise optoelektronische Lösungen"
-        description="Seit über 30 Jahren entwickeln und fertigen wir hochpräzise Lasermodule, optische Sensoren und kundenspezifische Optoelektronik für Industrie, Medizintechnik und Forschung. Made in Germany."
-        structuredData={structuredData}
-      />
+      <SEO title={heroCopy.seoTitle} description={heroCopy.seoDescription} structuredData={structuredData} />
       <Header />
 
       {/* Hero Section */}
@@ -106,24 +251,22 @@ export default function Home() {
         <div className="container relative z-10 text-primary-foreground py-32">
           <div className="max-w-3xl">
             <div className="inline-block px-4 py-2 bg-secondary/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
-              Präzision in Licht und Optik
+              {heroCopy.label}
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Optoelektronische Lösungen für höchste Ansprüche
+              {heroCopy.title}
             </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90 leading-relaxed">
-              Seit über 30 Jahren entwickeln und fertigen wir hochpräzise Lasermodule, optische Sensoren und kundenspezifische Optoelektronik für Industrie, Medizintechnik und Forschung.
-            </p>
+            <p className="text-xl md:text-2xl mb-8 opacity-90 leading-relaxed">{heroCopy.description}</p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/produkte">
                 <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8">
-                  Produkte entdecken
+                  {heroCopy.primaryCta}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link href="/kontakt">
                 <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 text-lg px-8">
-                  Kontakt aufnehmen
+                  {heroCopy.secondaryCta}
                 </Button>
               </Link>
             </div>
@@ -163,18 +306,16 @@ export default function Home() {
               transition={{ duration: 0.6 }}
             >
               <div className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-4" style={{color: 'oklch(0.98 0 0)', backgroundColor: 'oklab(0.35 -0.0507142 -0.108757 / 0.9)'}}>
-                Neues aus der Fertigung
+                {featuredCopy.pill}
               </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-accent-foreground">
-                Augensicherheit <span className="text-muted-foreground">und</span> Hohe Leistung?
+                {featuredCopy.headingStrong} <span className="text-muted-foreground">{featuredCopy.headingLight}</span> {featuredCopy.headingHighlight}
               </h2>
-              <h3 className="text-3xl font-bold text-secondary mb-6" style={{color: 'oklch(0.98 0 0)'}}>MVpulse!</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                Unser MVpulse-Lasermodul verbindet zwei Kriterien der industriellen Bildverarbeitung: Viel Licht mit Ausgangsleistungen bis 100 mW und Augensicherheit nach Laserklasse 2.
-              </p>
+              <h3 className="text-3xl font-bold text-secondary mb-6" style={{color: 'oklch(0.98 0 0)'}}>{featuredCopy.subheading}</h3>
+              <p className="text-lg text-muted-foreground mb-6">{featuredCopy.description}</p>
               <Link href="/produkte/mvpulse">
                 <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  Zum MVpulse
+                  {featuredCopy.button}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -187,10 +328,8 @@ export default function Home() {
       <section className="py-20">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">Unsere Produktkategorien</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Hochpräzise optoelektronische Komponenten für anspruchsvolle Anwendungen
-            </p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">{productSectionCopy.heading}</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{productSectionCopy.description}</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
@@ -204,10 +343,8 @@ export default function Home() {
       <section className="py-20 bg-muted">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">Warum BLAU Optoelektronik?</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Ihr Partner für präzise optoelektronische Lösungen
-            </p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">{featuresSectionCopy.heading}</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{featuresSectionCopy.description}</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => {
@@ -241,14 +378,14 @@ export default function Home() {
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Bereit für Ihre individuelle Lösung?
+            {ctaCopy.heading}
           </h2>
           <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Kontaktieren Sie uns für eine persönliche Beratung zu Ihrem Projekt. Unser Expertenteam steht Ihnen zur Verfügung.
+            {ctaCopy.description}
           </p>
           <Link href="/kontakt">
             <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8">
-              Jetzt Kontakt aufnehmen
+              {ctaCopy.button}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>

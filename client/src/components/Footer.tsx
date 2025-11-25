@@ -1,11 +1,23 @@
 import { Link } from "wouter";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { APP_LOGO } from "@/const";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { language } = useLanguage();
+  const isEnglish = language === "en";
 
-  const productLinks = [
+  const productLinks = isEnglish
+    ? [
+        { name: "Machine Vision", href: "/produkte/machine-vision" },
+        { name: "Line Lasers", href: "/produkte/linienlaser" },
+        { name: "Point Lasers", href: "/produkte/punktlaser" },
+        { name: "Powell Lenses", href: "/produkte/powelllinsen" },
+        { name: "OEM Modules", href: "/produkte/oem-module" },
+        { name: "MVpulse", href: "/produkte/mvpulse" },
+      ]
+    : [
     { name: "Machine Vision", href: "/produkte/machine-vision" },
     { name: "Linienlaser", href: "/produkte/linienlaser" },
     { name: "Punktlaser", href: "/produkte/punktlaser" },
@@ -14,14 +26,27 @@ export default function Footer() {
     { name: "MVpulse", href: "/produkte/mvpulse" },
   ];
 
-  const companyLinks = [
+  const companyLinks = isEnglish
+    ? [
+        { name: "About us", href: "/unternehmen" },
+        { name: "Technology", href: "/technologie" },
+        { name: "Industries", href: "/branchen" },
+        { name: "Careers", href: "/karriere" },
+      ]
+    : [
     { name: "Über uns", href: "/unternehmen" },
     { name: "Technologie", href: "/technologie" },
     { name: "Branchen", href: "/branchen" },
     { name: "Karriere", href: "/karriere" },
   ];
 
-  const resourceLinks = [
+  const resourceLinks = isEnglish
+    ? [
+        { name: "Downloads", href: "/ressourcen" },
+        { name: "FAQ", href: "/faq" },
+        { name: "Contact", href: "/kontakt" },
+      ]
+    : [
     { name: "Downloads", href: "/ressourcen" },
     { name: "FAQ", href: "/faq" },
     { name: "Kontakt", href: "/kontakt" },
@@ -41,12 +66,14 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-sm opacity-90 mb-4 max-w-md">
-              Seit über 30 Jahren entwickeln und fertigen wir hochpräzise optoelektronische Komponenten und Systeme für anspruchsvolle Anwendungen in Industrie, Medizintechnik und Forschung.
+              {isEnglish
+                ? "For more than 30 years we have been developing and manufacturing high-precision optoelectronic components and systems for demanding applications in industry, medical technology and research."
+                : "Seit über 30 Jahren entwickeln und fertigen wir hochpräzise optoelektronische Komponenten und Systeme für anspruchsvolle Anwendungen in Industrie, Medizintechnik und Forschung."}
             </p>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span>Deutschland</span>
+                <span>{isEnglish ? "Germany" : "Deutschland"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
@@ -61,7 +88,7 @@ export default function Footer() {
 
           {/* Products */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Produkte</h3>
+            <h3 className="font-semibold text-lg mb-4">{isEnglish ? "Products" : "Produkte"}</h3>
             <ul className="space-y-2">
               {productLinks.map((link) => (
                 <li key={link.href}>
@@ -77,7 +104,7 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Unternehmen</h3>
+            <h3 className="font-semibold text-lg mb-4">{isEnglish ? "Company" : "Unternehmen"}</h3>
             <ul className="space-y-2">
               {companyLinks.map((link) => (
                 <li key={link.href}>
@@ -93,7 +120,7 @@ export default function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Ressourcen</h3>
+            <h3 className="font-semibold text-lg mb-4">{isEnglish ? "Resources" : "Ressourcen"}</h3>
             <ul className="space-y-2">
               {resourceLinks.map((link) => (
                 <li key={link.href}>
@@ -111,22 +138,22 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm opacity-80">
-            © {currentYear} BLAU Optoelektronik GmbH. Alle Rechte vorbehalten.
+            © {currentYear} BLAU Optoelektronik GmbH. {isEnglish ? "All rights reserved." : "Alle Rechte vorbehalten."}
           </p>
           <div className="flex gap-6 text-sm">
             <Link href="/datenschutz">
               <span className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
-                Datenschutz
+                {isEnglish ? "Privacy" : "Datenschutz"}
               </span>
             </Link>
             <Link href="/impressum">
               <span className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
-                Impressum
+                {isEnglish ? "Legal notice" : "Impressum"}
               </span>
             </Link>
             <Link href="/agb">
               <span className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
-                AGB
+                {isEnglish ? "Terms & Conditions" : "AGB"}
               </span>
             </Link>
           </div>

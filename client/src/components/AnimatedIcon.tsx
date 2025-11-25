@@ -35,12 +35,19 @@ export default function AnimatedIcon({
   };
 
   return (
-    <motion.div {...animations[animationType]} className={className}>
+    <motion.div
+      animate={animations[animationType].animate}
+      transition={{ 
+        ...animations[animationType].transition,
+        // Fix types: supply proper 'ease' as array or easing function per framer-motion typing
+        ease: animations[animationType].transition.ease === "linear"
+          ? (t => t) // linear
+          : [0.4, 0, 0.2, 1], // cubic-bezier for 'easeInOut', can customize
+      }}
+      className={className}
+    >
       <Icon size={size} />
     </motion.div>
   );
 }
-
-
-
 

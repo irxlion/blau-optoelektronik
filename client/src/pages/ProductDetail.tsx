@@ -8,11 +8,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getProductById } from "@/data/products";
 import SEO from "@/components/SEO";
 import NotFound from "./NotFound";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ProductDetail() {
   const params = useParams();
   const productId = params.id;
-  const product = productId ? getProductById(productId) : undefined;
+  const { language } = useLanguage();
+  const isEnglish = language === "en";
+  const product = productId ? getProductById(productId, language) : undefined;
   const [selectedImage, setSelectedImage] = useState(0);
 
   if (!product) {
@@ -56,7 +59,7 @@ export default function ProductDetail() {
             </Link>
             <ChevronRight className="h-4 w-4" />
             <Link href="/produkte" className="hover:text-foreground transition-colors">
-              Produkte
+              {isEnglish ? "Products" : "Produkte"}
             </Link>
             <ChevronRight className="h-4 w-4" />
             <span className="text-foreground font-medium">{product.name}</span>
@@ -70,7 +73,7 @@ export default function ProductDetail() {
           <Link href="/produkte">
             <Button variant="ghost" className="mb-6">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Zurück zur Übersicht
+              {isEnglish ? "Back to overview" : "Zurück zur Übersicht"}
             </Button>
           </Link>
 
@@ -115,19 +118,21 @@ export default function ProductDetail() {
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <Link href="/kontakt">
                   <Button size="lg" className="bg-primary hover:bg-primary/90">
-                    Anfrage senden
+                    {isEnglish ? "Send inquiry" : "Anfrage senden"}
                   </Button>
                 </Link>
                 <Button size="lg" variant="outline">
                   <Download className="mr-2 h-5 w-5" />
-                  Datenblatt herunterladen
+                  {isEnglish ? "Download datasheet" : "Datenblatt herunterladen"}
                 </Button>
               </div>
 
               {/* Key Features */}
               <Card className="bg-accent border-border/50">
                 <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4 text-accent-foreground">Hauptmerkmale</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-accent-foreground">
+                    {isEnglish ? "Key features" : "Hauptmerkmale"}
+                  </h3>
                   <ul className="space-y-2">
                     {product.features.slice(0, 4).map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-accent-foreground">
@@ -146,7 +151,9 @@ export default function ProductDetail() {
       {/* Features Grid */}
       <section className="py-12 bg-muted">
         <div className="container">
-          <h2 className="text-3xl font-bold mb-8 text-foreground">Alle Features</h2>
+          <h2 className="text-3xl font-bold mb-8 text-foreground">
+            {isEnglish ? "All features" : "Alle Features"}
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {product.features.map((feature, idx) => (
               <Card key={idx} className="border-border/50">
@@ -167,7 +174,9 @@ export default function ProductDetail() {
       {/* Technical Specifications */}
       <section className="py-12">
         <div className="container">
-          <h2 className="text-3xl font-bold mb-8 text-foreground">Technische Daten</h2>
+          <h2 className="text-3xl font-bold mb-8 text-foreground">
+            {isEnglish ? "Technical specifications" : "Technische Daten"}
+          </h2>
           <Card className="border-border/50">
             <CardContent className="p-0">
               <div className="divide-y divide-border">
@@ -189,7 +198,9 @@ export default function ProductDetail() {
       {/* Applications */}
       <section className="py-12 bg-muted">
         <div className="container">
-          <h2 className="text-3xl font-bold mb-8 text-foreground">Anwendungsbereiche</h2>
+          <h2 className="text-3xl font-bold mb-8 text-foreground">
+            {isEnglish ? "Applications" : "Anwendungsbereiche"}
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {product.applications.map((application, idx) => (
               <Card key={idx} className="border-border/50">
@@ -208,7 +219,9 @@ export default function ProductDetail() {
       {/* Downloads */}
       <section className="py-12">
         <div className="container">
-          <h2 className="text-3xl font-bold mb-8 text-foreground">Downloads</h2>
+          <h2 className="text-3xl font-bold mb-8 text-foreground">
+            {isEnglish ? "Downloads" : "Downloads"}
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {product.downloads.map((download, idx) => (
               <Card key={idx} className="border-border/50 hover:shadow-lg transition-shadow group">
@@ -235,14 +248,16 @@ export default function ProductDetail() {
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Interesse an {product.name}?
+            {isEnglish ? `Interested in ${product.name}?` : `Interesse an ${product.name}?`}
           </h2>
           <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
-            Kontaktieren Sie uns für weitere Informationen, technische Beratung oder ein individuelles Angebot.
+            {isEnglish
+              ? "Contact us for further details, technical consulting or a tailored quotation."
+              : "Kontaktieren Sie uns für weitere Informationen, technische Beratung oder ein individuelles Angebot."}
           </p>
           <Link href="/kontakt">
             <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
-              Jetzt Kontakt aufnehmen
+              {isEnglish ? "Talk to us now" : "Jetzt Kontakt aufnehmen"}
             </Button>
           </Link>
         </div>

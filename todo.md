@@ -1,7 +1,7 @@
 # BLAU Optoelektronik Website - Project TODO
 
 ## Phase 1: Design System & Global Styles
-- [x] Configure Tailwind theme with modern tech color palette
+- [x] Configure Tailwind theme with modern tech color palette (blue, white, dark accents)
 - [x] Set up typography with professional font (Google Fonts)
 - [x] Create global CSS variables for consistent theming
 - [x] Configure responsive breakpoints and spacing system
@@ -58,8 +58,6 @@
 - [x] Resources/Download center page
 - [x] Contact page with form
 - [x] FAQ section
-- [ ] Blog/News system (optional)
-- [ ] Career page (optional)
 
 ## Phase 7: Animations & Interactions
 - [x] Scroll-based animations with Framer Motion
@@ -78,25 +76,24 @@
 - [ ] Material and lighting simulations
 - [ ] Interactive product comparison tool
 
-
 ## Phase 9: SEO & Performance
 - [x] Add meta tags for all pages
 - [x] Implement structured data (Schema.org)
 - [x] Create sitemap.xml
 - [x] Add robots.txt
-- [ ] Optimize images (Next/Image)
 - [x] Implement lazy loading
 
-## Phase 11: Accessibility
+## Phase 10: Accessibility
 - [x] ARIA labels and roles
 - [x] Keyboard navigation support
 - [x] Focus indicators
 - [x] Screen reader optimization
 - [x] Alt text for all images
 
-## Phase 12: Testing & Deployment
+## Phase 11: Testing & Deployment
 - [ ] Cross-browser testing
 - [ ] Mobile responsiveness testing
 - [ ] Performance testing
+- [ ] Accessibility audit
 - [ ] SEO audit
 - [ ] Create final checkpoint

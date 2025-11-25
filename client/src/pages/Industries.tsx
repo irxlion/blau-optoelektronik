@@ -4,80 +4,158 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Industries() {
-  const industries = [
-    {
-      icon: Heart,
-      title: "Medizintechnik",
-      description: "Präzise Lasermodule und optische Sensoren für medizinische Diagnostik und Therapie",
-      applications: [
-        "Laser für medizinische Bildgebung",
-        "Optische Kohärenztomographie (OCT)",
-        "Spektroskopie für Gewebeanalyse",
-        "Positionssensoren für chirurgische Roboter",
-        "Augensichere Lasermodule für Patientenumgebungen"
-      ],
-      products: ["MVpulse", "Punktlaser", "OEM Module"],
-      image: "/industry-medical-tech.jpg"
-    },
-    {
-      icon: Cog,
-      title: "Maschinenbau",
-      description: "Robuste Lösungen für industrielle Fertigungs- und Produktionsanlagen",
-      applications: [
-        "Positionierung und Ausrichtung",
-        "Dimensionsmessung von Werkstücken",
-        "Schweißnahtführung",
-        "Kantenerfassung",
-        "Oberflächeninspektion"
-      ],
-      products: ["Linienlaser", "Punktlaser", "OEM Module"],
-      image: "/manufacturing-facility.jpg"
-    },
-    {
-      icon: Factory,
-      title: "Automatisierungstechnik",
-      description: "Hochgeschwindigkeits-Sensoren für moderne Automatisierungsprozesse",
-      applications: [
-        "Industrielle Bildverarbeitung",
-        "Qualitätskontrolle in Echtzeit",
-        "Roboterführung und -navigation",
-        "Objekterkennung und -tracking",
-        "Barcode- und Schriftlesung"
-      ],
-      products: ["Machine Vision", "MVpulse", "Linienlaser"],
-      image: "/hero-laser-tech.jpg"
-    },
-    {
-      icon: Microscope,
-      title: "Forschung & Entwicklung",
-      description: "Flexible Lösungen für wissenschaftliche Anwendungen und Laborumgebungen",
-      applications: [
-        "Spektroskopie und Materialanalyse",
-        "Optische Messtechnik",
-        "Laser-Doppler-Anemometrie",
-        "Holographie",
-        "Quantenoptik-Experimente"
-      ],
-      products: ["Punktlaser", "OEM Module", "Powelllinsen"],
-      image: "/technology-optical-sensors.jpg"
-    },
-    {
-      icon: Cpu,
-      title: "Mikroelektronik",
-      description: "Präzisionslösungen für Halbleiterfertigung und Elektronikproduktion",
-      applications: [
-        "Wafer-Inspektion",
-        "Chip-Positionierung",
-        "Lötstellen-Kontrolle",
-        "Leiterplatten-Prüfung",
-        "Bonddraht-Inspektion"
-      ],
-      products: ["Machine Vision", "Punktlaser", "OEM Module"],
-      image: "/product-oem-module.jpg"
-    }
-  ];
+  const { language, t } = useLanguage();
+  const isEnglish = language === "en";
+
+  const industries = t({
+    de: [
+      {
+        icon: Heart,
+        title: "Medizintechnik",
+        description: "Präzise Lasermodule und optische Sensoren für medizinische Diagnostik und Therapie",
+        applications: [
+          "Laser für medizinische Bildgebung",
+          "Optische Kohärenztomographie (OCT)",
+          "Spektroskopie für Gewebeanalyse",
+          "Positionssensoren für chirurgische Roboter",
+          "Augensichere Lasermodule für Patientenumgebungen"
+        ],
+        products: ["MVpulse", "Punktlaser", "OEM Module"],
+        image: "/industry-medical-tech.jpg"
+      },
+      {
+        icon: Cog,
+        title: "Maschinenbau",
+        description: "Robuste Lösungen für industrielle Fertigungs- und Produktionsanlagen",
+        applications: [
+          "Positionierung und Ausrichtung",
+          "Dimensionsmessung von Werkstücken",
+          "Schweißnahtführung",
+          "Kantenerfassung",
+          "Oberflächeninspektion"
+        ],
+        products: ["Linienlaser", "Punktlaser", "OEM Module"],
+        image: "/manufacturing-facility.jpg"
+      },
+      {
+        icon: Factory,
+        title: "Automatisierungstechnik",
+        description: "Hochgeschwindigkeits-Sensoren für moderne Automatisierungsprozesse",
+        applications: [
+          "Industrielle Bildverarbeitung",
+          "Qualitätskontrolle in Echtzeit",
+          "Roboterführung und -navigation",
+          "Objekterkennung und -tracking",
+          "Barcode- und Schriftlesung"
+        ],
+        products: ["Machine Vision", "MVpulse", "Linienlaser"],
+        image: "/hero-laser-tech.jpg"
+      },
+      {
+        icon: Microscope,
+        title: "Forschung & Entwicklung",
+        description: "Flexible Lösungen für wissenschaftliche Anwendungen und Laborumgebungen",
+        applications: [
+          "Spektroskopie und Materialanalyse",
+          "Optische Messtechnik",
+          "Laser-Doppler-Anemometrie",
+          "Holographie",
+          "Quantenoptik-Experimente"
+        ],
+        products: ["Punktlaser", "OEM Module", "Powelllinsen"],
+        image: "/technology-optical-sensors.jpg"
+      },
+      {
+        icon: Cpu,
+        title: "Mikroelektronik",
+        description: "Präzisionslösungen für Halbleiterfertigung und Elektronikproduktion",
+        applications: [
+          "Wafer-Inspektion",
+          "Chip-Positionierung",
+          "Lötstellen-Kontrolle",
+          "Leiterplatten-Prüfung",
+          "Bonddraht-Inspektion"
+        ],
+        products: ["Machine Vision", "Punktlaser", "OEM Module"],
+        image: "/product-oem-module.jpg"
+      }
+    ],
+    en: [
+      {
+        icon: Heart,
+        title: "Medical technology",
+        description: "Precision laser modules and optical sensors for medical diagnostics and therapy",
+        applications: [
+          "Lasers for medical imaging",
+          "Optical coherence tomography (OCT)",
+          "Spectroscopy for tissue analysis",
+          "Position sensors for surgical robots",
+          "Eye-safe modules for patient environments"
+        ],
+        products: ["MVpulse", "Point lasers", "OEM modules"],
+        image: "/industry-medical-tech.jpg"
+      },
+      {
+        icon: Cog,
+        title: "Mechanical engineering",
+        description: "Rugged solutions for industrial manufacturing and production equipment",
+        applications: [
+          "Positioning and alignment",
+          "Dimensional measurement of workpieces",
+          "Weld seam guidance",
+          "Edge detection",
+          "Surface inspection"
+        ],
+        products: ["Line lasers", "Point lasers", "OEM modules"],
+        image: "/manufacturing-facility.jpg"
+      },
+      {
+        icon: Factory,
+        title: "Automation technology",
+        description: "High-speed sensors for modern automation processes",
+        applications: [
+          "Industrial imaging",
+          "Real-time quality control",
+          "Robot guidance and navigation",
+          "Object detection and tracking",
+          "Barcode and character reading"
+        ],
+        products: ["Machine Vision", "MVpulse", "Line lasers"],
+        image: "/hero-laser-tech.jpg"
+      },
+      {
+        icon: Microscope,
+        title: "Research & development",
+        description: "Flexible solutions for scientific applications and laboratory environments",
+        applications: [
+          "Spectroscopy and material analysis",
+          "Optical metrology",
+          "Laser Doppler anemometry",
+          "Holography",
+          "Quantum optics experiments"
+        ],
+        products: ["Point lasers", "OEM modules", "Powell lenses"],
+        image: "/technology-optical-sensors.jpg"
+      },
+      {
+        icon: Cpu,
+        title: "Microelectronics",
+        description: "Precision solutions for semiconductor manufacturing and electronics production",
+        applications: [
+          "Wafer inspection",
+          "Chip positioning",
+          "Solder joint control",
+          "PCB inspection",
+          "Bond wire inspection"
+        ],
+        products: ["Machine Vision", "Point lasers", "OEM modules"],
+        image: "/product-oem-module.jpg"
+      }
+    ]
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -90,13 +168,15 @@ export default function Industries() {
             <div className="flex items-center gap-2 text-sm mb-4 opacity-90">
               <span>Home</span>
               <ChevronRight className="h-4 w-4" />
-              <span>Branchen</span>
+              <span>{isEnglish ? "Industries" : "Branchen"}</span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Branchen & Anwendungen
+              {isEnglish ? "Industries & applications" : "Branchen & Anwendungen"}
             </h1>
             <p className="text-xl opacity-90">
-              Unsere optoelektronischen Lösungen finden Einsatz in den unterschiedlichsten Branchen und Anwendungsbereichen.
+              {isEnglish
+                ? "Our optoelectronic solutions power a wide range of industries and application areas."
+                : "Unsere optoelektronischen Lösungen finden Einsatz in den unterschiedlichsten Branchen und Anwendungsbereichen."}
             </p>
           </div>
         </div>
@@ -122,7 +202,9 @@ export default function Industries() {
 
                       {/* Applications */}
                       <div className="mb-8">
-                        <h3 className="text-xl font-semibold mb-4 text-foreground">Typische Anwendungen</h3>
+                        <h3 className="text-xl font-semibold mb-4 text-foreground">
+                          {isEnglish ? "Typical applications" : "Typische Anwendungen"}
+                        </h3>
                         <ul className="space-y-3">
                           {industry.applications.map((app, appIdx) => (
                             <li key={appIdx} className="flex items-start gap-3">
@@ -135,7 +217,9 @@ export default function Industries() {
 
                       {/* Relevant Products */}
                       <div className="mb-6">
-                        <h3 className="text-xl font-semibold mb-4 text-foreground">Passende Produkte</h3>
+                        <h3 className="text-xl font-semibold mb-4 text-foreground">
+                          {isEnglish ? "Recommended products" : "Passende Produkte"}
+                        </h3>
                         <div className="flex flex-wrap gap-2">
                           {industry.products.map((product, prodIdx) => (
                             <span
@@ -181,14 +265,16 @@ export default function Industries() {
       <section className="py-20 bg-accent">
         <div className="container text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-accent-foreground">
-            Ihre Branche ist nicht dabei?
+            {isEnglish ? "Is your industry missing?" : "Ihre Branche ist nicht dabei?"}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Wir entwickeln auch kundenspezifische Lösungen für spezielle Anwendungsfälle. Kontaktieren Sie uns für eine individuelle Beratung.
+            {isEnglish
+              ? "We also develop bespoke solutions for specialised use cases. Contact us for individual consulting."
+              : "Wir entwickeln auch kundenspezifische Lösungen für spezielle Anwendungsfälle. Kontaktieren Sie uns für eine individuelle Beratung."}
           </p>
           <Link href="/kontakt">
             <Button size="lg" className="bg-primary hover:bg-primary/90">
-              Jetzt Kontakt aufnehmen
+              {isEnglish ? "Get in touch" : "Jetzt Kontakt aufnehmen"}
             </Button>
           </Link>
         </div>

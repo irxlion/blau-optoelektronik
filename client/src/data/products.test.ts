@@ -1,55 +1,60 @@
-import { describe, it, expect } from 'vitest';
-import { products, getProductById, getProductsByCategory } from './products';
+import { describe, it, expect } from "vitest";
+import { getProducts, getProductById, getProductsByCategory } from "./products";
+import { Language } from "@/contexts/LanguageContext";
 
-describe('Product Data', () => {
-  it('should have all 6 products', () => {
+const language: Language = "de";
+
+const products = getProducts(language);
+
+describe("Product Data", () => {
+  it("should have all 6 products", () => {
     expect(products).toHaveLength(6);
   });
 
-  it('should have valid product structure', () => {
-    products.forEach(product => {
-      expect(product).toHaveProperty('id');
-      expect(product).toHaveProperty('name');
-      expect(product).toHaveProperty('category');
-      expect(product).toHaveProperty('description');
-      expect(product).toHaveProperty('features');
-      expect(product).toHaveProperty('specifications');
-      expect(product).toHaveProperty('applications');
+  it("should have valid product structure", () => {
+    products.forEach((product) => {
+      expect(product).toHaveProperty("id");
+      expect(product).toHaveProperty("name");
+      expect(product).toHaveProperty("category");
+      expect(product).toHaveProperty("description");
+      expect(product).toHaveProperty("features");
+      expect(product).toHaveProperty("specifications");
+      expect(product).toHaveProperty("applications");
       expect(product.features.length).toBeGreaterThan(0);
       expect(Object.keys(product.specifications).length).toBeGreaterThan(0);
     });
   });
 
-  it('should get product by id', () => {
-    const product = getProductById('machine-vision');
+  it("should get product by id", () => {
+    const product = getProductById("machine-vision", language);
     expect(product).toBeDefined();
-    expect(product?.name).toBe('Machine Vision Laser');
+    expect(product?.name).toBe("Machine Vision Laser");
   });
 
-  it('should return undefined for invalid id', () => {
-    const product = getProductById('invalid-id');
+  it("should return undefined for invalid id", () => {
+    const product = getProductById("invalid-id", language);
     expect(product).toBeUndefined();
   });
 
-  it('should get products by category', () => {
-    const machineVisionProducts = getProductsByCategory('Machine Vision');
+  it("should get products by category", () => {
+    const machineVisionProducts = getProductsByCategory("Machine Vision", language);
     expect(machineVisionProducts.length).toBeGreaterThan(0);
-    machineVisionProducts.forEach(product => {
-      expect(product.category).toBe('Machine Vision');
+    machineVisionProducts.forEach((product) => {
+      expect(product.category).toBe("Machine Vision");
     });
   });
 
-  it('should have MVpulse product', () => {
-    const mvpulse = getProductById('mvpulse');
+  it("should have MVpulse product", () => {
+    const mvpulse = getProductById("mvpulse", language);
     expect(mvpulse).toBeDefined();
-    expect(mvpulse?.name).toBe('MVpulse');
-    expect(mvpulse?.category).toBe('Machine Vision');
+    expect(mvpulse?.name).toBe("MVpulse");
+    expect(mvpulse?.category).toBe("Machine Vision");
   });
 
-  it('should have all required product IDs', () => {
-    const requiredIds = ['machine-vision', 'linienlaser', 'punktlaser', 'powelllinsen', 'oem-module', 'mvpulse'];
-    requiredIds.forEach(id => {
-      const product = getProductById(id);
+  it("should have all required product IDs", () => {
+    const requiredIds = ["machine-vision", "linienlaser", "punktlaser", "powelllinsen", "oem-module", "mvpulse"];
+    requiredIds.forEach((id) => {
+      const product = getProductById(id, language);
       expect(product).toBeDefined();
     });
   });

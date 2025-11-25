@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ProductCardProps {
   title: string;
@@ -11,6 +12,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ title, description, image, href }: ProductCardProps) {
+  const { language } = useLanguage();
+  const isEnglish = language === "en";
+
   return (
     <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-border/50">
       <div className="relative aspect-square overflow-hidden bg-muted">
@@ -31,7 +35,7 @@ export default function ProductCard({ title, description, image, href }: Product
         </p>
         <Link href={href}>
           <Button variant="ghost" className="group/btn p-0 h-auto font-medium text-primary hover:bg-transparent">
-            Mehr erfahren
+            {isEnglish ? "Learn more" : "Mehr erfahren"}
             <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
           </Button>
         </Link>
