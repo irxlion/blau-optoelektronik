@@ -1,0 +1,137 @@
+import { Link } from "wouter";
+import { Mail, Phone, MapPin } from "lucide-react";
+import { APP_LOGO } from "@/const";
+
+export default function Footer() {
+  const currentYear = new Date().getFullYear();
+
+  const productLinks = [
+    { name: "Machine Vision", href: "/produkte/machine-vision" },
+    { name: "Linienlaser", href: "/produkte/linienlaser" },
+    { name: "Punktlaser", href: "/produkte/punktlaser" },
+    { name: "Powelllinsen", href: "/produkte/powelllinsen" },
+    { name: "OEM Module", href: "/produkte/oem-module" },
+    { name: "MVpulse", href: "/produkte/mvpulse" },
+  ];
+
+  const companyLinks = [
+    { name: "Über uns", href: "/unternehmen" },
+    { name: "Technologie", href: "/technologie" },
+    { name: "Branchen", href: "/branchen" },
+    { name: "Karriere", href: "/karriere" },
+  ];
+
+  const resourceLinks = [
+    { name: "Downloads", href: "/ressourcen" },
+    { name: "FAQ", href: "/faq" },
+    { name: "Kontakt", href: "/kontakt" },
+  ];
+
+  return (
+    <footer className="bg-primary text-primary-foreground">
+      <div className="container py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+          {/* Company Info */}
+          <div className="lg:col-span-2">
+            <Link href="/" className="flex items-center gap-3 mb-4">
+              <img src={APP_LOGO} alt="BLAU Optoelektronik" className="h-10 w-auto brightness-0 invert" />
+              <div>
+                <div className="text-xl font-bold">BLAU</div>
+                <div className="text-sm opacity-80">Optoelektronik GmbH</div>
+              </div>
+            </Link>
+            <p className="text-sm opacity-90 mb-4 max-w-md">
+              Seit über 30 Jahren entwickeln und fertigen wir hochpräzise optoelektronische Komponenten und Systeme für anspruchsvolle Anwendungen in Industrie, Medizintechnik und Forschung.
+            </p>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span>Deutschland</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                <span>+49 (0) 7551 93748-0</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                <span>info@blauoptoelektronik.de</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Products */}
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Produkte</h3>
+            <ul className="space-y-2">
+              {productLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>
+                    <span className="text-sm opacity-90 hover:opacity-100 hover:underline transition-opacity cursor-pointer">
+                      {link.name}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Unternehmen</h3>
+            <ul className="space-y-2">
+              {companyLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>
+                    <span className="text-sm opacity-90 hover:opacity-100 hover:underline transition-opacity cursor-pointer">
+                      {link.name}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h3 className="font-semibold text-lg mb-4">Ressourcen</h3>
+            <ul className="space-y-2">
+              {resourceLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>
+                    <span className="text-sm opacity-90 hover:opacity-100 hover:underline transition-opacity cursor-pointer">
+                      {link.name}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-primary-foreground/20 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm opacity-80">
+            © {currentYear} BLAU Optoelektronik GmbH. Alle Rechte vorbehalten.
+          </p>
+          <div className="flex gap-6 text-sm">
+            <Link href="/datenschutz">
+              <span className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
+                Datenschutz
+              </span>
+            </Link>
+            <Link href="/impressum">
+              <span className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
+                Impressum
+              </span>
+            </Link>
+            <Link href="/agb">
+              <span className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
+                AGB
+              </span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
