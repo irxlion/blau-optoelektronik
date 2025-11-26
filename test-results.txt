@@ -1,0 +1,18 @@
+🧪 Testing Netlify Login Functionality
+
+==================================================
+
+📡 Test 1: Testing login endpoint with correct credentials...
+   Status Code: 404
+   ❌ Error: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+
+📡 Test 2: Testing with wrong credentials...
+   Status Code: 404
+   ❌ Error: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+
+📡 Test 3: Testing products endpoint...
+   Status Code: 200
+   ❌ Error: Unexpected token '<', "<!doctype "... is not valid JSON
+
+==================================================
+✨ Test completed!

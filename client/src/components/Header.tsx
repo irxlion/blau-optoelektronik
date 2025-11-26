@@ -23,49 +23,49 @@ export default function Header() {
 
   const productCategories = isEnglish
     ? [
-        { name: "Machine Vision", href: "/produkte/machine-vision", description: "Lasers for industrial imaging" },
-        { name: "Line Lasers", href: "/produkte/linienlaser", description: "Precision positioning" },
-        { name: "Point Lasers", href: "/produkte/punktlaser", description: "Round or elliptical beam profiles" },
-        { name: "Powell Lenses", href: "/produkte/powelllinsen", description: "Aspheric optics" },
-        { name: "OEM Modules", href: "/produkte/oem-module", description: "Custom solutions" },
-        { name: "MVpulse", href: "/produkte/mvpulse", description: "Eye safety & high performance" },
-      ]
+      { name: "Machine Vision", href: "/produkte/machine-vision", description: "Lasers for industrial imaging" },
+      { name: "Line Lasers", href: "/produkte/linienlaser", description: "Precision positioning" },
+      { name: "Point Lasers", href: "/produkte/punktlaser", description: "Round or elliptical beam profiles" },
+      { name: "Powell Lenses", href: "/produkte/powelllinsen", description: "Aspheric optics" },
+      { name: "OEM Modules", href: "/produkte/oem-module", description: "Custom solutions" },
+      { name: "MVpulse", href: "/produkte/mvpulse", description: "Eye safety & high performance" },
+    ]
     : [
-    { name: "Machine Vision", href: "/produkte/machine-vision", description: "Laser für industrielle Bildverarbeitung" },
-    { name: "Linienlaser", href: "/produkte/linienlaser", description: "Präzise Positionierung" },
-    { name: "Punktlaser", href: "/produkte/punktlaser", description: "Runde oder elliptische Strahlprofile" },
-    { name: "Powelllinsen", href: "/produkte/powelllinsen", description: "Asphärische Linsen" },
-    { name: "OEM Module", href: "/produkte/oem-module", description: "Kundenspezifische Lösungen" },
-    { name: "MVpulse", href: "/produkte/mvpulse", description: "Augensicherheit & Hohe Leistung" },
-  ];
+      { name: "Machine Vision", href: "/produkte/machine-vision", description: "Laser für industrielle Bildverarbeitung" },
+      { name: "Linienlaser", href: "/produkte/linienlaser", description: "Präzise Positionierung" },
+      { name: "Punktlaser", href: "/produkte/punktlaser", description: "Runde oder elliptische Strahlprofile" },
+      { name: "Powelllinsen", href: "/produkte/powelllinsen", description: "Asphärische Linsen" },
+      { name: "OEM Module", href: "/produkte/oem-module", description: "Kundenspezifische Lösungen" },
+      { name: "MVpulse", href: "/produkte/mvpulse", description: "Augensicherheit & Hohe Leistung" },
+    ];
 
   const navItems = isEnglish
     ? [
-        {
-          name: "Products",
-          href: "/produkte",
-          hasDropdown: true,
-          dropdownItems: productCategories,
-        },
-        { name: "Technology", href: "/technologie" },
-        { name: "Industries", href: "/branchen" },
-        { name: "Company", href: "/unternehmen" },
-        { name: "Resources", href: "/ressourcen" },
-        { name: "Contact", href: "/kontakt" },
-      ]
+      {
+        name: "Products",
+        href: "/produkte",
+        hasDropdown: true,
+        dropdownItems: productCategories,
+      },
+      { name: "Technology", href: "/technologie" },
+      { name: "Industries", href: "/branchen" },
+      { name: "Company", href: "/unternehmen" },
+      { name: "Resources", href: "/ressourcen" },
+      { name: "Contact", href: "/kontakt" },
+    ]
     : [
-    { 
-      name: "Produkte", 
-      href: "/produkte",
-      hasDropdown: true,
-          dropdownItems: productCategories,
-    },
-    { name: "Technologie", href: "/technologie" },
-    { name: "Branchen", href: "/branchen" },
-    { name: "Unternehmen", href: "/unternehmen" },
-    { name: "Ressourcen", href: "/ressourcen" },
-    { name: "Kontakt", href: "/kontakt" },
-  ];
+      {
+        name: "Produkte",
+        href: "/produkte",
+        hasDropdown: true,
+        dropdownItems: productCategories,
+      },
+      { name: "Technologie", href: "/technologie" },
+      { name: "Branchen", href: "/branchen" },
+      { name: "Unternehmen", href: "/unternehmen" },
+      { name: "Ressourcen", href: "/ressourcen" },
+      { name: "Kontakt", href: "/kontakt" },
+    ];
 
   const desktopCta = isEnglish ? "Contact us" : "Kontakt aufnehmen";
   const mobileNavLabel = isEnglish ? "Mobile navigation" : "Mobile Navigation";
@@ -86,11 +86,10 @@ export default function Header() {
   return (
     <header
       role="banner"
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
           ? "bg-background/95 backdrop-blur-md shadow-md"
           : "bg-transparent"
-      }`}
+        }`}
     >
       <div className="container">
         <div className="flex items-center justify-between h-20">
@@ -128,7 +127,7 @@ export default function Header() {
 
                 {/* Mega Menu Dropdown */}
                 {item.hasDropdown && activeDropdown === item.name && (
-                  <div 
+                  <div
                     role="menu"
                     aria-label={`${item.name} ${dropdownAriaLabel}`}
                     className="absolute top-full left-0 mt-2 w-96 bg-card border border-border rounded-lg shadow-xl p-4"
@@ -157,9 +156,8 @@ export default function Header() {
                   key={code}
                   type="button"
                   onClick={() => setLanguage(code)}
-                  className={`px-3 py-1 text-xs font-semibold transition-colors ${
-                    language === code ? "bg-secondary text-secondary-foreground" : "text-muted-foreground"
-                  }`}
+                  className={`px-3 py-1 text-xs font-semibold transition-colors ${language === code ? "bg-secondary text-secondary-foreground" : "text-muted-foreground"
+                    }`}
                   aria-pressed={language === code}
                 >
                   {label}
@@ -194,7 +192,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-border" role="navigation" aria-label={mobileNavLabel}>
+          <div className="lg:hidden py-4 bg-white border-t border-border" role="navigation" aria-label={mobileNavLabel}>
             <nav className="flex flex-col gap-2">
               <div className="flex items-center gap-2 mb-4">
                 {SUPPORTED_LANGUAGES.map(({ code, label, name }) => (

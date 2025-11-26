@@ -1,0 +1,55 @@
+functionsDirectory = "C:\\Users\\alial\\Downloads\\blau-optoelektronik-complete (2)\\blau-optoelektronik\\netlify\\functions"
+functionsDirectoryOrigin = "config-v1"
+redirectsOrigin = "config"
+plugins = []
+headers = []
+
+[build]
+publish = "C:\\Users\\alial\\Downloads\\blau-optoelektronik-complete (2)\\blau-optoelektronik\\dist\\public"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "pnpm vite build"
+functions = "C:\\Users\\alial\\Downloads\\blau-optoelektronik-complete (2)\\blau-optoelektronik\\netlify\\functions"
+
+[build.environment]
+NODE_VERSION = "20"
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[functions]
+
+[functions."*"]
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/:splat"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]

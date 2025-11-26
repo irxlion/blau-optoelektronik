@@ -10,47 +10,47 @@ export default function Footer() {
 
   const productLinks = isEnglish
     ? [
-        { name: "Machine Vision", href: "/produkte/machine-vision" },
-        { name: "Line Lasers", href: "/produkte/linienlaser" },
-        { name: "Point Lasers", href: "/produkte/punktlaser" },
-        { name: "Powell Lenses", href: "/produkte/powelllinsen" },
-        { name: "OEM Modules", href: "/produkte/oem-module" },
-        { name: "MVpulse", href: "/produkte/mvpulse" },
-      ]
+      { name: "Machine Vision", href: "/produkte/machine-vision" },
+      { name: "Line Lasers", href: "/produkte/linienlaser" },
+      { name: "Point Lasers", href: "/produkte/punktlaser" },
+      { name: "Powell Lenses", href: "/produkte/powelllinsen" },
+      { name: "OEM Modules", href: "/produkte/oem-module" },
+      { name: "MVpulse", href: "/produkte/mvpulse" },
+    ]
     : [
-    { name: "Machine Vision", href: "/produkte/machine-vision" },
-    { name: "Linienlaser", href: "/produkte/linienlaser" },
-    { name: "Punktlaser", href: "/produkte/punktlaser" },
-    { name: "Powelllinsen", href: "/produkte/powelllinsen" },
-    { name: "OEM Module", href: "/produkte/oem-module" },
-    { name: "MVpulse", href: "/produkte/mvpulse" },
-  ];
+      { name: "Machine Vision", href: "/produkte/machine-vision" },
+      { name: "Linienlaser", href: "/produkte/linienlaser" },
+      { name: "Punktlaser", href: "/produkte/punktlaser" },
+      { name: "Powelllinsen", href: "/produkte/powelllinsen" },
+      { name: "OEM Module", href: "/produkte/oem-module" },
+      { name: "MVpulse", href: "/produkte/mvpulse" },
+    ];
 
   const companyLinks = isEnglish
     ? [
-        { name: "About us", href: "/unternehmen" },
-        { name: "Technology", href: "/technologie" },
-        { name: "Industries", href: "/branchen" },
-        { name: "Careers", href: "/karriere" },
-      ]
+      { name: "About us", href: "/unternehmen" },
+      { name: "Technology", href: "/technologie" },
+      { name: "Industries", href: "/branchen" },
+      { name: "Careers", href: "/karriere" },
+    ]
     : [
-    { name: "Über uns", href: "/unternehmen" },
-    { name: "Technologie", href: "/technologie" },
-    { name: "Branchen", href: "/branchen" },
-    { name: "Karriere", href: "/karriere" },
-  ];
+      { name: "Über uns", href: "/unternehmen" },
+      { name: "Technologie", href: "/technologie" },
+      { name: "Branchen", href: "/branchen" },
+      { name: "Karriere", href: "/karriere" },
+    ];
 
   const resourceLinks = isEnglish
     ? [
-        { name: "Downloads", href: "/ressourcen" },
-        { name: "FAQ", href: "/faq" },
-        { name: "Contact", href: "/kontakt" },
-      ]
+      { name: "Downloads", href: "/ressourcen" },
+      { name: "FAQ", href: "/faq" },
+      { name: "Contact", href: "/kontakt" },
+    ]
     : [
-    { name: "Downloads", href: "/ressourcen" },
-    { name: "FAQ", href: "/faq" },
-    { name: "Kontakt", href: "/kontakt" },
-  ];
+      { name: "Downloads", href: "/ressourcen" },
+      { name: "FAQ", href: "/faq" },
+      { name: "Kontakt", href: "/kontakt" },
+    ];
 
   return (
     <footer className="bg-primary text-primary-foreground">
