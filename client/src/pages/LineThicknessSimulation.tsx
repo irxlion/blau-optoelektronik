@@ -5,13 +5,6 @@ import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 
-// Declare Google Charts types
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 export default function LineThicknessSimulation() {
   const { language } = useLanguage();
   const isEnglish = language === "en";

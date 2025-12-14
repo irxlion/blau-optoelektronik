@@ -13,8 +13,6 @@ functions = "C:\\Users\\alial\\Downloads\\blau-optoelektronik-complete (2)\\blau
 
 [build.environment]
 NODE_VERSION = "20"
-SUPABASE_URL = "https://xtuwjizliuthdgytloju.supabase.co"
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0dXdqaXpsaXV0aGRneXRsb2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2MTIwMjAsImV4cCI6MjA4MDE4ODAyMH0.U5iQhb_rDZedHFfAMl2tA85jn_kvAp2G6m35CyS0do4"
 
 [build.processing]
 

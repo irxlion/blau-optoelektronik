@@ -11,11 +11,13 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { ContactDialog } from "@/components/ContactDialog";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [location] = useLocation();
   const { language, setLanguage } = useLanguage();
   const isEnglish = language === "en";
@@ -237,11 +239,12 @@ export default function Header() {
                 </button>
               ))}
             </div>
-            <Link href="/kontakt">
-              <Button className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
-                {desktopCta}
-              </Button>
-            </Link>
+            <Button 
+              onClick={() => setIsContactDialogOpen(true)}
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+            >
+              {desktopCta}
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -367,19 +370,23 @@ export default function Header() {
                 )}
                 style={{ transitionDelay: "300ms" }}
               >
-                <Link href="/kontakt">
-                  <Button
-                    className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-transform hover:scale-[1.02]"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {desktopCta}
-                  </Button>
-                </Link>
+                <Button
+                  className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-transform hover:scale-[1.02]"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setIsContactDialogOpen(true);
+                  }}
+                >
+                  {desktopCta}
+                </Button>
               </div>
             </div>
           </SheetContent>
         </Sheet>
       </div>
+
+      {/* Contact Dialog */}
+      <ContactDialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen} />
     </header>
   );
 }
