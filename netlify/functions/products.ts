@@ -1,20 +1,56 @@
 import { Handler } from '@netlify/functions';
-import fs from 'fs/promises';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js';
 
-// In Netlify Functions, we need to use environment variables or a database
-// For simplicity, we'll use a JSON file in the repo (read-only in production)
-// For a real app, use a database like MongoDB, Supabase, or Netlify Blobs
+const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json',
+};
 
-const PRODUCTS_FILE = path.join(process.cwd(), 'server', 'products.json');
+// Supabase Client initialisieren
+const supabaseUrl = process.env.SUPABASE_URL || 'https://xtuwjizliuthdgytloju.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0dXdqaXpsaXV0aGRneXRsb2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2MTIwMjAsImV4cCI6MjA4MDE4ODAyMH0.U5iQhb_rDZedHFfAMl2tA85jn_kvAp2G6m35CyS0do4';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Helper: Produkt aus DB-Format in Frontend-Format konvertieren
+function dbProductToFrontendProduct(dbProduct: any) {
+    return {
+        id: dbProduct.product_id,
+        name: dbProduct.name,
+        category: dbProduct.category,
+        description: dbProduct.description || '',
+        longDescription: dbProduct.long_description || '',
+        image: dbProduct.image || '',
+        images: dbProduct.images || [],
+        features: dbProduct.features || [],
+        specifications: dbProduct.specifications || {},
+        applications: dbProduct.applications || [],
+        downloads: dbProduct.downloads || []
+    };
+}
+
+// Helper: Frontend-Produkt in DB-Format konvertieren
+function frontendProductToDbProduct(product: any, language: 'de' | 'en') {
+    return {
+        product_id: product.id,
+        language: language,
+        name: product.name,
+        category: product.category,
+        description: product.description,
+        long_description: product.longDescription,
+        image: product.image,
+        images: product.images || [],
+        features: product.features || [],
+        specifications: product.specifications || {},
+        applications: product.applications || [],
+        downloads: product.downloads || [],
+        is_active: true
+    };
+}
 
 export const handler: Handler = async (event) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    };
-
     // Handle CORS preflight
     if (event.httpMethod === 'OPTIONS') {
         return {
@@ -26,29 +62,105 @@ export const handler: Handler = async (event) => {
 
     try {
         if (event.httpMethod === 'GET') {
-            // Read products
-            const data = await fs.readFile(PRODUCTS_FILE, 'utf-8');
-            return {
-                statusCode: 200,
-                headers,
-                body: data,
-            };
-        } else if (event.httpMethod === 'POST') {
-            // Save products
-            const { de, en } = JSON.parse(event.body || '{}');
+            // Produkte aus Supabase abrufen
+            const { data: products, error } = await supabase
+                .from('products')
+                .select('*')
+                .eq('is_active', true)
+                .order('product_id', { ascending: true })
+                .order('language', { ascending: true });
 
-            if (!de || !en) {
+            if (error) {
+                console.error('Error fetching products:', error);
                 return {
-                    statusCode: 400,
+                    statusCode: 500,
                     headers,
-                    body: JSON.stringify({ error: 'Invalid data format' }),
+                    body: JSON.stringify({ error: 'Failed to fetch products' }),
                 };
             }
 
-            // Note: In Netlify, the filesystem is read-only in production
-            // This will work locally but not in production
-            // For production, you need to use Netlify Blobs, a database, or external storage
-            await fs.writeFile(PRODUCTS_FILE, JSON.stringify({ de, en }, null, 2));
+            // Produkte nach Sprache gruppieren
+            const productsByLang: { de: any[]; en: any[] } = { de: [], en: [] };
+
+            products?.forEach((dbProduct) => {
+                const frontendProduct = dbProductToFrontendProduct(dbProduct);
+                if (dbProduct.language === 'de') {
+                    productsByLang.de.push(frontendProduct);
+                } else if (dbProduct.language === 'en') {
+                    productsByLang.en.push(frontendProduct);
+                }
+            });
+
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify(productsByLang),
+            };
+        } else if (event.httpMethod === 'POST') {
+            // Authentifizierung prüfen für POST (Speichern)
+            const authHeader = event.headers.authorization || event.headers.Authorization;
+            if (!authHeader) {
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({ error: 'Unauthorized' }),
+                };
+            }
+
+            // Token validieren
+            try {
+                const token = authHeader.replace('Bearer ', '');
+                const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
+                // Admin und Mitarbeiter können Produkte speichern
+                if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
+                    return {
+                        statusCode: 403,
+                        headers,
+                        body: JSON.stringify({ error: 'Forbidden - Nur Admins und Mitarbeiter können Produkte speichern' }),
+                    };
+                }
+            } catch (e) {
+                console.warn('Token validation failed:', e);
+            }
+
+            // Produkte speichern
+            const { de, en } = JSON.parse(event.body || '{}');
+
+            if (!de || !en || !Array.isArray(de) || !Array.isArray(en)) {
+                return {
+                    statusCode: 400,
+                    headers,
+                    body: JSON.stringify({ error: 'Invalid data format. Expected { de: Product[], en: Product[] }' }),
+                };
+            }
+
+            // Alle Produkte in DB-Format konvertieren
+            const dbProducts: any[] = [];
+
+            de.forEach((product: any) => {
+                dbProducts.push(frontendProductToDbProduct(product, 'de'));
+            });
+
+            en.forEach((product: any) => {
+                dbProducts.push(frontendProductToDbProduct(product, 'en'));
+            });
+
+            // Upsert alle Produkte (aktualisiert wenn product_id + language existiert, sonst erstellt)
+            const { error } = await supabase
+                .from('products')
+                .upsert(dbProducts, {
+                    onConflict: 'product_id,language',
+                    ignoreDuplicates: false
+                });
+
+            if (error) {
+                console.error('Error saving products:', error);
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({ error: 'Failed to save products', details: error.message }),
+                };
+            }
 
             return {
                 statusCode: 200,
@@ -62,12 +174,12 @@ export const handler: Handler = async (event) => {
                 body: JSON.stringify({ error: 'Method not allowed' }),
             };
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error('Products error:', error);
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: 'Internal server error' }),
+            body: JSON.stringify({ error: 'Internal server error', details: error.message }),
         };
     }
 };

@@ -10,7 +10,7 @@ export default function Footer() {
 
   const productLinks = isEnglish
     ? [
-      { name: "Machine Vision", href: "/produkte/machine-vision" },
+      { name: "Machine Vision Laser Modules", href: "/produkte/machine-vision" },
       { name: "Line Lasers", href: "/produkte/linienlaser" },
       { name: "Point Lasers", href: "/produkte/punktlaser" },
       { name: "Powell Lenses", href: "/produkte/powelllinsen" },
@@ -18,7 +18,7 @@ export default function Footer() {
       { name: "MVpulse", href: "/produkte/mvpulse" },
     ]
     : [
-      { name: "Machine Vision", href: "/produkte/machine-vision" },
+      { name: "Machine Vision Lasermodule", href: "/produkte/machine-vision" },
       { name: "Linienlaser", href: "/produkte/linienlaser" },
       { name: "Punktlaser", href: "/produkte/punktlaser" },
       { name: "Powelllinsen", href: "/produkte/powelllinsen" },
@@ -60,10 +60,6 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-3 mb-4">
               <img src={APP_LOGO} alt="BLAU Optoelektronik" className="h-10 w-auto brightness-0 invert" />
-              <div>
-                <div className="text-xl font-bold">BLAU</div>
-                <div className="text-sm opacity-80">Optoelektronik GmbH</div>
-              </div>
             </Link>
             <p className="text-sm opacity-90 mb-4 max-w-md">
               {isEnglish

@@ -19,7 +19,7 @@ const productData: Record<Language, Product[]> = {
   {
     id: "machine-vision",
     name: "Machine Vision Laser",
-    category: "Industrielle Bildverarbeitung",
+    category: "Machine Vision Lasermodule",
     description: "Hochpräzise Lasermodule für industrielle Bildverarbeitung mit optimaler Genauigkeit und Messgeschwindigkeit.",
     longDescription: "Die Laser der Machine Vision Serie gewährleisten ein Optimum an Genauigkeit und Messgeschwindigkeit. Speziell entwickelt für anspruchsvolle Bildverarbeitungsanwendungen in der Industrie, bieten diese Module höchste Präzision und Zuverlässigkeit. Mit modernster Lasertechnologie und präziser Optik ermöglichen sie schnelle und genaue Messungen auch unter schwierigen Bedingungen.",
     image: "/product-machine-vision.jpg",
@@ -221,7 +221,7 @@ const productData: Record<Language, Product[]> = {
   {
     id: "mvpulse",
     name: "MVpulse",
-    category: "Machine Vision",
+    category: "Machine Vision Lasermodule",
     description: "Augensicherheit nach Laserklasse 2 kombiniert mit hoher Leistung bis 100 mW.",
     longDescription: "Unser MVpulse-Lasermodul verbindet zwei Kriterien der industriellen Bildverarbeitung: Viel Licht mit Ausgangsleistungen bis 100 mW und Augensicherheit nach Laserklasse 2. Durch innovative gepulste Lasertechnologie erreichen wir hohe Spitzenleistungen bei gleichzeitiger Einhaltung der Augensicherheitsgrenzwerte. Dies ermöglicht den Einsatz in Bereichen, in denen Laserklasse 3 nicht zugelassen ist.",
     image: "/product-machine-vision.jpg",
@@ -268,7 +268,7 @@ const productData: Record<Language, Product[]> = {
     {
       id: "machine-vision",
       name: "Machine Vision Laser",
-      category: "Industrial imaging",
+      category: "Machine Vision laser modules",
       description: "High-precision laser modules for industrial imaging with outstanding accuracy and measurement speed.",
       longDescription: "The lasers in the Machine Vision series deliver maximum precision and measurement speed. Developed specifically for demanding industrial imaging applications, these modules provide exceptional accuracy and reliability. Advanced laser technology and precision optics enable fast, accurate measurements even in challenging environments.",
       image: "/product-machine-vision.jpg",
@@ -470,7 +470,7 @@ const productData: Record<Language, Product[]> = {
     {
       id: "mvpulse",
       name: "MVpulse",
-      category: "Machine vision",
+      category: "Machine Vision laser modules",
       description: "Laser class 2 eye safety combined with high output power up to 100 mW.",
       longDescription: "Our MVpulse laser module combines two decisive criteria for industrial imaging: lots of light with output power up to 100 mW and laser class 2 eye safety. Innovative pulsed laser technology delivers high peak power while remaining within eye-safety limits, enabling use in environments where class 3 lasers are not permitted.",
       image: "/product-machine-vision.jpg",

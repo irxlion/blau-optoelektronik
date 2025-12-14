@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { login } from "@/lib/api";
+import { customerLogin } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export default function Login() {
+export default function CustomerLogin() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -17,11 +17,11 @@ export default function Login() {
         e.preventDefault();
         setLoading(true);
         try {
-            const result = await login(username, password);
+            const result = await customerLogin(username, password);
             if (result.success) {
-                localStorage.setItem("authToken", result.token!);
+                localStorage.setItem("customerToken", result.token!);
                 toast.success("Login successful");
-                setLocation("/dashboard");
+                setLocation("/tools");
             } else {
                 toast.error(result.error || "Login failed");
             }
@@ -36,7 +36,7 @@ export default function Login() {
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <Card className="w-full max-w-md">
                 <CardHeader>
-                    <CardTitle className="text-2xl text-center">Blau Optoelektronik Login</CardTitle>
+                    <CardTitle className="text-2xl text-center">Blau Optoelektronik Tools Login</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,3 +69,4 @@ export default function Login() {
         </div>
     );
 }
+

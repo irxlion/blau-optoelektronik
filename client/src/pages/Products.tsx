@@ -8,17 +8,31 @@ import { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+function getProductHref(product: Product) {
+  // /produkte/machine-vision ist jetzt die Kategorie-Seite
+  if (product.id === "machine-vision") return "/produkte/machine-vision-laser";
+  return `/produkte/${product.id}`;
+}
+
 export default function Products() {
   const { language } = useLanguage();
   const isEnglish = language === "en";
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [productsData, setProductsData] = useState<{ de: Product[]; en: Product[] } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts()
-      .then(setProductsData)
-      .catch(console.error)
+      .then((data) => {
+        setProductsData(data);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error("Fehler beim Laden der Produkte:", err);
+        setError(err.message || "Fehler beim Laden der Produkte");
+        setProductsData({ de: [], en: [] });
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -93,6 +107,20 @@ export default function Products() {
       {/* Products Grid */}
       <section className="py-16">
         <div className="container">
+          {error && (
+            <div className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive font-semibold mb-2">
+                {isEnglish ? "Error loading products" : "Fehler beim Laden der Produkte"}
+              </p>
+              <p className="text-sm text-muted-foreground">{error}</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {isEnglish 
+                  ? "Please check the browser console for more details or contact support." 
+                  : "Bitte überprüfen Sie die Browser-Konsole für weitere Details oder kontaktieren Sie den Support."}
+              </p>
+            </div>
+          )}
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.map((product) => (
               <ProductCard
@@ -100,15 +128,20 @@ export default function Products() {
                 title={product.name}
                 description={product.description}
                 image={product.image}
-                href={`/produkte/${product.id}`}
+                href={getProductHref(product)}
               />
             ))}
           </div>
 
-          {filteredProducts.length === 0 && (
+          {!error && filteredProducts.length === 0 && (
             <div className="text-center py-16">
               <p className="text-xl text-muted-foreground">
-                {isEnglish ? "No products found in this category." : "Keine Produkte in dieser Kategorie gefunden."}
+                {isEnglish ? "No products found." : "Keine Produkte gefunden."}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                {isEnglish 
+                  ? "Please check if products have been migrated to the database." 
+                  : "Bitte überprüfen Sie, ob Produkte in die Datenbank migriert wurden."}
               </p>
             </div>
           )}

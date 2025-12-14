@@ -45,20 +45,20 @@ export const handler: Handler = async (event) => {
             };
         }
 
-        console.log('Login attempt:', { username });
+        console.log('Customer login attempt:', { username });
 
-        // Admin aus Supabase abrufen - verwende maybeSingle() statt single() für besseres Error-Handling
-        const { data: admin, error } = await supabase
-            .from('admins')
+        // Customer aus Supabase abrufen
+        const { data: customer, error } = await supabase
+            .from('customers')
             .select('*')
             .eq('username', username)
             .eq('is_active', true)
             .maybeSingle();
 
-        console.log('Admin query result:', { admin: admin ? { username: admin.username, hasPasswordHash: !!admin.password_hash } : null, error });
+        console.log('Customer query result:', { customer: customer ? { username: customer.username, hasPasswordHash: !!customer.password_hash } : null, error });
 
         if (error) {
-            console.error('Admin lookup error:', error);
+            console.error('Customer lookup error:', error);
             return {
                 statusCode: 500,
                 headers,
@@ -66,8 +66,8 @@ export const handler: Handler = async (event) => {
             };
         }
 
-        if (!admin) {
-            console.error('Admin not found:', username);
+        if (!customer) {
+            console.error('Customer not found:', username);
             return {
                 statusCode: 401,
                 headers,
@@ -77,7 +77,7 @@ export const handler: Handler = async (event) => {
 
         // Passwort verifizieren
         console.log('Comparing password...');
-        const isValidPassword = await bcrypt.compare(password, admin.password_hash);
+        const isValidPassword = await bcrypt.compare(password, customer.password_hash);
         console.log('Password valid:', isValidPassword);
 
         if (!isValidPassword) {
@@ -90,17 +90,15 @@ export const handler: Handler = async (event) => {
 
         // Last login aktualisieren
         await supabase
-            .from('admins')
+            .from('customers')
             .update({ last_login: new Date().toISOString() })
-            .eq('id', admin.id);
+            .eq('id', customer.id);
 
-        // JWT Token generieren (vereinfacht - in Produktion sollte ein echter JWT verwendet werden)
-        // Rolle aus Datenbank verwenden (admin oder mitarbeiter)
-        const adminRole = admin.role || 'mitarbeiter';
+        // Customer Token generieren (mit role: 'customer')
         const token = Buffer.from(JSON.stringify({ 
-            id: admin.id, 
-            username: admin.username,
-            role: adminRole, // Rolle aus Datenbank
+            id: customer.id, 
+            username: customer.username,
+            role: 'customer',
             exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 Stunden
         })).toString('base64');
 
@@ -111,14 +109,15 @@ export const handler: Handler = async (event) => {
                 success: true,
                 token: token,
                 user: {
-                    id: admin.id,
-                    username: admin.username,
-                    email: admin.email
+                    id: customer.id,
+                    username: customer.username,
+                    email: customer.email,
+                    company_name: customer.company_name
                 }
             }),
         };
-    } catch (error) {
-        console.error('Login error:', error);
+    } catch (error: any) {
+        console.error('Customer login error:', error);
         return {
             statusCode: 500,
             headers,
@@ -126,3 +125,4 @@ export const handler: Handler = async (event) => {
         };
     }
 };
+

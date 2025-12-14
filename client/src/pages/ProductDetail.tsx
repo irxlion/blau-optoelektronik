@@ -13,7 +13,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ProductDetail() {
   const params = useParams();
-  const productId = params.id;
+  const requestedId = params.id;
+  const productId = requestedId === "machine-vision-laser" ? "machine-vision" : requestedId;
   const { language } = useLanguage();
   const isEnglish = language === "en";
   const [product, setProduct] = useState<Product | undefined>(undefined);

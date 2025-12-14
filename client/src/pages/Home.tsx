@@ -17,7 +17,7 @@ export default function Home() {
   const products = t({
     de: [
       {
-        title: "Machine Vision",
+        title: "Machine Vision Lasermodule",
         description: "Hochpräzise Lasermodule für industrielle Bildverarbeitung mit optimaler Genauigkeit und Messgeschwindigkeit.",
         image: "/product-machine-vision.jpg",
         href: "/produkte/machine-vision",
@@ -49,7 +49,7 @@ export default function Home() {
     ],
     en: [
       {
-        title: "Machine Vision",
+        title: "Machine Vision Laser Modules",
         description: "High-precision laser modules for industrial imaging with outstanding accuracy and measurement speed.",
         image: "/product-machine-vision.jpg",
         href: "/produkte/machine-vision",

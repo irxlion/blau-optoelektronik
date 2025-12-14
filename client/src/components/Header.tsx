@@ -1,9 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { APP_LOGO } from "@/const";
 import { Button } from "@/components/ui/button";
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/contexts/LanguageContext";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -12,6 +19,8 @@ export default function Header() {
   const [location] = useLocation();
   const { language, setLanguage } = useLanguage();
   const isEnglish = language === "en";
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [menuItemsVisible, setMenuItemsVisible] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,9 +30,30 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Animation für Menü-Items beim Öffnen
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      // Kurze Verzögerung für bessere Animation
+      const timer = setTimeout(() => {
+        setMenuItemsVisible(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setMenuItemsVisible(false);
+    }
+  }, [isMobileMenuOpen]);
+
   const productCategories = isEnglish
     ? [
-      { name: "Machine Vision", href: "/produkte/machine-vision", description: "Lasers for industrial imaging" },
+      { name: "Machine Vision Laser Modules", href: "/produkte/machine-vision", description: "Lasers for industrial imaging" },
       { name: "Line Lasers", href: "/produkte/linienlaser", description: "Precision positioning" },
       { name: "Point Lasers", href: "/produkte/punktlaser", description: "Round or elliptical beam profiles" },
       { name: "Powell Lenses", href: "/produkte/powelllinsen", description: "Aspheric optics" },
@@ -31,12 +61,22 @@ export default function Header() {
       { name: "MVpulse", href: "/produkte/mvpulse", description: "Eye safety & high performance" },
     ]
     : [
-      { name: "Machine Vision", href: "/produkte/machine-vision", description: "Laser für industrielle Bildverarbeitung" },
+      { name: "Machine Vision Lasermodule", href: "/produkte/machine-vision", description: "Laser für industrielle Bildverarbeitung" },
       { name: "Linienlaser", href: "/produkte/linienlaser", description: "Präzise Positionierung" },
       { name: "Punktlaser", href: "/produkte/punktlaser", description: "Runde oder elliptische Strahlprofile" },
       { name: "Powelllinsen", href: "/produkte/powelllinsen", description: "Asphärische Linsen" },
       { name: "OEM Module", href: "/produkte/oem-module", description: "Kundenspezifische Lösungen" },
       { name: "MVpulse", href: "/produkte/mvpulse", description: "Augensicherheit & Hohe Leistung" },
+    ];
+
+  const toolsCategories = isEnglish
+    ? [
+      { name: "Maximum Power Simulation", href: "/tools/maximum-power-simulation", description: "Calculate maximum laser power" },
+      { name: "Line Thickness Simulation", href: "/tools/line-thickness-simulation", description: "Calculate line thickness at focus distance" },
+    ]
+    : [
+      { name: "Maximale Leistung Simulation", href: "/tools/maximale-leistung-simulation", description: "Maximale Laserleistung berechnen" },
+      { name: "Liniendicken Simulation", href: "/tools/liniendickensimulation", description: "Liniendicke bei Fokusdistanz berechnen" },
     ];
 
   const navItems = isEnglish
@@ -51,6 +91,12 @@ export default function Header() {
       { name: "Industries", href: "/branchen" },
       { name: "Company", href: "/unternehmen" },
       { name: "Resources", href: "/ressourcen" },
+      {
+        name: "Tools",
+        href: "/tools",
+        hasDropdown: true,
+        dropdownItems: toolsCategories,
+      },
       { name: "Contact", href: "/kontakt" },
     ]
     : [
@@ -64,6 +110,12 @@ export default function Header() {
       { name: "Branchen", href: "/branchen" },
       { name: "Unternehmen", href: "/unternehmen" },
       { name: "Ressourcen", href: "/ressourcen" },
+      {
+        name: "Tools",
+        href: "/tools",
+        hasDropdown: true,
+        dropdownItems: toolsCategories,
+      },
       { name: "Kontakt", href: "/kontakt" },
     ];
 
@@ -110,8 +162,22 @@ export default function Header() {
               <div
                 key={item.name}
                 className="relative"
-                onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.name)}
-                onMouseLeave={() => setActiveDropdown(null)}
+                onMouseEnter={() => {
+                  if (item.hasDropdown) {
+                    if (dropdownTimeoutRef.current) {
+                      clearTimeout(dropdownTimeoutRef.current);
+                      dropdownTimeoutRef.current = null;
+                    }
+                    setActiveDropdown(item.name);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (item.hasDropdown) {
+                    dropdownTimeoutRef.current = setTimeout(() => {
+                      setActiveDropdown(null);
+                    }, 150);
+                  }
+                }}
               >
                 <Link href={item.href}>
                   <Button
@@ -125,13 +191,19 @@ export default function Header() {
                   </Button>
                 </Link>
 
+                {/* Invisible bridge to prevent gap */}
+                {item.hasDropdown && activeDropdown === item.name && (
+                  <div className="absolute top-full left-0 w-full h-2" />
+                )}
+
                 {/* Mega Menu Dropdown */}
                 {item.hasDropdown && activeDropdown === item.name && (
                   <div
                     role="menu"
                     aria-label={`${item.name} ${dropdownAriaLabel}`}
-                    className="absolute top-full left-0 mt-2 w-96 bg-card border border-border rounded-lg shadow-xl p-4"
+                    className="absolute top-full left-0 pt-2 w-96 bg-transparent"
                   >
+                    <div className="bg-card border border-border rounded-lg shadow-xl p-4">
                     <div className="grid gap-2">
                       {item.dropdownItems?.map((dropdownItem) => (
                         <Link key={dropdownItem.href} href={dropdownItem.href}>
@@ -141,6 +213,7 @@ export default function Header() {
                           </div>
                         </Link>
                       ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -190,70 +263,122 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden py-4 bg-white border-t border-border" role="navigation" aria-label={mobileNavLabel}>
-            <nav className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 mb-4">
-                {SUPPORTED_LANGUAGES.map(({ code, label, name }) => (
-                  <Button
-                    key={code}
-                    variant={language === code ? "default" : "outline"}
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => setLanguage(code)}
-                    aria-pressed={language === code}
-                    title={name}
+        {/* Mobile Menu - Using Sheet Component */}
+        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <SheetContent side="right" className="w-full sm:max-w-sm p-0">
+            <SheetHeader className="px-6 pt-6 pb-4 border-b">
+              <SheetTitle className="text-left">
+                {isEnglish ? "Menu" : "Menü"}
+              </SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col h-[calc(100vh-80px)] overflow-hidden">
+              {/* Scrollable Content */}
+              <nav 
+                className="flex-1 overflow-y-auto px-6 py-4" 
+                role="navigation" 
+                aria-label={mobileNavLabel}
+              >
+                <div className="flex flex-col gap-2">
+                  {/* Language Switcher */}
+                  <div 
+                    className={cn(
+                      "flex items-center gap-2 mb-4 pb-4 border-b transition-all duration-300",
+                      menuItemsVisible 
+                        ? "opacity-100 translate-x-0" 
+                        : "opacity-0 -translate-x-4"
+                    )}
+                    style={{ transitionDelay: "50ms" }}
                   >
-                    {label}
-                  </Button>
-                ))}
-              </div>
-              {navItems.map((item) => (
-                <div key={item.name}>
-                  <Link href={item.href}>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-left focus:outline-none focus:ring-2 focus:ring-primary"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          setIsMobileMenuOpen(false);
-                        }
-                      }}
+                    {SUPPORTED_LANGUAGES.map(({ code, label, name }) => (
+                      <Button
+                        key={code}
+                        variant={language === code ? "default" : "outline"}
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => setLanguage(code)}
+                        aria-pressed={language === code}
+                        title={name}
+                      >
+                        {label}
+                      </Button>
+                    ))}
+                  </div>
+                  
+                  {/* Navigation Items */}
+                  {navItems.map((item, index) => (
+                    <div 
+                      key={item.name} 
+                      className={cn(
+                        "mb-2 transition-all duration-300",
+                        menuItemsVisible 
+                          ? "opacity-100 translate-x-0" 
+                          : "opacity-0 -translate-x-4"
+                      )}
+                      style={{ transitionDelay: `${100 + index * 50}ms` }}
                     >
-                      {item.name}
-                    </Button>
-                  </Link>
-                  {item.hasDropdown && (
-                    <div className="ml-4 mt-1 flex flex-col gap-1">
-                      {item.dropdownItems?.map((dropdownItem) => (
-                        <Link key={dropdownItem.href} href={dropdownItem.href}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="w-full justify-start text-left text-sm"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            {dropdownItem.name}
-                          </Button>
-                        </Link>
-                      ))}
+                      <Link href={item.href}>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-left font-medium transition-colors"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              setIsMobileMenuOpen(false);
+                            }
+                          }}
+                        >
+                          {item.name}
+                        </Button>
+                      </Link>
+                      {item.hasDropdown && (
+                        <div className="ml-4 mt-1 flex flex-col gap-1">
+                          {item.dropdownItems?.map((dropdownItem, subIndex) => (
+                            <Link key={dropdownItem.href} href={dropdownItem.href}>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={cn(
+                                  "w-full justify-start text-left text-sm text-muted-foreground hover:text-foreground transition-all duration-300",
+                                  menuItemsVisible 
+                                    ? "opacity-100 translate-x-0" 
+                                    : "opacity-0 -translate-x-4"
+                                )}
+                                style={{ transitionDelay: `${150 + index * 50 + subIndex * 30}ms` }}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              >
+                                {dropdownItem.name}
+                              </Button>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-              <Link href="/kontakt">
-                <Button
-                  className="w-full mt-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {desktopCta}
-                </Button>
-              </Link>
-            </nav>
-          </div>
-        )}
+              </nav>
+              
+              {/* Fixed Footer */}
+              <div 
+                className={cn(
+                  "px-6 py-4 border-t bg-background transition-all duration-300",
+                  menuItemsVisible 
+                    ? "opacity-100 translate-y-0" 
+                    : "opacity-0 translate-y-4"
+                )}
+                style={{ transitionDelay: "300ms" }}
+              >
+                <Link href="/kontakt">
+                  <Button
+                    className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-transform hover:scale-[1.02]"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {desktopCta}
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </header>
   );

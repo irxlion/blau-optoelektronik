@@ -37,10 +37,10 @@ describe("Product Data", () => {
   });
 
   it("should get products by category", () => {
-    const machineVisionProducts = getProductsByCategory("Machine Vision", language);
+    const machineVisionProducts = getProductsByCategory("Machine Vision Lasermodule", language);
     expect(machineVisionProducts.length).toBeGreaterThan(0);
     machineVisionProducts.forEach((product) => {
-      expect(product.category).toBe("Machine Vision");
+      expect(product.category).toBe("Machine Vision Lasermodule");
     });
   });
 
@@ -48,7 +48,7 @@ describe("Product Data", () => {
     const mvpulse = getProductById("mvpulse", language);
     expect(mvpulse).toBeDefined();
     expect(mvpulse?.name).toBe("MVpulse");
-    expect(mvpulse?.category).toBe("Machine Vision");
+    expect(mvpulse?.category).toBe("Machine Vision Lasermodule");
   });
 
   it("should have all required product IDs", () => {

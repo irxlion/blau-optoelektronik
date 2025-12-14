@@ -7,8 +7,10 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollProgress from "./components/ScrollProgress";
+import PrivacyBanner from "./components/PrivacyBanner";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
+import MachineVisionLaserModules from "./pages/MachineVisionLaserModules";
 import ProductDetail from "./pages/ProductDetail";
 import Contact from "./pages/Contact";
 import Company from "./pages/Company";
@@ -22,14 +24,21 @@ import AGB from "./pages/AGB";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import CustomerLogin from "./pages/CustomerLogin";
+import Tools from "./pages/Tools";
+import MaxPowerSimulation from "./pages/MaxPowerSimulation";
+import LineThicknessSimulation from "./pages/LineThicknessSimulation";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path="/login" component={Login} />
+      <Route path="/customer-login" component={CustomerLogin} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/tools" component={Tools} />
       <Route path="/produkte" component={Products} />
+      <Route path="/produkte/machine-vision" component={MachineVisionLaserModules} />
       <Route path="/produkte/:id" component={ProductDetail} />
       <Route path="/kontakt" component={Contact} />
       <Route path="/unternehmen" component={Company} />
@@ -40,6 +49,10 @@ function Router() {
       <Route path="/datenschutz" component={Datenschutz} />
       <Route path="/impressum" component={Impressum} />
       <Route path="/agb" component={AGB} />
+      <Route path="/tools/maximale-leistung-simulation" component={MaxPowerSimulation} />
+      <Route path="/tools/maximum-power-simulation" component={MaxPowerSimulation} />
+      <Route path="/tools/liniendickensimulation" component={LineThicknessSimulation} />
+      <Route path="/tools/line-thickness-simulation" component={LineThicknessSimulation} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -64,6 +77,7 @@ function App() {
             <Toaster />
             <ScrollProgress />
             <ScrollToTop />
+            <PrivacyBanner />
             <Router />
           </TooltipProvider>
         </ThemeProvider>
