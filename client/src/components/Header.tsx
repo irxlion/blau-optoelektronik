@@ -1,9 +1,19 @@
+/**
+ * Moderner Header mit Full-Width Hero-Header und überlagerter Navigation
+ * - Weiße, abgerundete Top-Navigation mit leichtem Shadow
+ * - Orange als Akzentfarbe für aktive Elemente und CTA
+ * - Dropdowns mit Sub-Dropdown für Machine Vision Lasermodule
+ * - Responsive für Desktop, Tablet und Mobile
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown } from "lucide-react";
-import { APP_LOGO } from "@/const";
+import { Menu, X, ChevronDown, ShoppingCart, ChevronRight } from "lucide-react";
+import { APP_LOGO_HEADER } from "@/const";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/contexts/LanguageContext";
+import { useCart } from "@/contexts/CartContext";
 import {
   Sheet,
   SheetContent,
@@ -17,12 +27,16 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [activeSubDropdown, setActiveSubDropdown] = useState<string | null>(null);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { language, setLanguage } = useLanguage();
+  const { getTotalItems } = useCart();
   const isEnglish = language === "en";
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const subDropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [menuItemsVisible, setMenuItemsVisible] = useState(false);
+  const cartItemCount = getTotalItems();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,13 +51,15 @@ export default function Header() {
       if (dropdownTimeoutRef.current) {
         clearTimeout(dropdownTimeoutRef.current);
       }
+      if (subDropdownTimeoutRef.current) {
+        clearTimeout(subDropdownTimeoutRef.current);
+      }
     };
   }, []);
 
   // Animation für Menü-Items beim Öffnen
   useEffect(() => {
     if (isMobileMenuOpen) {
-      // Kurze Verzögerung für bessere Animation
       const timer = setTimeout(() => {
         setMenuItemsVisible(true);
       }, 100);
@@ -53,217 +69,385 @@ export default function Header() {
     }
   }, [isMobileMenuOpen]);
 
-  const productCategories = isEnglish
+  // Machine Vision Sub-Dropdown Items
+  const machineVisionSubItems = isEnglish
     ? [
-      { name: "Machine Vision Laser Modules", href: "/produkte/machine-vision", description: "Lasers for industrial imaging" },
-      { name: "Line Lasers", href: "/produkte/linienlaser", description: "Precision positioning" },
-      { name: "Point Lasers", href: "/produkte/punktlaser", description: "Round or elliptical beam profiles" },
-      { name: "Powell Lenses", href: "/produkte/powelllinsen", description: "Aspheric optics" },
-      { name: "OEM Modules", href: "/produkte/oem-module", description: "Custom solutions" },
-      { name: "MVpulse", href: "/produkte/mvpulse", description: "Eye safety & high performance" },
-    ]
+        { name: "MVpulse", href: "/produkte/mvpulse", description: "Eye safety & high performance" },
+        { name: "Standard Modules", href: "/produkte/machine-vision", description: "Standard machine vision modules" },
+      ]
     : [
-      { name: "Machine Vision Lasermodule", href: "/produkte/machine-vision", description: "Laser für industrielle Bildverarbeitung" },
-      { name: "Linienlaser", href: "/produkte/linienlaser", description: "Präzise Positionierung" },
-      { name: "Punktlaser", href: "/produkte/punktlaser", description: "Runde oder elliptische Strahlprofile" },
-      { name: "Powelllinsen", href: "/produkte/powelllinsen", description: "Asphärische Linsen" },
-      { name: "OEM Module", href: "/produkte/oem-module", description: "Kundenspezifische Lösungen" },
-      { name: "MVpulse", href: "/produkte/mvpulse", description: "Augensicherheit & Hohe Leistung" },
-    ];
+        { name: "MVpulse", href: "/produkte/mvpulse", description: "Augensicherheit & Hohe Leistung" },
+        { name: "Standard Module", href: "/produkte/machine-vision", description: "Standard Machine Vision Module" },
+      ];
 
-  const toolsCategories = isEnglish
+  // Produkt-Kategorien mit Sub-Dropdown für Machine Vision
+  type DropdownItem = {
+    name: string;
+    href: string;
+    hasSubDropdown?: boolean;
+    subDropdownItems?: Array<{
+      name: string;
+      href: string;
+      description?: string;
+    }>;
+  };
+
+  const productCategories: DropdownItem[] = isEnglish
     ? [
-      { name: "Maximum Power Simulation", href: "/tools/maximum-power-simulation", description: "Calculate maximum laser power" },
-      { name: "Line Thickness Simulation", href: "/tools/line-thickness-simulation", description: "Calculate line thickness at focus distance" },
-    ]
+        {
+          name: "Machine Vision Laser Modules",
+          href: "/produkte/machine-vision",
+          hasSubDropdown: true,
+          subDropdownItems: machineVisionSubItems,
+        },
+        { name: "Line Lasers", href: "/produkte/linienlaser" },
+        { name: "Point Lasers", href: "/produkte/punktlaser" },
+        { name: "Powell Lenses", href: "/produkte/powelllinsen" },
+        { name: "OEM Modules", href: "/produkte/oem-module" },
+      ]
     : [
-      { name: "Maximale Leistung Simulation", href: "/tools/maximale-leistung-simulation", description: "Maximale Laserleistung berechnen" },
-      { name: "Liniendicken Simulation", href: "/tools/liniendickensimulation", description: "Liniendicke bei Fokusdistanz berechnen" },
-    ];
+        {
+          name: "Machine Vision Lasermodule",
+          href: "/produkte/machine-vision",
+          hasSubDropdown: true,
+          subDropdownItems: machineVisionSubItems,
+        },
+        { name: "Linienlaser", href: "/produkte/linienlaser" },
+        { name: "Punktlaser", href: "/produkte/punktlaser" },
+        { name: "Powelllinsen", href: "/produkte/powelllinsen" },
+        { name: "OEM Module", href: "/produkte/oem-module" },
+      ];
+
+  const toolsCategories: DropdownItem[] = isEnglish
+    ? [
+        { name: "Maximum Power Simulation", href: "/tools/maximum-power-simulation" },
+        { name: "Line Thickness Simulation", href: "/tools/line-thickness-simulation" },
+      ]
+    : [
+        { name: "Maximale Leistung Simulation", href: "/tools/maximale-leistung-simulation" },
+        { name: "Liniendicken Simulation", href: "/tools/liniendickensimulation" },
+      ];
 
   const navItems = isEnglish
     ? [
-      {
-        name: "Products",
-        href: "/produkte",
-        hasDropdown: true,
-        dropdownItems: productCategories,
-      },
-      { name: "Technology", href: "/technologie" },
-      { name: "Industries", href: "/branchen" },
-      { name: "Company", href: "/unternehmen" },
-      { name: "Resources", href: "/ressourcen" },
-      {
-        name: "Tools",
-        href: "/tools",
-        hasDropdown: true,
-        dropdownItems: toolsCategories,
-      },
-      { name: "Contact", href: "/kontakt" },
-    ]
+        { name: "Home", href: "/" },
+        { name: "About us", href: "/unternehmen" },
+        { name: "Technology", href: "/technologie" },
+        { name: "Careers", href: "/karriere" },
+        {
+          name: "Products",
+          href: "/produkte",
+          hasDropdown: true,
+          dropdownItems: productCategories,
+        },
+        {
+          name: "Tools",
+          href: "/tools",
+          hasDropdown: true,
+          dropdownItems: toolsCategories,
+        },
+        { name: "Shop", href: "/shop" },
+        { name: "Contact", href: "/kontakt" },
+      ]
     : [
-      {
-        name: "Produkte",
-        href: "/produkte",
-        hasDropdown: true,
-        dropdownItems: productCategories,
-      },
-      { name: "Technologie", href: "/technologie" },
-      { name: "Branchen", href: "/branchen" },
-      { name: "Unternehmen", href: "/unternehmen" },
-      { name: "Ressourcen", href: "/ressourcen" },
-      {
-        name: "Tools",
-        href: "/tools",
-        hasDropdown: true,
-        dropdownItems: toolsCategories,
-      },
-      { name: "Kontakt", href: "/kontakt" },
-    ];
+        { name: "Start", href: "/" },
+        { name: "Über uns", href: "/unternehmen" },
+        { name: "Technologie", href: "/technologie" },
+        { name: "Karriere", href: "/karriere" },
+        {
+          name: "Produkte",
+          href: "/produkte",
+          hasDropdown: true,
+          dropdownItems: productCategories,
+        },
+        {
+          name: "Tools",
+          href: "/tools",
+          hasDropdown: true,
+          dropdownItems: toolsCategories,
+        },
+        { name: "Shop", href: "/shop" },
+        { name: "Kontakt", href: "/kontakt" },
+      ];
 
-  const desktopCta = isEnglish ? "Contact us" : "Kontakt aufnehmen";
+  const desktopCta = isEnglish ? "Contact us" : "Kontakt Aufnehmen";
   const mobileNavLabel = isEnglish ? "Mobile navigation" : "Mobile Navigation";
   const mainNavLabel = isEnglish ? "Main navigation" : "Hauptnavigation";
-  const dropdownAriaLabel = isEnglish ? "submenu" : "Untermenü";
 
   const isHome = location === "/";
-  const useLightNavColors = isHome && !isScrolled;
+  const showHeroHeader = isHome && !isScrolled;
+
+  // Navigation-Styles basierend auf Seite
+  const getNavBarClass = () => {
+    if (showHeroHeader) {
+      // Auf Homepage: Transparente Navigation über Hero
+      return "bg-white/95 backdrop-blur-sm";
+    }
+    // Auf anderen Seiten: Weiße, abgerundete Navigation mit Shadow
+    return "bg-white rounded-b-2xl shadow-md";
+  };
 
   const getNavItemClass = (href: string) => {
     const isActive = location === href;
     if (isActive) {
-      return useLightNavColors ? "text-secondary" : "text-primary";
+      return "text-primary font-semibold";
     }
-    return useLightNavColors ? "text-white hover:text-white/80" : "text-foreground hover:text-primary";
+    return "text-foreground hover:text-primary transition-colors";
+  };
+
+  const handleDropdownEnter = (itemName: string) => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
+    }
+    setActiveDropdown(itemName);
+  };
+
+  const handleDropdownLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+      setActiveSubDropdown(null);
+    }, 150);
+  };
+
+  const handleSubDropdownEnter = (itemName: string) => {
+    if (subDropdownTimeoutRef.current) {
+      clearTimeout(subDropdownTimeoutRef.current);
+      subDropdownTimeoutRef.current = null;
+    }
+    setActiveSubDropdown(itemName);
+  };
+
+  const handleSubDropdownLeave = () => {
+    subDropdownTimeoutRef.current = setTimeout(() => {
+      setActiveSubDropdown(null);
+    }, 150);
   };
 
   return (
-    <header
-      role="banner"
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-          ? "bg-background/95 backdrop-blur-md shadow-md"
-          : "bg-transparent"
-        }`}
-    >
-      <div className="container">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-            aria-label={isEnglish ? "Go to homepage" : "Zur Startseite"}
-          >
-            <img src={APP_LOGO} alt="BLAU Optoelektronik Logo" className="h-10 w-auto" />
-            <div className="hidden md:block">
-            </div>
-          </Link>
+    <>
+      <header
+        role="banner"
+        className={cn(
+          "fixed left-0 right-0 z-50 transition-all duration-300",
+          showHeroHeader ? "top-2 md:top-4" : "top-2 md:top-4"
+        )}
+      >
+        <div className="container mx-auto px-3 sm:px-4 md:px-6">
+          <div className={cn("w-full rounded-lg md:rounded-xl", getNavBarClass(), showHeroHeader ? "" : "shadow-md")}>
+            <div className="flex items-center justify-between h-14 md:h-16 px-3 sm:px-4 md:px-6">
+            {/* Logo */}
+            <Link
+              href="/"
+              onClick={(e) => {
+                if (location === "/") {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+              className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
+              aria-label={isEnglish ? "Go to homepage" : "Zur Startseite"}
+            >
+              <img src={APP_LOGO_HEADER} alt="BLAU Optoelektronik Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
+            </Link>
 
-          {/* Desktop Navigation */}
-          <nav role="navigation" aria-label={mainNavLabel} className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => (
-              <div
-                key={item.name}
-                className="relative"
-                onMouseEnter={() => {
-                  if (item.hasDropdown) {
-                    if (dropdownTimeoutRef.current) {
-                      clearTimeout(dropdownTimeoutRef.current);
-                      dropdownTimeoutRef.current = null;
+            {/* Desktop Navigation */}
+            <nav role="navigation" aria-label={mainNavLabel} className="hidden lg:flex items-center gap-4 xl:gap-6 flex-1 justify-center">
+              {navItems.map((item) => (
+                <div
+                  key={item.name}
+                  className="relative"
+                  onMouseEnter={() => {
+                    if (item.hasDropdown) {
+                      handleDropdownEnter(item.name);
                     }
-                    setActiveDropdown(item.name);
-                  }
-                }}
-                onMouseLeave={() => {
-                  if (item.hasDropdown) {
-                    dropdownTimeoutRef.current = setTimeout(() => {
-                      setActiveDropdown(null);
-                    }, 150);
-                  }
-                }}
-              >
-                <Link href={item.href}>
-                  <Button
-                    variant="ghost"
-                    className={`flex items-center gap-1 transition-colors ${getNavItemClass(item.href)}`}
-                    aria-expanded={item.hasDropdown && activeDropdown === item.name}
-                    aria-haspopup={item.hasDropdown}
-                  >
-                    {item.name}
-                    {item.hasDropdown && <ChevronDown className="h-4 w-4" aria-hidden="true" />}
-                  </Button>
-                </Link>
+                  }}
+                  onMouseLeave={() => {
+                    if (item.hasDropdown) {
+                      handleDropdownLeave();
+                    }
+                  }}
+                >
+                  <Link href={item.href}>
+                    <button
+                      className={cn(
+                        "text-xs xl:text-sm font-medium uppercase tracking-wide flex items-center gap-1 whitespace-nowrap",
+                        getNavItemClass(item.href)
+                      )}
+                      aria-expanded={item.hasDropdown && activeDropdown === item.name}
+                      aria-haspopup={item.hasDropdown}
+                    >
+                      {item.name}
+                      {item.hasDropdown && (
+                        <ChevronDown className="h-3 w-3 xl:h-4 xl:w-4" aria-hidden="true" />
+                      )}
+                    </button>
+                  </Link>
 
-                {/* Invisible bridge to prevent gap */}
-                {item.hasDropdown && activeDropdown === item.name && (
-                  <div className="absolute top-full left-0 w-full h-2" />
-                )}
+                  {/* Invisible bridge to prevent gap */}
+                  {item.hasDropdown && activeDropdown === item.name && (
+                    <div className="absolute top-full left-0 w-full h-2" />
+                  )}
 
-                {/* Mega Menu Dropdown */}
-                {item.hasDropdown && activeDropdown === item.name && (
-                  <div
-                    role="menu"
-                    aria-label={`${item.name} ${dropdownAriaLabel}`}
-                    className="absolute top-full left-0 pt-2 w-96 bg-transparent"
-                  >
-                    <div className="bg-card border border-border rounded-lg shadow-xl p-4">
-                    <div className="grid gap-2">
-                      {item.dropdownItems?.map((dropdownItem) => (
-                        <Link key={dropdownItem.href} href={dropdownItem.href}>
-                          <div role="menuitem" className="p-3 rounded-md hover:bg-accent transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary">
-                            <div className="font-medium text-card-foreground">{dropdownItem.name}</div>
-                            <div className="text-sm text-muted-foreground">{dropdownItem.description}</div>
-                          </div>
-                        </Link>
-                      ))}
+                  {/* Dropdown Menu */}
+                  {item.hasDropdown && activeDropdown === item.name && (
+                    <div
+                      role="menu"
+                      className="absolute top-full left-0 pt-2 w-56 xl:w-64"
+                      onMouseEnter={() => handleDropdownEnter(item.name)}
+                      onMouseLeave={handleDropdownLeave}
+                    >
+                      <div className="bg-card border border-border rounded-lg shadow-lg p-2">
+                        <div className="space-y-1">
+                          {item.dropdownItems?.map((dropdownItem) => (
+                            <div
+                              key={dropdownItem.href}
+                              className="relative"
+                              onMouseEnter={() => {
+                                if (dropdownItem.hasSubDropdown) {
+                                  handleSubDropdownEnter(dropdownItem.name);
+                                }
+                              }}
+                              onMouseLeave={() => {
+                                if (dropdownItem.hasSubDropdown) {
+                                  handleSubDropdownLeave();
+                                }
+                              }}
+                            >
+                              <Link href={dropdownItem.href}>
+                                <div
+                                  role="menuitem"
+                                  className={cn(
+                                    "px-4 py-2 rounded-md text-sm transition-colors cursor-pointer flex items-center justify-between",
+                                    location === dropdownItem.href
+                                      ? "bg-primary/10 text-primary font-semibold"
+                                      : "text-foreground hover:bg-muted hover:text-primary"
+                                  )}
+                                >
+                                  <span>{dropdownItem.name}</span>
+                                  {dropdownItem.hasSubDropdown && (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
+                                </div>
+                              </Link>
+
+                              {/* Sub-Dropdown Menu */}
+                              {dropdownItem.hasSubDropdown &&
+                                activeSubDropdown === dropdownItem.name && (
+                                  <div
+                                    role="menu"
+                                    className="absolute left-full top-0 ml-2 w-56 xl:w-64"
+                                    onMouseEnter={() =>
+                                      handleSubDropdownEnter(dropdownItem.name)
+                                    }
+                                    onMouseLeave={handleSubDropdownLeave}
+                                  >
+                                    <div className="bg-card border border-border rounded-lg shadow-lg p-2">
+                                      <div className="space-y-1">
+                                        {dropdownItem.subDropdownItems?.map(
+                                          (subItem) => (
+                                            <Link
+                                              key={subItem.href}
+                                              href={subItem.href}
+                                            >
+                                              <div
+                                                role="menuitem"
+                                                className={cn(
+                                                  "px-4 py-2 rounded-md text-sm transition-colors cursor-pointer",
+                                                  location === subItem.href
+                                                    ? "bg-primary/10 text-primary font-semibold"
+                                                    : "text-foreground hover:bg-muted hover:text-primary"
+                                                )}
+                                              >
+                                                <div className="font-medium">
+                                                  {subItem.name}
+                                                </div>
+                                                {subItem.description && (
+                                                  <div className="text-xs text-muted-foreground mt-1">
+                                                    {subItem.description}
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </Link>
+                                          )
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
-
-          {/* CTA Button + Language Switch */}
-          <div className="hidden lg:flex items-center gap-3">
-            <div className="flex rounded-full border border-border overflow-hidden">
-              {SUPPORTED_LANGUAGES.map(({ code, label }) => (
-                <button
-                  key={code}
-                  type="button"
-                  onClick={() => setLanguage(code)}
-                  className={`px-3 py-1 text-xs font-semibold transition-colors ${language === code ? "bg-secondary text-secondary-foreground" : "text-muted-foreground"
-                    }`}
-                  aria-pressed={language === code}
-                >
-                  {label}
-                </button>
+                  )}
+                </div>
               ))}
-            </div>
-            <Button 
-              onClick={() => setIsContactDialogOpen(true)}
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-            >
-              {desktopCta}
-            </Button>
-          </div>
+            </nav>
 
-          {/* Mobile Menu Button */}
-          <button
-            className={`lg:hidden p-2 ${useLightNavColors ? "text-white" : "text-foreground"} focus:outline-none focus:ring-2 focus:ring-primary rounded`}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label={
-              isMobileMenuOpen
-                ? isEnglish
-                  ? "Close menu"
-                  : "Menü schließen"
-                : isEnglish
+            {/* CTA Button + Cart + Language Switcher */}
+            <div className="hidden lg:flex items-center gap-2 xl:gap-4 flex-shrink-0">
+              {/* Language Switcher */}
+              <div className="flex items-center gap-1 border border-border rounded-lg p-1">
+                {SUPPORTED_LANGUAGES.map(({ code, label }) => (
+                  <Button
+                    key={code}
+                    variant={language === code ? "default" : "ghost"}
+                    size="sm"
+                    className="h-7 px-2 text-xs font-medium"
+                    onClick={() => setLanguage(code)}
+                    aria-pressed={language === code}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+              {/* Warenkorb-Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/shop/cart")}
+                className="relative text-foreground hover:text-primary h-9 w-9 xl:h-10 xl:w-10"
+                aria-label={isEnglish ? "Shopping cart" : "Warenkorb"}
+              >
+                <ShoppingCart className="h-4 w-4 xl:h-5 xl:w-5" />
+                {cartItemCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 bg-primary text-primary-foreground text-[10px]">
+                    {cartItemCount > 99 ? "99+" : cartItemCount}
+                  </Badge>
+                )}
+              </Button>
+              <Button
+                onClick={() => setIsContactDialogOpen(true)}
+                className="bg-secondary hover:bg-primary text-secondary-foreground hover:text-primary-foreground rounded-full px-3 xl:px-6 py-1.5 xl:py-2 text-xs xl:text-sm font-semibold uppercase tracking-wide transition-colors whitespace-nowrap"
+              >
+                {desktopCta}
+              </Button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden p-2 text-foreground focus:outline-none flex-shrink-0"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={
+                isMobileMenuOpen
+                  ? isEnglish
+                    ? "Close menu"
+                    : "Menü schließen"
+                  : isEnglish
                   ? "Open menu"
                   : "Menü öffnen"
-            }
-            aria-expanded={isMobileMenuOpen}
-          >
-            {isMobileMenuOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <Menu className="h-6 w-6" aria-hidden="true" />}
-          </button>
+              }
+              aria-expanded={isMobileMenuOpen}
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
+              ) : (
+                <Menu className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
+              )}
+            </button>
+            </div>
+          </div>
         </div>
 
         {/* Mobile Menu - Using Sheet Component */}
@@ -276,18 +460,18 @@ export default function Header() {
             </SheetHeader>
             <div className="flex flex-col h-[calc(100vh-80px)] overflow-hidden">
               {/* Scrollable Content */}
-              <nav 
-                className="flex-1 overflow-y-auto px-6 py-4" 
-                role="navigation" 
+              <nav
+                className="flex-1 overflow-y-auto px-6 py-4"
+                role="navigation"
                 aria-label={mobileNavLabel}
               >
                 <div className="flex flex-col gap-2">
                   {/* Language Switcher */}
-                  <div 
+                  <div
                     className={cn(
                       "flex items-center gap-2 mb-4 pb-4 border-b transition-all duration-300",
-                      menuItemsVisible 
-                        ? "opacity-100 translate-x-0" 
+                      menuItemsVisible
+                        ? "opacity-100 translate-x-0"
                         : "opacity-0 -translate-x-4"
                     )}
                     style={{ transitionDelay: "50ms" }}
@@ -306,72 +490,49 @@ export default function Header() {
                       </Button>
                     ))}
                   </div>
-                  
+
                   {/* Navigation Items */}
                   {navItems.map((item, index) => (
-                    <div 
-                      key={item.name} 
-                      className={cn(
-                        "mb-2 transition-all duration-300",
-                        menuItemsVisible 
-                          ? "opacity-100 translate-x-0" 
-                          : "opacity-0 -translate-x-4"
-                      )}
-                      style={{ transitionDelay: `${100 + index * 50}ms` }}
-                    >
-                      <Link href={item.href}>
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start text-left font-medium transition-colors"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              setIsMobileMenuOpen(false);
-                            }
-                          }}
-                        >
-                          {item.name}
-                        </Button>
-                      </Link>
-                      {item.hasDropdown && (
-                        <div className="ml-4 mt-1 flex flex-col gap-1">
-                          {item.dropdownItems?.map((dropdownItem, subIndex) => (
-                            <Link key={dropdownItem.href} href={dropdownItem.href}>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className={cn(
-                                  "w-full justify-start text-left text-sm text-muted-foreground hover:text-foreground transition-all duration-300",
-                                  menuItemsVisible 
-                                    ? "opacity-100 translate-x-0" 
-                                    : "opacity-0 -translate-x-4"
-                                )}
-                                style={{ transitionDelay: `${150 + index * 50 + subIndex * 30}ms` }}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                              >
-                                {dropdownItem.name}
-                              </Button>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <MobileNavItem
+                      key={item.name}
+                      item={item}
+                      index={index}
+                      menuItemsVisible={menuItemsVisible}
+                      onClose={() => setIsMobileMenuOpen(false)}
+                    />
                   ))}
                 </div>
               </nav>
-              
+
               {/* Fixed Footer */}
-              <div 
+              <div
                 className={cn(
-                  "px-6 py-4 border-t bg-background transition-all duration-300",
-                  menuItemsVisible 
-                    ? "opacity-100 translate-y-0" 
+                  "px-6 py-4 border-t bg-background transition-all duration-300 space-y-2",
+                  menuItemsVisible
+                    ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-4"
                 )}
                 style={{ transitionDelay: "300ms" }}
               >
+                {/* Warenkorb-Button für Mobile */}
                 <Button
-                  className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground transition-transform hover:scale-[1.02]"
+                  variant="outline"
+                  className="w-full relative"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setLocation("/shop/cart");
+                  }}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  {isEnglish ? "Shopping Cart" : "Warenkorb"}
+                  {cartItemCount > 0 && (
+                    <Badge className="ml-2 bg-primary text-primary-foreground">
+                      {cartItemCount > 99 ? "99+" : cartItemCount}
+                    </Badge>
+                  )}
+                </Button>
+                <Button
+                  className="w-full bg-secondary hover:bg-primary text-secondary-foreground hover:text-primary-foreground rounded-full"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     setIsContactDialogOpen(true);
@@ -383,10 +544,150 @@ export default function Header() {
             </div>
           </SheetContent>
         </Sheet>
-      </div>
+      </header>
 
       {/* Contact Dialog */}
-      <ContactDialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen} />
-    </header>
+      <ContactDialog
+        open={isContactDialogOpen}
+        onOpenChange={setIsContactDialogOpen}
+      />
+    </>
+  );
+}
+
+// Mobile Navigation Item Component
+function MobileNavItem({
+  item,
+  index,
+  menuItemsVisible,
+  onClose,
+}: {
+  item: {
+    name: string;
+    href: string;
+    hasDropdown?: boolean;
+    dropdownItems?: Array<any>;
+  };
+  index: number;
+  menuItemsVisible: boolean;
+  onClose: () => void;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div
+      className={cn(
+        "mb-2 transition-all duration-300",
+        menuItemsVisible
+          ? "opacity-100 translate-x-0"
+          : "opacity-0 -translate-x-4"
+      )}
+      style={{ transitionDelay: `${100 + index * 50}ms` }}
+    >
+      {item.hasDropdown ? (
+        <>
+                            <button
+                              className="w-full flex items-center justify-between px-3 py-2 rounded-md text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <span>{item.name}</span>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform",
+                isExpanded && "rotate-180"
+              )}
+            />
+          </button>
+          {isExpanded && (
+            <div className="ml-4 mt-1 space-y-1">
+              {item.dropdownItems?.map((dropdownItem) => (
+                <div key={dropdownItem.href}>
+                  {dropdownItem.hasSubDropdown ? (
+                    <MobileSubDropdown
+                      item={dropdownItem}
+                      onClose={onClose}
+                    />
+                  ) : (
+                    <Link href={dropdownItem.href}>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="w-full justify-start text-left text-sm text-muted-foreground hover:text-primary"
+                                          onClick={onClose}
+                                        >
+                                          {dropdownItem.name}
+                                        </Button>
+                    </Link>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+                          <Link href={item.href}>
+                            <Button
+                              variant="ghost"
+                              className="w-full justify-start text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
+                              onClick={onClose}
+                            >
+                              {item.name}
+                            </Button>
+                          </Link>
+      )}
+    </div>
+  );
+}
+
+// Mobile Sub-Dropdown Component
+function MobileSubDropdown({
+  item,
+  onClose,
+}: {
+  item: {
+    name: string;
+    href: string;
+    hasSubDropdown?: boolean;
+    subDropdownItems?: Array<{
+      name: string;
+      href: string;
+      description?: string;
+    }>;
+  };
+  onClose: () => void;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div>
+      <button
+        className="w-full flex items-center justify-between px-3 py-2 rounded-md text-left text-sm text-muted-foreground hover:bg-muted hover:text-primary transition-colors"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <span>{item.name}</span>
+        <ChevronRight
+          className={cn(
+            "h-4 w-4 transition-transform",
+            isExpanded && "rotate-90"
+          )}
+        />
+      </button>
+      {isExpanded && item.subDropdownItems && (
+        <div className="ml-4 mt-1 space-y-1">
+          {item.subDropdownItems.map((subItem) => (
+            <Link key={subItem.href} href={subItem.href}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-left text-xs text-muted-foreground hover:text-primary"
+                onClick={onClose}
+              >
+                {subItem.name}
+              </Button>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

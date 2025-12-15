@@ -106,6 +106,7 @@ export default function ProductDetail() {
                   src={product.images[selectedImage]}
                   alt={product.name}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
               {product.images.length > 1 && (
@@ -119,7 +120,7 @@ export default function ProductDetail() {
                           : "border-transparent hover:border-muted-foreground/30"
                         }`}
                     >
-                      <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
+                      <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" />
                     </button>
                   ))}
                 </div>

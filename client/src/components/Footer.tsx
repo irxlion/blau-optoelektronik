@@ -30,13 +30,11 @@ export default function Footer() {
     ? [
       { name: "About us", href: "/unternehmen" },
       { name: "Technology", href: "/technologie" },
-      { name: "Industries", href: "/branchen" },
       { name: "Careers", href: "/karriere" },
     ]
     : [
       { name: "Über uns", href: "/unternehmen" },
       { name: "Technologie", href: "/technologie" },
-      { name: "Branchen", href: "/branchen" },
       { name: "Karriere", href: "/karriere" },
     ];
 

@@ -1,0 +1,237 @@
+import { useState, useEffect } from "react";
+import { Career } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
+
+interface CareerFormProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    career?: Career;
+    onSave: (career: Career) => void;
+}
+
+export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormProps) {
+    const { language } = useLanguage();
+    const isEnglish = language === "en";
+    const [formData, setFormData] = useState<Partial<Career>>({});
+
+    useEffect(() => {
+        if (career) {
+            setFormData(career);
+        } else {
+            setFormData({
+                id: "",
+                title: "",
+                department: "",
+                location: "",
+                employmentType: "",
+                shortDescription: "",
+                description: "",
+                requirements: "",
+                benefits: "",
+                salaryRange: "",
+                applicationEmail: "",
+                applicationUrl: "",
+                isPublished: false,
+            });
+        }
+    }, [career, open]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSwitchChange = (checked: boolean) => {
+        setFormData((prev) => ({ ...prev, isPublished: checked }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.id || !formData.title || !formData.description) {
+            toast.error(isEnglish ? "Please fill in all required fields" : "Bitte füllen Sie alle Pflichtfelder aus");
+            return;
+        }
+
+        onSave(updatedFormData);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>{career ? (isEnglish ? "Edit Job Posting" : "Stelle bearbeiten") : (isEnglish ? "Add New Job Posting" : "Neue Stelle hinzufügen")}</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="id">{isEnglish ? "Job ID *" : "Job-ID *"}</Label>
+                            <Input
+                                id="id"
+                                name="id"
+                                value={formData.id || ""}
+                                onChange={handleChange}
+                                required
+                                disabled={!!career}
+                                placeholder={isEnglish ? "e.g. software-engineer" : "z.B. software-engineer"}
+                            />
+                            <p className="text-xs text-muted-foreground">{isEnglish ? "Unique ID (only when creating)" : "Eindeutige ID (nur bei Erstellung)"}</p>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="title">{isEnglish ? "Title *" : "Titel *"}</Label>
+                            <Input
+                                id="title"
+                                name="title"
+                                value={formData.title || ""}
+                                onChange={handleChange}
+                                required
+                                placeholder={isEnglish ? "e.g. Software Engineer" : "z.B. Software Engineer"}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="department">{isEnglish ? "Department" : "Abteilung"}</Label>
+                            <Input
+                                id="department"
+                                name="department"
+                                value={formData.department || ""}
+                                onChange={handleChange}
+                                placeholder={isEnglish ? "e.g. Development" : "z.B. Entwicklung"}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="location">{isEnglish ? "Location" : "Standort"}</Label>
+                            <Input
+                                id="location"
+                                name="location"
+                                value={formData.location || ""}
+                                onChange={handleChange}
+                                placeholder={isEnglish ? "e.g. Munich" : "z.B. München"}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="employmentType">{isEnglish ? "Employment Type" : "Anstellungsart"}</Label>
+                            <Input
+                                id="employmentType"
+                                name="employmentType"
+                                value={formData.employmentType || ""}
+                                onChange={handleChange}
+                                placeholder={isEnglish ? "e.g. Full-time" : "z.B. Vollzeit"}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="shortDescription">{isEnglish ? "Short Description" : "Kurzbeschreibung"}</Label>
+                        <Textarea
+                            id="shortDescription"
+                            name="shortDescription"
+                            value={formData.shortDescription || ""}
+                            onChange={handleChange}
+                            rows={2}
+                            placeholder={isEnglish ? "Brief description for overview" : "Kurze Beschreibung für die Übersicht"}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="description">{isEnglish ? "Full Description *" : "Vollständige Beschreibung *"}</Label>
+                        <Textarea
+                            id="description"
+                            name="description"
+                            value={formData.description || ""}
+                            onChange={handleChange}
+                            required
+                            rows={8}
+                            placeholder={isEnglish ? "Detailed job description" : "Detaillierte Stellenbeschreibung"}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="requirements">{isEnglish ? "Requirements" : "Anforderungen"}</Label>
+                            <Textarea
+                                id="requirements"
+                                name="requirements"
+                                value={formData.requirements || ""}
+                                onChange={handleChange}
+                                rows={6}
+                                placeholder={isEnglish ? "List of requirements" : "Aufzählung der Anforderungen"}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="benefits">{isEnglish ? "Benefits" : "Vorteile/Benefits"}</Label>
+                            <Textarea
+                                id="benefits"
+                                name="benefits"
+                                value={formData.benefits || ""}
+                                onChange={handleChange}
+                                rows={6}
+                                placeholder={isEnglish ? "List of benefits" : "Aufzählung der Vorteile"}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="salaryRange">{isEnglish ? "Salary Range" : "Gehaltsangabe"}</Label>
+                            <Input
+                                id="salaryRange"
+                                name="salaryRange"
+                                value={formData.salaryRange || ""}
+                                onChange={handleChange}
+                                placeholder={isEnglish ? "e.g. 50,000 - 70,000 €" : "z.B. 50.000 - 70.000 €"}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="applicationEmail">{isEnglish ? "Application Email" : "Bewerbungs-E-Mail"}</Label>
+                            <Input
+                                id="applicationEmail"
+                                name="applicationEmail"
+                                type="email"
+                                value={formData.applicationEmail || ""}
+                                onChange={handleChange}
+                                placeholder="karriere@blau-optoelektronik.de"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="applicationUrl">{isEnglish ? "Application URL (optional)" : "Bewerbungs-URL (optional)"}</Label>
+                        <Input
+                            id="applicationUrl"
+                            name="applicationUrl"
+                            type="url"
+                            value={formData.applicationUrl || ""}
+                            onChange={handleChange}
+                            placeholder="https://..."
+                        />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            id="isPublished"
+                            checked={formData.isPublished || false}
+                            onCheckedChange={handleSwitchChange}
+                        />
+                        <Label htmlFor="isPublished">{isEnglish ? "Published (visible on website)" : "Veröffentlicht (auf Website sichtbar)"}</Label>
+                    </div>
+
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                            {isEnglish ? "Cancel" : "Abbrechen"}
+                        </Button>
+                        <Button type="submit">{isEnglish ? "Save" : "Speichern"}</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}

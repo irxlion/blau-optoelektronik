@@ -7,15 +7,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductForm } from "@/components/ProductForm";
 import { CustomerManagement } from "@/components/CustomerManagement";
 import { AdminManagement } from "@/components/AdminManagement";
+import { CareerForm } from "@/components/CareerForm";
+import { fetchCareers, saveCareers, deleteCareer, Career } from "@/lib/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield } from "lucide-react";
+import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Dashboard() {
+    const { language } = useLanguage();
+    const isEnglish = language === "en";
     const [products, setProducts] = useState<{ de: Product[]; en: Product[] } | null>(null);
+    const [careers, setCareers] = useState<{ de: Career[]; en: Career[] } | null>(null);
     const [loading, setLoading] = useState(true);
     const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
+    const [editingCareer, setEditingCareer] = useState<Career | undefined>(undefined);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isCareerFormOpen, setIsCareerFormOpen] = useState(false);
     const [currentLang, setCurrentLang] = useState<"de" | "en">("de");
     const [userRole, setUserRole] = useState<'admin' | 'mitarbeiter' | null>(null);
     const [, setLocation] = useLocation();
@@ -44,7 +52,13 @@ export default function Dashboard() {
         }
         
         loadProducts();
+        loadCareers();
     }, [setLocation]);
+
+    useEffect(() => {
+        // Lade Karriere-Stellen neu wenn sich die Sprache ändert
+        loadCareers();
+    }, [currentLang]);
 
     const loadProducts = async () => {
         try {
@@ -54,6 +68,17 @@ export default function Dashboard() {
             toast.error("Failed to load products");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const loadCareers = async () => {
+        try {
+            // Im Dashboard alle Stellen laden (auch nicht veröffentlichte)
+            const data = await fetchCareers(true);
+            setCareers(data);
+        } catch (error) {
+            console.error("Error loading careers:", error);
+            toast.error(isEnglish ? "Failed to load career postings" : "Fehler beim Laden der Karriere-Stellen");
         }
     };
 
@@ -110,6 +135,59 @@ export default function Dashboard() {
         setIsFormOpen(true);
     };
 
+    const handleSaveCareer = async (career: Career) => {
+        if (!careers) return;
+
+        const newCareers = { ...careers };
+        const list = newCareers[currentLang];
+        const index = list.findIndex((c) => c.id === career.id);
+
+        if (index >= 0) {
+            list[index] = career;
+        } else {
+            list.push(career);
+        }
+
+        try {
+            await saveCareers(newCareers);
+            setCareers(newCareers);
+            setIsCareerFormOpen(false);
+            toast.success(isEnglish ? "Career posting saved successfully" : "Stelle erfolgreich gespeichert");
+        } catch (error) {
+            toast.error(isEnglish ? "Failed to save career posting" : "Fehler beim Speichern der Stelle");
+        }
+    };
+
+    const handleDeleteCareer = async (careerId: string) => {
+        if (!careers || !confirm(isEnglish ? "Are you sure you want to delete this career posting?" : "Möchten Sie diese Stelle wirklich löschen?")) return;
+
+        try {
+            // Lösche die Stelle aus der Datenbank (beide Sprachen werden gelöscht)
+            await deleteCareer(careerId);
+            
+            // Aktualisiere lokalen State
+            const newCareers = { ...careers };
+            newCareers.de = newCareers.de.filter((c) => c.id !== careerId);
+            newCareers.en = newCareers.en.filter((c) => c.id !== careerId);
+            setCareers(newCareers);
+            
+            toast.success(isEnglish ? "Career posting deleted successfully" : "Stelle erfolgreich gelöscht");
+        } catch (error: any) {
+            console.error("Error deleting career:", error);
+            toast.error(isEnglish ? "Failed to delete career posting" : "Fehler beim Löschen der Stelle");
+        }
+    };
+
+    const handleEditCareer = (career: Career) => {
+        setEditingCareer(career);
+        setIsCareerFormOpen(true);
+    };
+
+    const handleAddCareer = () => {
+        setEditingCareer(undefined);
+        setIsCareerFormOpen(true);
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -158,11 +236,16 @@ export default function Dashboard() {
                                 <span className="hidden sm:inline">Kundenverwaltung</span>
                                 <span className="sm:hidden">Kunden</span>
                             </TabsTrigger>
+                            <TabsTrigger value="careers" className="flex-shrink-0">
+                                <Briefcase className="mr-2 h-4 w-4" /> 
+                                <span className="hidden sm:inline">{isEnglish ? "Careers" : "Karriere"}</span>
+                                <span className="sm:hidden">{isEnglish ? "Careers" : "Karriere"}</span>
+                            </TabsTrigger>
                             {userRole === 'admin' && (
                                 <TabsTrigger value="admins" className="flex-shrink-0">
                                     <Shield className="mr-2 h-4 w-4" /> 
-                                    <span className="hidden sm:inline">Admin-Verwaltung</span>
-                                    <span className="sm:hidden">Admin</span>
+                                    <span className="hidden sm:inline">{isEnglish ? "Admin Management" : "Admin-Verwaltung"}</span>
+                                    <span className="sm:hidden">{isEnglish ? "Admin" : "Admin"}</span>
                                 </TabsTrigger>
                             )}
                         </TabsList>
@@ -171,7 +254,7 @@ export default function Dashboard() {
                     <TabsContent value="products" className="space-y-4">
                 <Card>
                             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                                <CardTitle className="text-xl sm:text-2xl">Produkte ({currentLang.toUpperCase()})</CardTitle>
+                                <CardTitle className="text-xl sm:text-2xl">{isEnglish ? "Products" : "Produkte"} ({currentLang.toUpperCase()})</CardTitle>
                                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                                     <Button 
                                         variant="outline" 
@@ -185,8 +268,8 @@ export default function Dashboard() {
                                         className="w-full sm:w-auto"
                                     >
                                         <Plus className="mr-2 h-4 w-4" /> 
-                                        <span className="hidden sm:inline">Produkt hinzufügen</span>
-                                        <span className="sm:hidden">Hinzufügen</span>
+                                        <span className="hidden sm:inline">{isEnglish ? "Add product" : "Produkt hinzufügen"}</span>
+                                        <span className="sm:hidden">{isEnglish ? "Add" : "Hinzufügen"}</span>
                         </Button>
                                 </div>
                     </CardHeader>
@@ -242,6 +325,82 @@ export default function Dashboard() {
 
                     <TabsContent value="customers" className="space-y-4">
                         <CustomerManagement />
+                    </TabsContent>
+
+                    <TabsContent value="careers" className="space-y-4">
+                        <Card>
+                            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <CardTitle className="text-xl sm:text-2xl">{isEnglish ? "Career Postings" : "Karriere-Stellen"} ({currentLang.toUpperCase()})</CardTitle>
+                                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={() => setCurrentLang(currentLang === "de" ? "en" : "de")}
+                                        className="w-full sm:w-auto text-sm"
+                                    >
+                                        {currentLang === "de" ? "EN" : "DE"}
+                                    </Button>
+                                    <Button 
+                                        onClick={handleAddCareer}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        <Plus className="mr-2 h-4 w-4" /> 
+                                        <span className="hidden sm:inline">{isEnglish ? "Add job posting" : "Stelle hinzufügen"}</span>
+                                        <span className="sm:hidden">{isEnglish ? "Add" : "Hinzufügen"}</span>
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid gap-4">
+                                    {careers?.[currentLang].map((career) => (
+                                        <div
+                                            key={career.id}
+                                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg bg-white shadow-sm gap-4"
+                                        >
+                                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                <div className="min-w-0 flex-1">
+                                                    <h3 className="font-semibold text-base sm:text-lg truncate">{career.title}</h3>
+                                                    <p className="text-sm text-gray-500 truncate">
+                                                        {career.department && `${career.department} • `}
+                                                        {career.location}
+                                                        {career.isPublished && (
+                                                            <span className="ml-2 text-green-600">• Veröffentlicht</span>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 justify-end sm:justify-start">
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={() => handleEditCareer(career)}
+                                                    className="h-10 w-10"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={() => handleDeleteCareer(career.id)}
+                                                    className="h-10 w-10"
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {careers?.[currentLang].length === 0 && (
+                                        <p className="text-center text-muted-foreground py-8">Keine Stellen vorhanden</p>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <CareerForm
+                            open={isCareerFormOpen}
+                            onOpenChange={setIsCareerFormOpen}
+                            career={editingCareer}
+                            onSave={handleSaveCareer}
+                        />
                     </TabsContent>
 
                     {userRole === 'admin' && (

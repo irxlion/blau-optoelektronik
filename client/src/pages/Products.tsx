@@ -1,11 +1,12 @@
 import { useMemo, useState, useEffect } from "react";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ChevronRight, Loader2, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { fetchProducts } from "@/lib/api";
 import { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 function getProductHref(product: Product) {
@@ -18,6 +19,7 @@ export default function Products() {
   const { language } = useLanguage();
   const isEnglish = language === "en";
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [productsData, setProductsData] = useState<{ de: Product[]; en: Product[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,8 +45,21 @@ export default function Products() {
 
   const categories = useMemo(() => Array.from(new Set(allProducts.map((p) => p.category))), [allProducts]);
 
-  const filteredProducts =
-    selectedCategory === "all" ? allProducts : allProducts.filter((p) => p.category === selectedCategory);
+  const filteredProducts = useMemo(() => {
+    let filtered = selectedCategory === "all" ? allProducts : allProducts.filter((p) => p.category === selectedCategory);
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query)
+      );
+    }
+    
+    return filtered;
+  }, [allProducts, selectedCategory, searchQuery]);
 
   if (loading) {
     return (
@@ -79,9 +94,21 @@ export default function Products() {
         </div>
       </section>
 
-      {/* Category Filter */}
+      {/* Search and Category Filter */}
       <section className="py-8 bg-muted border-b border-border">
         <div className="container">
+          <div className="mb-6 max-w-md mx-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder={isEnglish ? "Search products..." : "Produkte durchsuchen..."}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
           <div className="flex flex-wrap gap-3">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}

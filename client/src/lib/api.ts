@@ -382,3 +382,74 @@ export async function deleteAdmin(id: string): Promise<void> {
         throw new Error(data.error || "Failed to delete admin");
     }
 }
+
+// Karriere-Verwaltung
+export interface Career {
+    id: string;
+    title: string;
+    department?: string;
+    location?: string;
+    employmentType?: string;
+    shortDescription?: string;
+    description: string;
+    requirements?: string;
+    benefits?: string;
+    salaryRange?: string;
+    applicationEmail?: string;
+    applicationUrl?: string;
+    publishedAt?: string | null;
+    isPublished: boolean;
+}
+
+export async function fetchCareers(includeUnpublished: boolean = false): Promise<{ de: Career[]; en: Career[] }> {
+    try {
+        const url = includeUnpublished ? "/api/careers?all=true" : "/api/careers";
+        const response = await fetch(url);
+        
+        const contentType = response.headers.get("content-type");
+        if (contentType && !contentType.includes("application/json")) {
+            const text = await response.text();
+            if (text.trim().startsWith("<!") || text.includes("<!doctype")) {
+                console.warn("⚠️ API-Route nicht verfügbar. Verwende leere Liste als Fallback.");
+                return { de: [], en: [] };
+            }
+        }
+        
+        if (!response.ok) {
+            throw new Error("Failed to fetch careers");
+        }
+        
+        return response.json();
+    } catch (error: any) {
+        console.warn("⚠️ API nicht erreichbar. Verwende leere Liste als Fallback.");
+        return { de: [], en: [] };
+    }
+}
+
+export async function saveCareers(careers: { de: Career[]; en: Career[] }): Promise<void> {
+    const response = await fetch("/api/careers", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getAuthToken()}`,
+        },
+        body: JSON.stringify(careers),
+    });
+    if (!response.ok) {
+        throw new Error("Failed to save careers");
+    }
+}
+
+export async function deleteCareer(jobId: string): Promise<void> {
+    const response = await fetch(`/api/careers?job_id=${encodeURIComponent(jobId)}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getAuthToken()}`,
+        },
+    });
+    if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to delete career");
+    }
+}

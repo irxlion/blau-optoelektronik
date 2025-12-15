@@ -27,17 +27,19 @@ export const SUPPORTED_LANGUAGES: { code: Language; label: string; name: string 
 ];
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("de");
-
-  useEffect(() => {
+  // Initiale Sprache aus localStorage laden oder "de" als Standard
+  const getInitialLanguage = (): Language => {
     if (typeof window === "undefined") {
-      return;
+      return "de";
     }
     const stored = window.localStorage.getItem("language");
-    if (stored === "en") {
-      setLanguageState("en");
+    if (stored === "de" || stored === "en") {
+      return stored as Language;
     }
-  }, []);
+    return "de";
+  };
+
+  const [language, setLanguageState] = useState<Language>(getInitialLanguage);
 
   useEffect(() => {
     if (typeof window === "undefined") {
