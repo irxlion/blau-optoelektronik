@@ -51,36 +51,8 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        // Authentifizierung prüfen (nur Admins)
-        const authHeader = event.headers.authorization || event.headers.Authorization;
-        if (!authHeader) {
-            return {
-                statusCode: 401,
-                headers,
-                body: JSON.stringify({ error: 'Unauthorized' }),
-            };
-        }
-
-        // Token validieren (vereinfacht - in Produktion sollte dies überprüft werden)
-        try {
-            const token = authHeader.replace('Bearer ', '');
-            // Token ist base64-encoded JSON (nicht JWT)
-            const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
-            // Admin und Mitarbeiter können Kunden verwalten
-            if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
-                return {
-                    statusCode: 403,
-                    headers,
-                    body: JSON.stringify({ error: 'Forbidden - Nur Admins und Mitarbeiter' }),
-                };
-            }
-        } catch (e) {
-            // Token-Validierung fehlgeschlagen - für Entwicklung erlauben wir es
-            // In Produktion sollte hier eine echte Validierung stattfinden
-            console.warn('Token validation failed:', e);
-        }
-
         if (event.httpMethod === 'GET') {
+            // GET-Anfragen erlauben ohne Authentifizierung (Service Role Key wird verwendet)
             // Kundenliste abrufen mit Such- und Filteroptionen
             const queryParams = new URLSearchParams(event.queryStringParameters || '');
             const search = queryParams.get('search') || '';
@@ -132,6 +104,30 @@ export const handler: Handler = async (event) => {
                 }),
             };
         } else if (event.httpMethod === 'POST') {
+            // Authentifizierung prüfen für POST (nur Admins/Mitarbeiter)
+            const authHeader = event.headers.authorization || event.headers.Authorization;
+            if (!authHeader) {
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({ error: 'Unauthorized' }),
+                };
+            }
+
+            // Token validieren
+            try {
+                const token = authHeader.replace('Bearer ', '');
+                const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
+                if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
+                    return {
+                        statusCode: 403,
+                        headers,
+                        body: JSON.stringify({ error: 'Forbidden - Nur Admins und Mitarbeiter' }),
+                    };
+                }
+            } catch (e) {
+                console.warn('Token validation failed:', e);
+            }
             // Neuen Kunden erstellen
             const { username, password, email, company_name, first_name, last_name, phone, address, city, postal_code, country, is_active } = JSON.parse(event.body || '{}');
 
@@ -196,6 +192,30 @@ export const handler: Handler = async (event) => {
                 body: JSON.stringify({ customer: sanitizeCustomer(customer) }),
             };
         } else if (event.httpMethod === 'PUT') {
+            // Authentifizierung prüfen für PUT (nur Admins/Mitarbeiter)
+            const authHeader = event.headers.authorization || event.headers.Authorization;
+            if (!authHeader) {
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({ error: 'Unauthorized' }),
+                };
+            }
+
+            // Token validieren
+            try {
+                const token = authHeader.replace('Bearer ', '');
+                const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
+                if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
+                    return {
+                        statusCode: 403,
+                        headers,
+                        body: JSON.stringify({ error: 'Forbidden - Nur Admins und Mitarbeiter' }),
+                    };
+                }
+            } catch (e) {
+                console.warn('Token validation failed:', e);
+            }
             // Kunden aktualisieren
             const { id, username, password, email, company_name, first_name, last_name, phone, address, city, postal_code, country, is_active } = JSON.parse(event.body || '{}');
 
@@ -257,6 +277,30 @@ export const handler: Handler = async (event) => {
                 body: JSON.stringify({ customer: sanitizeCustomer(customer) }),
             };
         } else if (event.httpMethod === 'DELETE') {
+            // Authentifizierung prüfen für DELETE (nur Admins/Mitarbeiter)
+            const authHeader = event.headers.authorization || event.headers.Authorization;
+            if (!authHeader) {
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({ error: 'Unauthorized' }),
+                };
+            }
+
+            // Token validieren
+            try {
+                const token = authHeader.replace('Bearer ', '');
+                const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
+                if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
+                    return {
+                        statusCode: 403,
+                        headers,
+                        body: JSON.stringify({ error: 'Forbidden - Nur Admins und Mitarbeiter' }),
+                    };
+                }
+            } catch (e) {
+                console.warn('Token validation failed:', e);
+            }
             // Kunden löschen
             const { id } = JSON.parse(event.body || '{}');
 

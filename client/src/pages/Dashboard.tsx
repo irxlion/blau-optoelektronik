@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { fetchProducts, saveProducts } from "@/lib/api";
+import { fetchProducts, saveProducts, deleteProduct } from "@/lib/api";
 import { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,10 +8,12 @@ import { ProductForm } from "@/components/ProductForm";
 import { CustomerManagement } from "@/components/CustomerManagement";
 import { AdminManagement } from "@/components/AdminManagement";
 import { CareerForm } from "@/components/CareerForm";
+import { ShopProductManagement } from "@/components/ShopProductManagement";
 import { fetchCareers, saveCareers, deleteCareer, Career } from "@/lib/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase } from "lucide-react";
+import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase, ShoppingBag, ShoppingCart } from "lucide-react";
+import { OrderManagement } from "@/components/OrderManagement";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Dashboard() {
@@ -75,10 +77,16 @@ export default function Dashboard() {
         try {
             // Im Dashboard alle Stellen laden (auch nicht veröffentlichte)
             const data = await fetchCareers(true);
-            setCareers(data);
+            // Stelle sicher, dass beide Sprachen existieren
+            setCareers({
+                de: data.de || [],
+                en: data.en || [],
+            });
         } catch (error) {
             console.error("Error loading careers:", error);
             toast.error(isEnglish ? "Failed to load career postings" : "Fehler beim Laden der Karriere-Stellen");
+            // Fallback auf leere Arrays
+            setCareers({ de: [], en: [] });
         }
     };
 
@@ -113,14 +121,13 @@ export default function Dashboard() {
     const handleDelete = async (productId: string) => {
         if (!products || !confirm("Are you sure you want to delete this product?")) return;
 
-        const newProducts = { ...products };
-        newProducts[currentLang] = newProducts[currentLang].filter((p) => p.id !== productId);
-
         try {
-            await saveProducts(newProducts);
-            setProducts(newProducts);
+            await deleteProduct(productId);
+            // Produkte neu laden, um sicherzustellen, dass die DB aktualisiert wurde
+            await loadProducts();
             toast.success("Product deleted successfully");
         } catch (error) {
+            console.error("Error deleting product:", error);
             toast.error("Failed to delete product");
         }
     };
@@ -136,7 +143,10 @@ export default function Dashboard() {
     };
 
     const handleSaveCareer = async (career: Career) => {
-        if (!careers) return;
+        if (!careers) {
+            // Initialisiere careers falls noch nicht geladen
+            setCareers({ de: [], en: [] });
+        }
 
         const newCareers = { ...careers };
         const list = newCareers[currentLang];
@@ -148,13 +158,38 @@ export default function Dashboard() {
             list.push(career);
         }
 
+        // Stelle sicher, dass beide Sprachen existieren
+        // Wenn eine neue Stelle erstellt wird, erstelle auch einen Platzhalter für die andere Sprache
+        const otherLang = currentLang === "de" ? "en" : "de";
+        if (!newCareers[otherLang]) {
+            newCareers[otherLang] = [];
+        }
+
+        // Wenn es eine neue Stelle ist, erstelle auch einen Eintrag für die andere Sprache
+        // (mit minimalen Daten, die später bearbeitet werden können)
+        if (index < 0) {
+            const otherLangCareer: Career = {
+                ...career,
+                title: career.title + ` (${otherLang.toUpperCase()})`,
+                description: career.description || "",
+            };
+            // Prüfe ob bereits ein Eintrag für diese ID in der anderen Sprache existiert
+            const otherIndex = newCareers[otherLang].findIndex((c) => c.id === career.id);
+            if (otherIndex < 0) {
+                newCareers[otherLang].push(otherLangCareer);
+            }
+        }
+
         try {
             await saveCareers(newCareers);
             setCareers(newCareers);
             setIsCareerFormOpen(false);
+            setEditingCareer(undefined);
             toast.success(isEnglish ? "Career posting saved successfully" : "Stelle erfolgreich gespeichert");
-        } catch (error) {
-            toast.error(isEnglish ? "Failed to save career posting" : "Fehler beim Speichern der Stelle");
+        } catch (error: any) {
+            console.error("Error saving career:", error);
+            const errorMessage = error.message || (isEnglish ? "Failed to save career posting" : "Fehler beim Speichern der Stelle");
+            toast.error(errorMessage);
         }
     };
 
@@ -184,6 +219,10 @@ export default function Dashboard() {
     };
 
     const handleAddCareer = () => {
+        // Stelle sicher, dass careers initialisiert ist
+        if (!careers) {
+            setCareers({ de: [], en: [] });
+        }
         setEditingCareer(undefined);
         setIsCareerFormOpen(true);
     };
@@ -197,8 +236,8 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 md:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4 md:space-y-6">
                 {/* Header - Mobile Optimized */}
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
@@ -228,13 +267,23 @@ export default function Dashboard() {
                         <TabsList className="w-full sm:w-fit min-w-max">
                             <TabsTrigger value="products" className="flex-shrink-0">
                                 <Package className="mr-2 h-4 w-4" /> 
-                                <span className="hidden sm:inline">Produkte</span>
-                                <span className="sm:hidden">Prod.</span>
+                                <span className="hidden sm:inline">{isEnglish ? "Products" : "Produkte"}</span>
+                                <span className="sm:hidden">{isEnglish ? "Prod." : "Prod."}</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="shop-products" className="flex-shrink-0">
+                                <ShoppingBag className="mr-2 h-4 w-4" /> 
+                                <span className="hidden sm:inline">{isEnglish ? "Shop Products" : "Shop-Produkte"}</span>
+                                <span className="sm:hidden">{isEnglish ? "Shop" : "Shop"}</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="orders" className="flex-shrink-0">
+                                <ShoppingCart className="mr-2 h-4 w-4" /> 
+                                <span className="hidden sm:inline">{isEnglish ? "Orders" : "Bestellungen"}</span>
+                                <span className="sm:hidden">{isEnglish ? "Orders" : "Best."}</span>
                             </TabsTrigger>
                             <TabsTrigger value="customers" className="flex-shrink-0">
                                 <Users className="mr-2 h-4 w-4" /> 
-                                <span className="hidden sm:inline">Kundenverwaltung</span>
-                                <span className="sm:hidden">Kunden</span>
+                                <span className="hidden sm:inline">{isEnglish ? "Customers" : "Kundenverwaltung"}</span>
+                                <span className="sm:hidden">{isEnglish ? "Cust." : "Kunden"}</span>
                             </TabsTrigger>
                             <TabsTrigger value="careers" className="flex-shrink-0">
                                 <Briefcase className="mr-2 h-4 w-4" /> 
@@ -252,7 +301,7 @@ export default function Dashboard() {
                     </div>
 
                     <TabsContent value="products" className="space-y-4">
-                <Card>
+                        <Card>
                             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                 <CardTitle className="text-xl sm:text-2xl">{isEnglish ? "Products" : "Produkte"} ({currentLang.toUpperCase()})</CardTitle>
                                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -270,50 +319,80 @@ export default function Dashboard() {
                                         <Plus className="mr-2 h-4 w-4" /> 
                                         <span className="hidden sm:inline">{isEnglish ? "Add product" : "Produkt hinzufügen"}</span>
                                         <span className="sm:hidden">{isEnglish ? "Add" : "Hinzufügen"}</span>
-                        </Button>
+                                    </Button>
                                 </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid gap-4">
-                            {products?.[currentLang].map((product) => (
-                                <div
-                                    key={product.id}
-                                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg bg-white shadow-sm gap-4"
-                                >
-                                            <div className="flex items-center gap-4 flex-1 min-w-0">
-                                        <img
-                                            src={product.image}
-                                            alt={product.name}
-                                                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded flex-shrink-0"
-                                        />
-                                                <div className="min-w-0 flex-1">
-                                                    <h3 className="font-semibold text-base sm:text-lg truncate">{product.name}</h3>
-                                                    <p className="text-sm text-gray-500 truncate">{product.category}</p>
-                                        </div>
+                            </CardHeader>
+                            <CardContent>
+                                {loading ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <Loader2 className="h-6 w-6 animate-spin" />
                                     </div>
-                                            <div className="flex gap-2 justify-end sm:justify-start">
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    onClick={() => handleEdit(product)}
-                                                    className="h-10 w-10"
+                                ) : (
+                                    <div className="grid gap-4">
+                                        {products && products[currentLang] && products[currentLang].length > 0 ? (
+                                            products[currentLang].map((product) => (
+                                                <div
+                                                    key={product.id}
+                                                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg bg-white shadow-sm gap-4 hover:shadow-md transition-shadow"
                                                 >
-                                            <Pencil className="h-4 w-4" />
-                                        </Button>
+                                                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                        {product.image && (
+                                                            <img
+                                                                src={product.image}
+                                                                alt={product.name}
+                                                                className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded flex-shrink-0"
+                                                            />
+                                                        )}
+                                                        <div className="min-w-0 flex-1">
+                                                            <h3 className="font-semibold text-base sm:text-lg truncate">{product.name}</h3>
+                                                            <p className="text-sm text-gray-500 truncate">{product.category}</p>
+                                                            {product.description && (
+                                                                <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.description}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2 justify-end sm:justify-start">
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            onClick={() => handleEdit(product)}
+                                                            className="h-10 w-10"
+                                                            title={isEnglish ? "Edit" : "Bearbeiten"}
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            onClick={() => handleDelete(product.id)}
+                                                            className="h-10 w-10 text-red-500 hover:text-red-700"
+                                                            title={isEnglish ? "Delete" : "Löschen"}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-12">
+                                                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                                <p className="text-muted-foreground">
+                                                    {isEnglish ? "No products found" : "Keine Produkte vorhanden"}
+                                                </p>
                                                 <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    onClick={() => handleDelete(product.id)}
-                                                    className="h-10 w-10"
+                                                    onClick={handleAdd}
+                                                    variant="outline"
+                                                    className="mt-4"
                                                 >
-                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                        </Button>
+                                                    <Plus className="mr-2 h-4 w-4" />
+                                                    {isEnglish ? "Add first product" : "Erstes Produkt hinzufügen"}
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
+                                )}
+                            </CardContent>
+                        </Card>
 
                 <ProductForm
                     open={isFormOpen}
@@ -321,6 +400,14 @@ export default function Dashboard() {
                     product={editingProduct}
                     onSave={handleSaveProduct}
                 />
+                    </TabsContent>
+
+                    <TabsContent value="shop-products" className="space-y-4">
+                        <ShopProductManagement />
+                    </TabsContent>
+
+                    <TabsContent value="orders" className="space-y-4">
+                        <OrderManagement />
                     </TabsContent>
 
                     <TabsContent value="customers" className="space-y-4">
@@ -350,54 +437,88 @@ export default function Dashboard() {
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="grid gap-4">
-                                    {careers?.[currentLang].map((career) => (
-                                        <div
-                                            key={career.id}
-                                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg bg-white shadow-sm gap-4"
-                                        >
-                                            <div className="flex items-center gap-4 flex-1 min-w-0">
-                                                <div className="min-w-0 flex-1">
-                                                    <h3 className="font-semibold text-base sm:text-lg truncate">{career.title}</h3>
-                                                    <p className="text-sm text-gray-500 truncate">
-                                                        {career.department && `${career.department} • `}
-                                                        {career.location}
-                                                        {career.isPublished && (
-                                                            <span className="ml-2 text-green-600">• Veröffentlicht</span>
-                                                        )}
-                                                    </p>
+                                {loading ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <Loader2 className="h-6 w-6 animate-spin" />
+                                    </div>
+                                ) : (
+                                    <div className="grid gap-4">
+                                        {careers && careers[currentLang] && careers[currentLang].length > 0 ? (
+                                            careers[currentLang].map((career) => (
+                                                <div
+                                                    key={career.id}
+                                                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-lg bg-white shadow-sm gap-4 hover:shadow-md transition-shadow"
+                                                >
+                                                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <h3 className="font-semibold text-base sm:text-lg truncate">{career.title}</h3>
+                                                                {career.isPublished && (
+                                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                                                        {isEnglish ? "Published" : "Veröffentlicht"}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-sm text-gray-500 truncate">
+                                                                {career.department && `${career.department}${career.location ? " • " : ""}`}
+                                                                {career.location}
+                                                            </p>
+                                                            {career.shortDescription && (
+                                                                <p className="text-sm text-gray-600 mt-1 line-clamp-2">{career.shortDescription}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2 justify-end sm:justify-start">
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            onClick={() => handleEditCareer(career)}
+                                                            className="h-10 w-10"
+                                                            title={isEnglish ? "Edit" : "Bearbeiten"}
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            onClick={() => handleDeleteCareer(career.id)}
+                                                            className="h-10 w-10 text-red-500 hover:text-red-700"
+                                                            title={isEnglish ? "Delete" : "Löschen"}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="flex gap-2 justify-end sm:justify-start">
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-12">
+                                                <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                                <p className="text-muted-foreground">
+                                                    {isEnglish ? "No job postings found" : "Keine Stellen vorhanden"}
+                                                </p>
                                                 <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    onClick={() => handleEditCareer(career)}
-                                                    className="h-10 w-10"
+                                                    onClick={handleAddCareer}
+                                                    variant="outline"
+                                                    className="mt-4"
                                                 >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon" 
-                                                    onClick={() => handleDeleteCareer(career.id)}
-                                                    className="h-10 w-10"
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                                    <Plus className="mr-2 h-4 w-4" />
+                                                    {isEnglish ? "Add first job posting" : "Erste Stelle hinzufügen"}
                                                 </Button>
                                             </div>
-                                        </div>
-                                    ))}
-                                    {careers?.[currentLang].length === 0 && (
-                                        <p className="text-center text-muted-foreground py-8">Keine Stellen vorhanden</p>
-                                    )}
-                                </div>
+                                        )}
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 
                         <CareerForm
                             open={isCareerFormOpen}
-                            onOpenChange={setIsCareerFormOpen}
+                            onOpenChange={(open) => {
+                                setIsCareerFormOpen(open);
+                                if (!open) {
+                                    setEditingCareer(undefined);
+                                }
+                            }}
                             career={editingCareer}
                             onSave={handleSaveCareer}
                         />

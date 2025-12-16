@@ -43,6 +43,17 @@ export default function ShopProductDetail() {
     setLoading(true);
     try {
       const productData = await getProductWithAssets(productId);
+      if (productData) {
+        console.log("Geladenes Produkt:", productData.name);
+        console.log("Produkt-Assets:", productData.assets);
+        if (productData.assets && productData.assets.length > 0) {
+          const pdfs = productData.assets.filter((a) => 
+            a.type === "datasheet_pdf" || a.type === "manual_pdf" || 
+            (a.type === "other" && a.url.toLowerCase().endsWith('.pdf'))
+          );
+          console.log("PDF-Assets gefunden:", pdfs.length, pdfs);
+        }
+      }
       setProduct(productData);
     } catch (error) {
       console.error("Fehler beim Laden des Produkts:", error);
@@ -58,7 +69,11 @@ export default function ShopProductDetail() {
   };
 
   const getProductImage = (product: ShopProduct): string => {
-    // TODO: Später aus product.assets laden (type === "image")
+    // Verwende Hauptbild falls vorhanden
+    const mainImage = (product as any).main_image_url;
+    if (mainImage) return mainImage;
+    
+    // Fallback: Erstes Bild aus Assets
     const imageAsset = product.assets?.find((a) => a.type === "image");
     if (imageAsset) return imageAsset.url;
 
@@ -79,6 +94,10 @@ export default function ShopProductDetail() {
 
   const getManuals = (): ProductAsset[] => {
     return product?.assets?.filter((a) => a.type === "manual_pdf") || [];
+  };
+
+  const getOtherPDFs = (): ProductAsset[] => {
+    return product?.assets?.filter((a) => a.type === "other" && a.url.toLowerCase().endsWith('.pdf')) || [];
   };
 
   if (loading) {
@@ -239,8 +258,8 @@ export default function ShopProductDetail() {
                 </CardContent>
               </Card>
 
-              {/* Downloads */}
-              {(getDatasheets().length > 0 || getManuals().length > 0) && (
+              {/* Downloads - Zeige alle PDF-Assets */}
+              {(getDatasheets().length > 0 || getManuals().length > 0 || getOtherPDFs().length > 0) && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -249,17 +268,25 @@ export default function ShopProductDetail() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {getDatasheets().map((asset) => (
                         <a
                           key={asset.id}
                           href={asset.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-primary hover:underline"
+                          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent transition-colors group"
                         >
-                          <FileText className="h-4 w-4" />
-                          {isEnglish ? "Datasheet" : "Datenblatt"} (PDF)
+                          <div className="flex-shrink-0 w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded flex items-center justify-center">
+                            <FileText className="h-5 w-5 text-red-600 dark:text-red-400" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm group-hover:text-primary transition-colors">
+                              {isEnglish ? "Datasheet" : "Datenblatt"}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">{asset.url.split('/').pop() || "PDF"}</p>
+                          </div>
+                          <Download className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                         </a>
                       ))}
                       {getManuals().map((asset) => (
@@ -268,12 +295,41 @@ export default function ShopProductDetail() {
                           href={asset.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-primary hover:underline"
+                          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent transition-colors group"
                         >
-                          <FileText className="h-4 w-4" />
-                          {isEnglish ? "Manual" : "Handbuch"} (PDF)
+                          <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded flex items-center justify-center">
+                            <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm group-hover:text-primary transition-colors">
+                              {isEnglish ? "Manual" : "Handbuch"}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">{asset.url.split('/').pop() || "PDF"}</p>
+                          </div>
+                          <Download className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                         </a>
                       ))}
+                      {/* Andere PDFs */}
+                      {getOtherPDFs().map((asset) => (
+                          <a
+                            key={asset.id}
+                            href={asset.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent transition-colors group"
+                          >
+                            <div className="flex-shrink-0 w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
+                              <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm group-hover:text-primary transition-colors">
+                                {asset.url.split('/').pop() || (isEnglish ? "Document" : "Dokument")}
+                              </p>
+                              <p className="text-xs text-muted-foreground">PDF</p>
+                            </div>
+                            <Download className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                          </a>
+                        ))}
                     </div>
                   </CardContent>
                 </Card>

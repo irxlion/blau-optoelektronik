@@ -1,6 +1,7 @@
 functionsDirectory = "C:\\Users\\alial\\Downloads\\blau-optoelektronik-complete (2)\\blau-optoelektronik\\netlify\\functions"
 functionsDirectoryOrigin = "config-v1"
 redirectsOrigin = "config"
+site_id = "643d3f93-4e90-4ffa-b20d-d7f1e44d47e5"
 plugins = []
 headers = []
 

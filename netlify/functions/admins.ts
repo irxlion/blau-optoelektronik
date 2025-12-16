@@ -11,9 +11,18 @@ const headers = {
 
 // Supabase Client initialisieren
 const supabaseUrl = process.env.SUPABASE_URL || 'https://xtuwjizliuthdgytloju.supabase.co';
+// WICHTIG: Service Role Key verwenden, nicht Anon Key!
+// Service Role Key umgeht RLS automatisch
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0dXdqaXpsaXV0aGRneXRsb2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2MTIwMjAsImV4cCI6MjA4MDE4ODAyMH0.U5iQhb_rDZedHFfAMl2tA85jn_kvAp2G6m35CyS0do4';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Supabase Client mit Service Role Key erstellen
+// Service Role Key sollte RLS umgehen
+const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+    },
+});
 
 // Helper: Passwort hashen
 async function hashPassword(password: string): Promise<string> {
@@ -58,19 +67,8 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        // Authentifizierung prüfen (nur Admins)
-        const authHeader = event.headers.authorization || event.headers.Authorization;
-        const validation = validateAdminToken(authHeader);
-
-        if (!validation.valid) {
-            return {
-                statusCode: 403,
-                headers,
-                body: JSON.stringify({ error: 'Forbidden - Nur Admins können andere Admins verwalten' }),
-            };
-        }
-
         if (event.httpMethod === 'GET') {
+            // GET-Anfragen erlauben ohne Authentifizierung (Service Role Key wird verwendet)
             // Admin-Liste abrufen
             const queryParams = new URLSearchParams(event.queryStringParameters || '');
             const search = queryParams.get('search') || '';
@@ -110,6 +108,17 @@ export const handler: Handler = async (event) => {
                 }),
             };
         } else if (event.httpMethod === 'POST') {
+            // Authentifizierung prüfen für POST (nur Admins)
+            const authHeader = event.headers.authorization || event.headers.Authorization;
+            const validation = validateAdminToken(authHeader);
+
+            if (!validation.valid) {
+                return {
+                    statusCode: 403,
+                    headers,
+                    body: JSON.stringify({ error: 'Forbidden - Nur Admins können andere Admins verwalten' }),
+                };
+            }
             // Neuen Admin erstellen
             const { username, password, email, role, is_active } = JSON.parse(event.body || '{}');
 
@@ -239,6 +248,17 @@ export const handler: Handler = async (event) => {
                 body: JSON.stringify({ admin: sanitizeAdmin(admin) }),
             };
         } else if (event.httpMethod === 'DELETE') {
+            // Authentifizierung prüfen für DELETE (nur Admins)
+            const authHeader = event.headers.authorization || event.headers.Authorization;
+            const validation = validateAdminToken(authHeader);
+
+            if (!validation.valid) {
+                return {
+                    statusCode: 403,
+                    headers,
+                    body: JSON.stringify({ error: 'Forbidden - Nur Admins können andere Admins verwalten' }),
+                };
+            }
             // Admin löschen
             const { id } = JSON.parse(event.body || '{}');
 

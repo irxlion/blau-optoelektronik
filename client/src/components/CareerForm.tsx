@@ -59,7 +59,17 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
             return;
         }
 
-        onSave(updatedFormData);
+        // Stelle published_at setzen wenn isPublished true ist
+        const careerToSave: Career = {
+            ...formData,
+            publishedAt: formData.isPublished && !formData.publishedAt 
+                ? new Date().toISOString() 
+                : formData.isPublished 
+                    ? formData.publishedAt 
+                    : null,
+        } as Career;
+
+        onSave(careerToSave);
     };
 
     return (

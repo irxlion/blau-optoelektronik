@@ -3,6 +3,9 @@
   publish = "dist/public"
   functions = "netlify/functions"
 
+[context.production]
+  site_id = "643d3f93-4e90-4ffa-b20d-d7f1e44d47e5"
+
 # Umgebungsvariablen sollten in Netlify Dashboard gesetzt werden
 # Diese Werte sind nur Fallbacks für lokale Entwicklung
 [build.environment]

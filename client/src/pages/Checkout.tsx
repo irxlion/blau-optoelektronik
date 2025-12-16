@@ -134,11 +134,54 @@ export default function Checkout() {
 
     setLoading(true);
     try {
-      // TODO: Hier Bestellung an Backend/API senden
-      // await submitOrder(formData, items);
+      // Bestellung an Backend/API senden
+      const { createOrder } = await import("@/lib/api");
       
-      // Simuliere API-Aufruf
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const subtotal = getTotalPrice();
+      const tax = subtotal * 0.19;
+      const total = subtotal + tax;
+
+      // Bestellpositionen vorbereiten
+      const orderItems = items.map((item) => ({
+        product_id: item.product.id,
+        product_sku: item.product.sku,
+        product_name: item.product.name,
+        quantity: item.quantity,
+        unit_price: item.product.price_eur || 0,
+        total_price: (item.product.price_eur || 0) * item.quantity,
+        configuration: item.configuration || {},
+      }));
+
+      // Bestellung erstellen
+      await createOrder({
+        company_name: formData.company,
+        contact_person: formData.contactPerson,
+        email: formData.email,
+        phone: formData.phone,
+        billing_street: formData.billingAddress.street,
+        billing_city: formData.billingAddress.city,
+        billing_postal_code: formData.billingAddress.postalCode,
+        billing_country: formData.billingAddress.country,
+        shipping_street: formData.shippingAddress.sameAsBilling 
+          ? formData.billingAddress.street 
+          : formData.shippingAddress.street,
+        shipping_city: formData.shippingAddress.sameAsBilling 
+          ? formData.billingAddress.city 
+          : formData.shippingAddress.city,
+        shipping_postal_code: formData.shippingAddress.sameAsBilling 
+          ? formData.billingAddress.postalCode 
+          : formData.shippingAddress.postalCode,
+        shipping_country: formData.shippingAddress.sameAsBilling 
+          ? formData.billingAddress.country 
+          : formData.shippingAddress.country,
+        shipping_method: formData.shippingMethod,
+        payment_method: formData.paymentMethod,
+        subtotal_net: subtotal,
+        tax_amount: tax,
+        total_amount: total,
+        items: orderItems,
+        status: "pending",
+      });
 
       // Erfolg: Warenkorb leeren und zur Bestätigungsseite
       clearCart();

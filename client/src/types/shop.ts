@@ -33,6 +33,7 @@ export interface ShopProduct {
   power_mw: number | null;
   price_eur: number | null;
   is_active: boolean;
+  main_image_url?: string | null; // URL des Hauptbildes
   // Assets werden separat geladen und hier hinzugefügt
   assets?: ProductAsset[];
 }

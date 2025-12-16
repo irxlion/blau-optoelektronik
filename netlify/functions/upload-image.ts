@@ -119,15 +119,68 @@ export const handler: Handler = async (event) => {
 
             if (error) {
                 console.error('Upload error:', error);
-                // Prüfe ob Bucket existiert
-                if (error.message?.includes('Bucket not found')) {
-                    return {
-                        statusCode: 500,
-                        headers,
-                        body: JSON.stringify({ 
-                            error: 'Storage Bucket "uploads" existiert nicht. Bitte erstellen Sie ihn in Supabase Dashboard > Storage > Buckets' 
-                        }),
-                    };
+                // Prüfe ob Bucket existiert und versuche es zu erstellen
+                if (error.message?.includes('Bucket not found') || error.message?.includes('does not exist')) {
+                    // Versuche Bucket automatisch zu erstellen
+                    try {
+                        const { data: bucketData, error: bucketError } = await supabase.storage.createBucket('uploads', {
+                            public: true,
+                            fileSizeLimit: 10485760, // 10 MB
+                            allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf']
+                        });
+                        
+                        if (bucketError && !bucketError.message?.includes('already exists')) {
+                            console.error('Error creating bucket:', bucketError);
+                            return {
+                                statusCode: 500,
+                                headers,
+                                body: JSON.stringify({ 
+                                    error: 'Storage Bucket "uploads" konnte nicht erstellt werden. Bitte erstellen Sie ihn manuell in Supabase Dashboard > Storage > Buckets',
+                                    details: bucketError.message
+                                }),
+                            };
+                        }
+                        
+                        // Versuche Upload erneut nach Bucket-Erstellung
+                        const { data: retryData, error: retryError } = await supabase.storage
+                            .from('uploads')
+                            .upload(filePath, buffer, {
+                                contentType: mimeType,
+                                upsert: true,
+                            });
+                        
+                        if (retryError) {
+                            return {
+                                statusCode: 500,
+                                headers,
+                                body: JSON.stringify({ error: 'Upload fehlgeschlagen nach Bucket-Erstellung', details: retryError.message }),
+                            };
+                        }
+                        
+                        // Erfolgreich nach Retry
+                        const { data: urlData } = supabase.storage
+                            .from('uploads')
+                            .getPublicUrl(filePath);
+                        
+                        return {
+                            statusCode: 200,
+                            headers,
+                            body: JSON.stringify({
+                                success: true,
+                                url: urlData.publicUrl,
+                                path: filePath,
+                            }),
+                        };
+                    } catch (createError: any) {
+                        return {
+                            statusCode: 500,
+                            headers,
+                            body: JSON.stringify({ 
+                                error: 'Storage Bucket "uploads" existiert nicht und konnte nicht automatisch erstellt werden. Bitte erstellen Sie ihn in Supabase Dashboard > Storage > Buckets',
+                                details: createError.message
+                            }),
+                        };
+                    }
                 }
                 return {
                     statusCode: 500,

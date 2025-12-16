@@ -117,8 +117,15 @@ export default function Shop() {
   };
 
   const getProductImage = (product: ShopProduct): string => {
-    // TODO: Später aus product.assets laden
-    // Aktuell: Fallback zu bestehenden Produktbildern
+    // Verwende Hauptbild falls vorhanden (wird aus main_image_url oder erstes Bild geladen)
+    const mainImage = (product as any).main_image_url;
+    if (mainImage) return mainImage;
+    
+    // Fallback: Erstes Bild aus Assets
+    const imageAsset = product.assets?.find((a) => a.type === "image");
+    if (imageAsset) return imageAsset.url;
+    
+    // Fallback zu bestehenden Produktbildern
     const imageMap: Record<string, string> = {
       "Machine Vision Lasermodule": "/product-machine-vision.jpg",
       "Linienlaser": "/product-line-laser.jpg",

@@ -4,15 +4,23 @@ import { createClient } from '@supabase/supabase-js';
 const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
     'Content-Type': 'application/json',
 };
 
 // Supabase Client initialisieren
 const supabaseUrl = process.env.SUPABASE_URL || 'https://xtuwjizliuthdgytloju.supabase.co';
+// WICHTIG: Service Role Key verwenden, nicht Anon Key!
+// Service Role Key umgeht RLS automatisch
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0dXdqaXpsaXV0aGRneXRsb2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2MTIwMjAsImV4cCI6MjA4MDE4ODAyMH0.U5iQhb_rDZedHFfAMl2tA85jn_kvAp2G6m35CyS0do4';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Supabase Client mit Service Role Key erstellen
+const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+    },
+});
 
 // Helper: Produkt aus DB-Format in Frontend-Format konvertieren
 function dbProductToFrontendProduct(dbProduct: any) {
@@ -159,6 +167,64 @@ export const handler: Handler = async (event) => {
                     statusCode: 500,
                     headers,
                     body: JSON.stringify({ error: 'Failed to save products', details: error.message }),
+                };
+            }
+
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({ success: true }),
+            };
+        } else if (event.httpMethod === 'DELETE') {
+            // Authentifizierung prüfen für DELETE
+            const authHeader = event.headers.authorization || event.headers.Authorization;
+            if (!authHeader) {
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({ error: 'Unauthorized' }),
+                };
+            }
+
+            // Token validieren
+            try {
+                const token = authHeader.replace('Bearer ', '');
+                const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
+                // Admin und Mitarbeiter können Produkte löschen
+                if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
+                    return {
+                        statusCode: 403,
+                        headers,
+                        body: JSON.stringify({ error: 'Forbidden - Nur Admins und Mitarbeiter können Produkte löschen' }),
+                    };
+                }
+            } catch (e) {
+                console.warn('Token validation failed:', e);
+            }
+
+            // Produkt-ID aus Body extrahieren
+            const { product_id } = JSON.parse(event.body || '{}');
+
+            if (!product_id) {
+                return {
+                    statusCode: 400,
+                    headers,
+                    body: JSON.stringify({ error: 'product_id ist erforderlich' }),
+                };
+            }
+
+            // Alle Einträge mit dieser product_id löschen (sowohl DE als auch EN)
+            const { error } = await supabase
+                .from('products')
+                .delete()
+                .eq('product_id', product_id);
+
+            if (error) {
+                console.error('Error deleting product:', error);
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({ error: 'Failed to delete product', details: error.message }),
                 };
             }
 

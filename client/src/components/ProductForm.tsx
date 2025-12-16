@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { uploadImage, deleteImage, uploadPDF, deletePDF } from "@/lib/api";
+import { DragDropUpload } from "@/components/DragDropUpload";
+import { ImageManager } from "@/components/ImageManager";
 import { toast } from "sonner";
 import { Upload, X, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
 
@@ -235,10 +237,18 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Stelle sicher, dass Hauptbild in images-Array enthalten ist
+        const imageUrls = imagePaths.map((img) => img.url);
+        if (formData.image && !imageUrls.includes(formData.image)) {
+            imageUrls.unshift(formData.image);
+        }
+
         // Bilder und PDFs in formData integrieren
         const updatedFormData = {
             ...formData,
-            images: imagePaths.map((img) => img.url),
+            images: imageUrls,
+            // Stelle sicher, dass Hauptbild das erste Bild ist
+            image: formData.image || imageUrls[0] || "",
             downloads: [
                 ...pdfFiles.map((pdf) => ({
                     name: pdf.name,
@@ -260,7 +270,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                     <DialogTitle>{product ? "Edit Product" : "Add Product"}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="id">ID</Label>
                             <Input id="id" name="id" value={formData.id || ""} onChange={handleChange} required disabled={!!product} />
@@ -283,67 +293,74 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                     {/* Bild-Upload Bereich */}
                     <div className="space-y-2">
                         <Label>Produktbilder (PNG, JPG, max. 5 MB)</Label>
-                        <div className="flex items-center gap-2">
-                            <Input
-                                ref={imageInputRef}
-                                type="file"
-                                accept="image/png,image/jpeg,image/jpg"
-                                onChange={handleImageUpload}
-                                disabled={uploadingImage || !formData.id}
-                                className="hidden"
-                                id="image-upload"
-                            />
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => imageInputRef.current?.click()}
-                                disabled={uploadingImage || !formData.id}
-                            >
-                                {uploadingImage ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Upload...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Upload className="mr-2 h-4 w-4" /> Bild hochladen
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                        {imagePaths.length > 0 && (
-                            <div className="grid grid-cols-4 gap-2 mt-2">
-                                {imagePaths.map((img, index) => (
-                                    <div key={index} className="relative group">
-                                        <img
-                                            src={img.url}
-                                            alt={`Produktbild ${index + 1}`}
-                                            className="w-full h-24 object-cover rounded border"
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="destructive"
-                                            size="icon"
-                                            className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            onClick={() => handleImageDelete(img.path)}
-                                        >
-                                            <X className="h-3 w-3" />
-                                        </Button>
-                                        {formData.image === img.url && (
-                                            <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
-                                                Hauptbild
-                                            </div>
+                        {formData.id ? (
+                            <>
+                                <DragDropUpload
+                                    onImageUpload={async (file) => {
+                                        const e = {
+                                            target: { files: [file] },
+                                        } as React.ChangeEvent<HTMLInputElement>;
+                                        await handleImageUpload(e);
+                                    }}
+                                    acceptPDFs={false}
+                                    disabled={uploadingImage || !formData.id}
+                                    multiple={true}
+                                    className="mb-2"
+                                />
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        ref={imageInputRef}
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/jpg"
+                                        onChange={handleImageUpload}
+                                        disabled={uploadingImage || !formData.id}
+                                        className="hidden"
+                                        id="image-upload"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => imageInputRef.current?.click()}
+                                        disabled={uploadingImage || !formData.id}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        {uploadingImage ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Upload...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload className="mr-2 h-4 w-4" /> Oder Datei auswählen
+                                            </>
                                         )}
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            className="absolute inset-0 w-full h-full opacity-0 hover:opacity-100 bg-black/50 text-white text-xs"
-                                            onClick={() => setFormData((prev) => ({ ...prev, image: img.url }))}
-                                        >
-                                            Als Hauptbild setzen
-                                        </Button>
-                                    </div>
-                                ))}
+                                    </Button>
+                                </div>
+                            </>
+                        ) : (
+                            <p className="text-sm text-gray-500">Bitte geben Sie zuerst eine Produkt-ID ein</p>
+                        )}
+                        {imagePaths.length > 0 && (
+                            <div className="mt-4">
+                                <ImageManager
+                                    images={imagePaths.map((img, idx) => ({
+                                        id: img.path || `img-${idx}`,
+                                        url: img.url,
+                                        path: img.path,
+                                    }))}
+                                    mainImage={formData.image}
+                                    onImagesChange={(newImages) => {
+                                        setImagePaths(newImages.map((img) => ({
+                                            url: img.url,
+                                            path: img.path,
+                                        })));
+                                    }}
+                                    onMainImageChange={(url) => {
+                                        setFormData((prev) => ({ ...prev, image: url }));
+                                    }}
+                                    onDelete={handleImageDelete}
+                                    disabled={uploadingImage}
+                                    isEnglish={false}
+                                />
                             </div>
                         )}
                     </div>
@@ -351,40 +368,59 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                     {/* PDF-Upload Bereich */}
                     <div className="space-y-2">
                         <Label>PDF-Dokumente (Datenblätter, max. 10 MB)</Label>
-                        <div className="flex items-center gap-2">
-                            <Input
-                                ref={pdfInputRef}
-                                type="file"
-                                accept="application/pdf"
-                                onChange={handlePDFUpload}
-                                disabled={uploadingPDF || !formData.id}
-                                className="hidden"
-                                id="pdf-upload"
-                            />
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => pdfInputRef.current?.click()}
-                                disabled={uploadingPDF || !formData.id}
-                            >
-                                {uploadingPDF ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Upload...
-                                    </>
-                                ) : (
-                                    <>
-                                        <FileText className="mr-2 h-4 w-4" /> PDF hochladen
-                                    </>
-                                )}
-                            </Button>
-                        </div>
+                        {formData.id ? (
+                            <>
+                                <DragDropUpload
+                                    onPDFUpload={async (file) => {
+                                        const e = {
+                                            target: { files: [file] },
+                                        } as React.ChangeEvent<HTMLInputElement>;
+                                        await handlePDFUpload(e);
+                                    }}
+                                    acceptImages={false}
+                                    disabled={uploadingPDF || !formData.id}
+                                    multiple={true}
+                                    className="mb-2"
+                                />
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        ref={pdfInputRef}
+                                        type="file"
+                                        accept="application/pdf"
+                                        onChange={handlePDFUpload}
+                                        disabled={uploadingPDF || !formData.id}
+                                        className="hidden"
+                                        id="pdf-upload"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => pdfInputRef.current?.click()}
+                                        disabled={uploadingPDF || !formData.id}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        {uploadingPDF ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Upload...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <FileText className="mr-2 h-4 w-4" /> Oder Datei auswählen
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                            </>
+                        ) : (
+                            <p className="text-sm text-gray-500">Bitte geben Sie zuerst eine Produkt-ID ein</p>
+                        )}
                         {pdfFiles.length > 0 && (
                             <div className="space-y-2 mt-2">
                                 {pdfFiles.map((pdf, index) => (
                                     <div key={index} className="flex items-center justify-between p-2 border rounded">
                                         <div className="flex items-center gap-2">
                                             <FileText className="h-4 w-4 text-red-500" />
-                                            <span className="text-sm">{pdf.name}</span>
+                                            <span className="text-sm truncate">{pdf.name}</span>
                                         </div>
                                         <Button
                                             type="button"
