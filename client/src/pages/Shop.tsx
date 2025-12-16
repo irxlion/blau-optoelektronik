@@ -133,7 +133,32 @@ export default function Shop() {
       "Powelllinsen": "/product-powell-lens.jpg",
       "OEM Module": "/product-oem-module.jpg",
     };
-    return imageMap[product.category] || "/product-machine-vision.jpg";
+    const mapped = imageMap[product.category];
+    if (!mapped && isEnglish) {
+      // #region agent log
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        const key = `__dbg_shop_img_miss_${product.category || "unknown"}`;
+        if (!w[key]) {
+          w[key] = true;
+          fetch("http://127.0.0.1:7242/ingest/11ad90a2-7433-4ef9-b753-18907f0bce0b", {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({
+              sessionId: "debug-session",
+              runId: "pre-fix",
+              hypothesisId: "B",
+              location: "Shop.tsx:getProductImage",
+              message: "Shop image map miss (EN) -> fallback",
+              data: { category: product.category, productId: product.id, fallback: "/product-machine-vision.jpg" },
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {});
+        }
+      }
+      // #endregion
+    }
+    return mapped || "/product-machine-vision.jpg";
   };
 
   return (

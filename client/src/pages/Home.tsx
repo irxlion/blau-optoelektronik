@@ -46,7 +46,30 @@ export default function Home() {
 
   const getProductHref = (product: Product) => {
     // Eigene Route für die Machine-Vision-Seite
-    if (product.id === "machine-vision") return "/produkte/machine-vision";
+    if (product.id === "machine-vision") {
+      // #region agent log
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        if (!w.__dbg_home_machine_vision_href) {
+          w.__dbg_home_machine_vision_href = true;
+          fetch("http://127.0.0.1:7242/ingest/11ad90a2-7433-4ef9-b753-18907f0bce0b", {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({
+              sessionId: "debug-session",
+              runId: "pre-fix",
+              hypothesisId: "A",
+              location: "Home.tsx:getProductHref",
+              message: "Home machine-vision href computed",
+              data: { productId: product.id, href: "/produkte/machine-vision" },
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {});
+        }
+      }
+      // #endregion
+      return "/produkte/machine-vision";
+    }
     return `/produkte/${product.id}`;
   };
 
@@ -61,7 +84,32 @@ export default function Home() {
       "Powelllinsen": "/product-powell-lens.jpg",
       "OEM Module": "/product-oem-module.jpg",
     };
-    return imageMap[product.category] || "/product-machine-vision.jpg";
+    const mapped = imageMap[product.category];
+    if (!mapped && language === "en") {
+      // #region agent log
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        const key = `__dbg_home_img_miss_${product.category || "unknown"}`;
+        if (!w[key]) {
+          w[key] = true;
+          fetch("http://127.0.0.1:7242/ingest/11ad90a2-7433-4ef9-b753-18907f0bce0b", {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({
+              sessionId: "debug-session",
+              runId: "pre-fix",
+              hypothesisId: "B",
+              location: "Home.tsx:getProductImage",
+              message: "Image map miss (EN) -> fallback",
+              data: { category: product.category, productId: product.id, fallback: "/product-machine-vision.jpg" },
+              timestamp: Date.now(),
+            }),
+          }).catch(() => {});
+        }
+      }
+      // #endregion
+    }
+    return mapped || "/product-machine-vision.jpg";
   };
 
   // Wir nehmen die Reihenfolge der API und begrenzen auf 6 Karten.

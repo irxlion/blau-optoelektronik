@@ -19,7 +19,30 @@ const CATEGORY = {
 function getProductHref(product: Product) {
   // Reservierter Pfad: /produkte/machine-vision ist die Kategorie-Seite.
   // Damit die Standard-Variante dennoch erreichbar bleibt, geben wir ihr einen Alias.
-  if (product.id === "machine-vision") return "/produkte/machine-vision-laser";
+  if (product.id === "machine-vision") {
+    // #region agent log
+    if (typeof window !== "undefined") {
+      const w = window as any;
+      if (!w.__dbg_mv_modules_machine_vision_href) {
+        w.__dbg_mv_modules_machine_vision_href = true;
+        fetch("http://127.0.0.1:7242/ingest/11ad90a2-7433-4ef9-b753-18907f0bce0b", {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify({
+            sessionId: "debug-session",
+            runId: "pre-fix",
+            hypothesisId: "A",
+            location: "MachineVisionLaserModules.tsx:getProductHref",
+            message: "MachineVisionLaserModules machine-vision href computed",
+            data: { productId: product.id, href: "/produkte/machine-vision-laser" },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+      }
+    }
+    // #endregion
+    return "/produkte/machine-vision-laser";
+  }
   return `/produkte/${product.id}`;
 }
 
