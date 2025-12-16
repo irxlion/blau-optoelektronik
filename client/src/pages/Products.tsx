@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 function getProductHref(product: Product) {
-  // /produkte/machine-vision ist jetzt die Kategorie-Seite
-  if (product.id === "machine-vision") return "/produkte/machine-vision-laser";
+  // /produkte/machine-vision ist eine eigene Seite
+  if (product.id === "machine-vision") return "/produkte/machine-vision";
   return `/produkte/${product.id}`;
 }
 

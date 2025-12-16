@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, Zap, Award, Users, Globe, Factory, Microscope, Cog, Shield, Clock, TrendingUp, CheckCircle2, Sparkles, Layers, Gauge, Rocket, Target, BarChart3, HeartHandshake, Heart, Cpu } from "lucide-react";
+import { ArrowRight, Zap, Award, Users, Globe, Factory, Microscope, Cog, Shield, Clock, TrendingUp, CheckCircle2, Sparkles, Layers, Gauge, Rocket, Target, BarChart3, HeartHandshake, Heart, Cpu, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,77 +11,66 @@ import SEO from "@/components/SEO";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
+import { fetchProducts } from "@/lib/api";
+import type { Product } from "@/data/products";
 
 export default function Home() {
   const { language, t } = useLanguage();
   const isEnglish = language === "en";
 
-  const products = t({
-    de: [
-      {
-        title: "Machine Vision Lasermodule",
-        description: "Hochpräzise Lasermodule für industrielle Bildverarbeitung mit optimaler Genauigkeit und Messgeschwindigkeit.",
-        image: "/product-machine-vision.jpg",
-        href: "/produkte/machine-vision",
-      },
-      {
-        title: "Linienlaser",
-        description: "Präzise Positionierung durch hochwertige Linienlaser für anspruchsvolle Anwendungen.",
-        image: "/product-line-laser.jpg",
-        href: "/produkte/linienlaser",
-      },
-      {
-        title: "Punktlaser",
-        description: "Punktlaser-Module mit rundem oder elliptischem Strahlprofil für vielfältige Einsatzbereiche.",
-        image: "/product-point-laser.jpg",
-        href: "/produkte/punktlaser",
-      },
-      {
-        title: "Powelllinsen",
-        description: "Asphärische Powelllinsen in Eigenproduktion - mehrere hundert Einheiten pro Woche.",
-        image: "/product-powell-lens.jpg",
-        href: "/produkte/powelllinsen",
-      },
-      {
-        title: "OEM Module",
-        description: "Kundenspezifische Mechaniken, Optik und Elektronik nach Ihren Anforderungen, auch in Kleinserien.",
-        image: "/product-oem-module.jpg",
-        href: "/produkte/oem-module",
-      },
-    ],
-    en: [
-      {
-        title: "Machine Vision Laser Modules",
-        description: "High-precision laser modules for industrial imaging with outstanding accuracy and measurement speed.",
-        image: "/product-machine-vision.jpg",
-        href: "/produkte/machine-vision",
-      },
-      {
-        title: "Line Lasers",
-        description: "High-quality line lasers for precise positioning in demanding applications.",
-        image: "/product-line-laser.jpg",
-        href: "/produkte/linienlaser",
-      },
-      {
-        title: "Point Lasers",
-        description: "Point laser modules with round or elliptical beam profiles for versatile use cases.",
-        image: "/product-point-laser.jpg",
-        href: "/produkte/punktlaser",
-      },
-      {
-        title: "Powell Lenses",
-        description: "In-house manufactured aspheric Powell lenses – several hundred units per week.",
-        image: "/product-powell-lens.jpg",
-        href: "/produkte/powelllinsen",
-      },
-      {
-        title: "OEM Modules",
-        description: "Custom mechanics, optics and electronics tailored to your specifications, even for small batches.",
-        image: "/product-oem-module.jpg",
-        href: "/produkte/oem-module",
-      },
-    ],
-  });
+  // Produkte (aus dem Dashboard "Produkte" gepflegt) für die Startseite laden.
+  // Ziel: Startseite zeigt nur Produkte, die im Dashboard angelegt/hochgeladen wurden.
+  const [productsByLang, setProductsByLang] = useState<{ de: Product[]; en: Product[] }>({ de: [], en: [] });
+  const [productsLoading, setProductsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      setProductsLoading(true);
+      try {
+        const data = await fetchProducts();
+        if (!cancelled) setProductsByLang({ de: data.de || [], en: data.en || [] });
+      } catch (e) {
+        console.error("Fehler beim Laden der Produkte (Startseite):", e);
+        if (!cancelled) setProductsByLang({ de: [], en: [] });
+      } finally {
+        if (!cancelled) setProductsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const getProductHref = (product: Product) => {
+    // Eigene Route für die Machine-Vision-Seite
+    if (product.id === "machine-vision") return "/produkte/machine-vision";
+    return `/produkte/${product.id}`;
+  };
+
+  const getProductImage = (product: Product): string => {
+    const mainImage = product.image;
+    if (mainImage) return mainImage;
+
+    const imageMap: Record<string, string> = {
+      "Machine Vision Lasermodule": "/product-machine-vision.jpg",
+      "Linienlaser": "/product-line-laser.jpg",
+      "Punktlaser": "/product-point-laser.jpg",
+      "Powelllinsen": "/product-powell-lens.jpg",
+      "OEM Module": "/product-oem-module.jpg",
+    };
+    return imageMap[product.category] || "/product-machine-vision.jpg";
+  };
+
+  // Wir nehmen die Reihenfolge der API und begrenzen auf 6 Karten.
+  const homeProductCards = (productsByLang[language] || []).slice(0, 6).map((p) => ({
+    title: p.name,
+    description: p.description || p.longDescription || p.category,
+    image: getProductImage(p),
+    href: getProductHref(p),
+  }));
 
   const features = t({
     de: [
@@ -663,20 +653,42 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">{productSectionCopy.heading}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{productSectionCopy.description}</p>
           </motion.div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product, index) => (
-              <motion.div
-                key={product.href}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
-                <ProductCard {...product} />
-              </motion.div>
-            ))}
-          </div>
+          {productsLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : homeProductCards.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-lg text-muted-foreground">
+                {isEnglish ? "No products available yet." : "Noch keine Produkte verfügbar."}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {homeProductCards.map((product, index) => (
+                  <motion.div
+                    key={product.href}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <ProductCard {...product} />
+                  </motion.div>
+                ))}
+              </div>
+              <div className="mt-10 text-center">
+                <Link href="/produkte">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90">
+                    {isEnglish ? "View all products" : "Alle Produkte ansehen"}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

@@ -143,13 +143,15 @@ export default function Dashboard() {
     };
 
     const handleSaveCareer = async (career: Career) => {
-        if (!careers) {
-            // Initialisiere careers falls noch nicht geladen
-            setCareers({ de: [], en: [] });
-        }
+        // React-State-Updates sind asynchron: bei `careers === null` nie direkt danach
+        // mit dem alten Wert weiterarbeiten, sondern mit einer lokal initialisierten Kopie.
+        const baseCareers = careers ?? { de: [], en: [] };
+        const newCareers: { de: Career[]; en: Career[] } = {
+            de: [...(baseCareers.de ?? [])],
+            en: [...(baseCareers.en ?? [])],
+        };
 
-        const newCareers = { ...careers };
-        const list = newCareers[currentLang];
+        const list = [...newCareers[currentLang]];
         const index = list.findIndex((c) => c.id === career.id);
 
         if (index >= 0) {
@@ -157,13 +159,11 @@ export default function Dashboard() {
         } else {
             list.push(career);
         }
+        newCareers[currentLang] = list;
 
         // Stelle sicher, dass beide Sprachen existieren
         // Wenn eine neue Stelle erstellt wird, erstelle auch einen Platzhalter für die andere Sprache
         const otherLang = currentLang === "de" ? "en" : "de";
-        if (!newCareers[otherLang]) {
-            newCareers[otherLang] = [];
-        }
 
         // Wenn es eine neue Stelle ist, erstelle auch einen Eintrag für die andere Sprache
         // (mit minimalen Daten, die später bearbeitet werden können)
@@ -174,10 +174,12 @@ export default function Dashboard() {
                 description: career.description || "",
             };
             // Prüfe ob bereits ein Eintrag für diese ID in der anderen Sprache existiert
-            const otherIndex = newCareers[otherLang].findIndex((c) => c.id === career.id);
+            const otherList = [...newCareers[otherLang]];
+            const otherIndex = otherList.findIndex((c) => c.id === career.id);
             if (otherIndex < 0) {
-                newCareers[otherLang].push(otherLangCareer);
+                otherList.push(otherLangCareer);
             }
+            newCareers[otherLang] = otherList;
         }
 
         try {
