@@ -1,4 +1,4 @@
-functionsDirectory = "C:\\Users\\alial\\Downloads\\blau-optoelektronik-complete (2)\\blau-optoelektronik\\netlify\\functions"
+functionsDirectory = "C:\\Users\\alial\\OneDrive\\Desktop\\Blauop\\blau-optoelektronik\\netlify\\functions"
 functionsDirectoryOrigin = "config-v1"
 redirectsOrigin = "config"
 site_id = "643d3f93-4e90-4ffa-b20d-d7f1e44d47e5"
@@ -6,11 +6,11 @@ plugins = []
 headers = []
 
 [build]
-publish = "C:\\Users\\alial\\Downloads\\blau-optoelektronik-complete (2)\\blau-optoelektronik\\dist\\public"
+publish = "C:\\Users\\alial\\OneDrive\\Desktop\\Blauop\\blau-optoelektronik\\dist\\public"
 publishOrigin = "config"
 commandOrigin = "config"
 command = "pnpm vite build"
-functions = "C:\\Users\\alial\\Downloads\\blau-optoelektronik-complete (2)\\blau-optoelektronik\\netlify\\functions"
+functions = "C:\\Users\\alial\\OneDrive\\Desktop\\Blauop\\blau-optoelektronik\\netlify\\functions"
 
 [build.environment]
 NODE_VERSION = "20"

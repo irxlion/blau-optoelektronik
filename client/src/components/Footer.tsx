@@ -1,30 +1,68 @@
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "wouter";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { APP_LOGO } from "@/const";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { fetchProducts } from "@/lib/api";
+import { Product } from "@/data/products";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { language } = useLanguage();
   const isEnglish = language === "en";
+  const [productsData, setProductsData] = useState<{ de: Product[]; en: Product[] } | null>(null);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
-  const productLinks = isEnglish
-    ? [
-      { name: "Machine Vision Laser Modules", href: "/produkte/machine-vision" },
-      { name: "Line Lasers", href: "/produkte/linienlaser" },
-      { name: "Point Lasers", href: "/produkte/punktlaser" },
-      { name: "Powell Lenses", href: "/produkte/powelllinsen" },
-      { name: "OEM Modules", href: "/produkte/oem-module" },
-      { name: "MVpulse", href: "/produkte/mvpulse" },
-    ]
-    : [
-      { name: "Machine Vision Lasermodule", href: "/produkte/machine-vision" },
-      { name: "Linienlaser", href: "/produkte/linienlaser" },
-      { name: "Punktlaser", href: "/produkte/punktlaser" },
-      { name: "Powelllinsen", href: "/produkte/powelllinsen" },
-      { name: "OEM Module", href: "/produkte/oem-module" },
-      { name: "MVpulse", href: "/produkte/mvpulse" },
-    ];
+  // Produkte aus der Datenbank laden
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoadingProducts(true);
+        const data = await fetchProducts();
+        setProductsData(data);
+      } catch (error) {
+        console.error("Fehler beim Laden der Produkte für Footer:", error);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    loadProducts();
+  }, []);
+
+  // Kategorien aus der Datenbank extrahieren
+  const productLinks = useMemo(() => {
+    if (!productsData || loadingProducts) {
+      // Fallback zu statischen Kategorien während des Ladens
+      return isEnglish
+        ? [
+            { name: "Machine Vision Laser Modules", href: "/produkte/machine-vision" },
+            { name: "Line Lasers", href: "/produkte/linienlaser" },
+            { name: "Point Lasers", href: "/produkte/punktlaser" },
+            { name: "Powell Lenses", href: "/produkte/powelllinsen" },
+            { name: "OEM Modules", href: "/produkte/oem-module" },
+            { name: "MVpulse", href: "/produkte/mvpulse" },
+          ]
+        : [
+            { name: "Machine Vision Lasermodule", href: "/produkte/machine-vision" },
+            { name: "Linienlaser", href: "/produkte/linienlaser" },
+            { name: "Punktlaser", href: "/produkte/punktlaser" },
+            { name: "Powelllinsen", href: "/produkte/powelllinsen" },
+            { name: "OEM Module", href: "/produkte/oem-module" },
+            { name: "MVpulse", href: "/produkte/mvpulse" },
+          ];
+    }
+
+    const currentProducts = productsData[language];
+    
+    // Kategorien aus Produkten extrahieren und sortieren
+    const categories = Array.from(new Set(currentProducts.map((p) => p.category))).sort();
+    
+    // Kategorien als Links erstellen
+    return categories.map((category) => ({
+      name: category,
+      href: `/produkte?category=${encodeURIComponent(category)}`,
+    }));
+  }, [productsData, language, loadingProducts, isEnglish]);
 
   const companyLinks = isEnglish
     ? [

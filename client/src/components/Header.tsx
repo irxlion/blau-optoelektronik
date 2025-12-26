@@ -6,7 +6,7 @@
  * - Responsive für Desktop, Tablet und Mobile
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, ShoppingCart, ChevronRight } from "lucide-react";
 import { APP_LOGO_HEADER } from "@/const";
@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { ContactDialog } from "@/components/ContactDialog";
+import { fetchProducts } from "@/lib/api";
+import { Product } from "@/data/products";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,6 +39,8 @@ export default function Header() {
   const subDropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [menuItemsVisible, setMenuItemsVisible] = useState(false);
   const cartItemCount = getTotalItems();
+  const [productsData, setProductsData] = useState<{ de: Product[]; en: Product[] } | null>(null);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,18 +73,23 @@ export default function Header() {
     }
   }, [isMobileMenuOpen]);
 
-  // Machine Vision Sub-Dropdown Items
-  const machineVisionSubItems = isEnglish
-    ? [
-        { name: "MVpulse", href: "/produkte/mvpulse", description: "Eye safety & high performance" },
-        { name: "Standard Modules", href: "/produkte/machine-vision", description: "Standard machine vision modules" },
-      ]
-    : [
-        { name: "MVpulse", href: "/produkte/mvpulse", description: "Augensicherheit & Hohe Leistung" },
-        { name: "Standard Module", href: "/produkte/machine-vision", description: "Standard Machine Vision Module" },
-      ];
+  // Produkte aus der Datenbank laden
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoadingProducts(true);
+        const data = await fetchProducts();
+        setProductsData(data);
+      } catch (error) {
+        console.error("Fehler beim Laden der Produkte für Header:", error);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    loadProducts();
+  }, []);
 
-  // Produkt-Kategorien mit Sub-Dropdown für Machine Vision
+  // Produkt-Kategorien mit Sub-Dropdown
   type DropdownItem = {
     name: string;
     href: string;
@@ -92,31 +101,55 @@ export default function Header() {
     }>;
   };
 
-  const productCategories: DropdownItem[] = isEnglish
-    ? [
-        {
-          name: "Machine Vision Laser Modules",
-          href: "/produkte/machine-vision",
-          hasSubDropdown: true,
-          subDropdownItems: machineVisionSubItems,
-        },
-        { name: "Line Lasers", href: "/produkte/linienlaser" },
-        { name: "Point Lasers", href: "/produkte/punktlaser" },
-        { name: "Powell Lenses", href: "/produkte/powelllinsen" },
-        { name: "OEM Modules", href: "/produkte/oem-module" },
-      ]
-    : [
-        {
-          name: "Machine Vision Lasermodule",
-          href: "/produkte/machine-vision",
-          hasSubDropdown: true,
-          subDropdownItems: machineVisionSubItems,
-        },
-        { name: "Linienlaser", href: "/produkte/linienlaser" },
-        { name: "Punktlaser", href: "/produkte/punktlaser" },
-        { name: "Powelllinsen", href: "/produkte/powelllinsen" },
-        { name: "OEM Module", href: "/produkte/oem-module" },
-      ];
+  // Kategorien und Produkte aus der Datenbank extrahieren
+  const productCategories: DropdownItem[] = useMemo(() => {
+    if (!productsData || loadingProducts) {
+      // Fallback zu statischen Kategorien während des Ladens
+      return isEnglish
+        ? [
+            { name: "Machine Vision Laser Modules", href: "/produkte/machine-vision" },
+            { name: "Line Lasers", href: "/produkte/linienlaser" },
+            { name: "Point Lasers", href: "/produkte/punktlaser" },
+            { name: "Powell Lenses", href: "/produkte/powelllinsen" },
+            { name: "OEM Modules", href: "/produkte/oem-module" },
+          ]
+        : [
+            { name: "Machine Vision Lasermodule", href: "/produkte/machine-vision" },
+            { name: "Linienlaser", href: "/produkte/linienlaser" },
+            { name: "Punktlaser", href: "/produkte/punktlaser" },
+            { name: "Powelllinsen", href: "/produkte/powelllinsen" },
+            { name: "OEM Module", href: "/produkte/oem-module" },
+          ];
+    }
+
+    const currentProducts = productsData[language];
+    
+    // Kategorien aus Produkten extrahieren
+    const categories = Array.from(new Set(currentProducts.map((p) => p.category))).sort();
+    
+    // Kategorien mit ihren Produkten erstellen
+    return categories.map((category) => {
+      const categoryProducts = currentProducts.filter((p) => p.category === category);
+      
+      // Produkte für Sub-Dropdown vorbereiten
+      const subDropdownItems = categoryProducts.map((product) => ({
+        name: product.name,
+        href: `/produkte/${product.id}`,
+        description: product.description 
+          ? (product.description.length > 60 
+              ? product.description.substring(0, 60) + "..." 
+              : product.description)
+          : undefined,
+      }));
+
+      return {
+        name: category,
+        href: `/produkte?category=${encodeURIComponent(category)}`,
+        hasSubDropdown: subDropdownItems.length > 0,
+        subDropdownItems: subDropdownItems.length > 0 ? subDropdownItems : undefined,
+      };
+    });
+  }, [productsData, language, loadingProducts, isEnglish]);
 
   const toolsCategories: DropdownItem[] = isEnglish
     ? [
@@ -301,7 +334,7 @@ export default function Header() {
                         <div className="space-y-1">
                           {item.dropdownItems?.map((dropdownItem) => (
                             <div
-                              key={dropdownItem.href}
+                              key={dropdownItem.name}
                               className="relative"
                               onMouseEnter={() => {
                                 if (dropdownItem.hasSubDropdown) {
