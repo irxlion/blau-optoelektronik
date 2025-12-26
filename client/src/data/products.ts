@@ -12,6 +12,9 @@ export interface Product {
   specifications: { [key: string]: string };
   applications: string[];
   downloads: { name: string; type: string; url: string }[];
+  seoHeadHtml?: string;
+  technicalPropertiesHtml?: string;
+  tools?: string[]; // Array von Tool-IDs (z.B. ["max-power-simulation", "line-thickness-simulation"])
 }
 
 const productData: Record<Language, Product[]> = {

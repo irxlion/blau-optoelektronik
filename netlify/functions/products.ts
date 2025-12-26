@@ -34,8 +34,11 @@ function dbProductToFrontendProduct(dbProduct: any) {
         images: dbProduct.images || [],
         features: dbProduct.features || [],
         specifications: dbProduct.specifications || {},
+        technicalPropertiesHtml: dbProduct.technical_properties_html || '',
         applications: dbProduct.applications || [],
-        downloads: dbProduct.downloads || []
+        downloads: dbProduct.downloads || [],
+        seoHeadHtml: dbProduct.seo_head_html || '',
+        tools: dbProduct.tools || []
     };
 }
 
@@ -52,8 +55,11 @@ function frontendProductToDbProduct(product: any, language: 'de' | 'en') {
         images: product.images || [],
         features: product.features || [],
         specifications: product.specifications || {},
+        technical_properties_html: product.technicalPropertiesHtml || null,
         applications: product.applications || [],
         downloads: product.downloads || [],
+        seo_head_html: product.seoHeadHtml || null,
+        tools: product.tools || [],
         is_active: true
     };
 }

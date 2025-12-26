@@ -73,6 +73,13 @@ CREATE TABLE IF NOT EXISTS products (
     -- Downloads als JSON Array von Objekten
     downloads JSONB DEFAULT '[]'::jsonb, -- Format: [{"name": "...", "type": "...", "url": "..."}]
     
+    -- Tools als JSON Array von Tool-IDs
+    tools JSONB DEFAULT '[]'::jsonb, -- Format: ["max-power-simulation", "line-thickness-simulation"]
+    
+    -- HTML-Inhalte
+    technical_properties_html TEXT, -- HTML-Code für technische Daten Tabellen
+    seo_head_html TEXT, -- HTML-Code für SEO Meta-Tags im <head> Bereich
+    
     -- Metadaten
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "wouter";
-import { ArrowLeft, Download, Check, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Check, ChevronRight, Loader2, Calculator, LineChart } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,27 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
 
+  const handleDownload = (download: { name: string; type: string; url: string }) => {
+    if (!download.url || download.url === "#") {
+      // Wenn keine URL vorhanden ist, könnte man hier eine Fehlermeldung anzeigen
+      console.warn(`Download "${download.name}" hat keine gültige URL`);
+      return;
+    }
+
+    // PDFs in neuem Tab öffnen, andere Dateien herunterladen
+    if (download.type === "PDF" || download.url.toLowerCase().endsWith(".pdf")) {
+      window.open(download.url, "_blank");
+    } else {
+      // Andere Dateien herunterladen
+      const link = document.createElement("a");
+      link.href = download.url;
+      link.download = download.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   useEffect(() => {
     fetchProducts()
       .then((data) => {
@@ -30,6 +51,28 @@ export default function ProductDetail() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [productId, language]);
+
+  // SEO-Head HTML (aus Dashboard) in <head> einfügen
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (!product?.seoHeadHtml) return;
+
+    const containerId = "product-seo-head-html";
+    // remove any previous container
+    const existing = document.getElementById(containerId);
+    if (existing) existing.remove();
+
+    const container = document.createElement("div");
+    container.id = containerId;
+    // mark as managed
+    container.setAttribute("data-managed", "true");
+    container.innerHTML = product.seoHeadHtml;
+    document.head.appendChild(container);
+
+    return () => {
+      container.remove();
+    };
+  }, [product?.seoHeadHtml]);
 
   if (loading) {
     return (
@@ -125,6 +168,15 @@ export default function ProductDetail() {
                   ))}
                 </div>
               )}
+
+              {/* CTA (unter Galerie/Features) */}
+              <div className="flex">
+                <Link href="/kontakt">
+                  <Button size="lg" className="bg-primary hover:bg-primary/90 mt-[50px] mb-[50px]">
+                    {isEnglish ? "Send inquiry" : "Anfrage senden"}
+                  </Button>
+                </Link>
+              </div>
             </div>
 
             {/* Product Info */}
@@ -134,36 +186,12 @@ export default function ProductDetail() {
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">{product.name}</h1>
               <p className="text-xl text-muted-foreground mb-6">{product.description}</p>
-              <p className="text-foreground mb-8 leading-relaxed">{product.longDescription}</p>
+              <div
+                className="text-foreground mb-8 leading-relaxed space-y-3 [&_p]:leading-relaxed [&_p]:mb-3 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-primary [&_a]:underline"
+                dangerouslySetInnerHTML={{ __html: product.longDescription || "" }}
+              />
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Link href="/kontakt">
-                  <Button size="lg" className="bg-primary hover:bg-primary/90">
-                    {isEnglish ? "Send inquiry" : "Anfrage senden"}
-                  </Button>
-                </Link>
-                <Button size="lg" variant="outline">
-                  <Download className="mr-2 h-5 w-5" />
-                  {isEnglish ? "Download datasheet" : "Datenblatt herunterladen"}
-                </Button>
-              </div>
-
-              {/* Key Features */}
-              <Card className="bg-accent border-border/50">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4 text-accent-foreground">
-                    {isEnglish ? "Key features" : "Hauptmerkmale"}
-                  </h3>
-                  <ul className="space-y-2">
-                    {product.features.slice(0, 4).map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-accent-foreground">
-                        <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              {/* CTA wurde in die linke Spalte unter Galerie/Features verschoben */}
             </div>
           </div>
         </div>
@@ -188,6 +216,35 @@ export default function ProductDetail() {
                 </CardContent>
               </Card>
             ))}
+            {/* Tools Buttons */}
+            {product.tools && product.tools.length > 0 && (
+              <>
+                {product.tools.includes("max-power-simulation") && (
+                  <Card className="border-border/50 hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <Link href={isEnglish ? "/tools/maximum-power-simulation" : "/tools/maximale-leistung-simulation"}>
+                        <Button className="w-full" variant="outline">
+                          <Calculator className="mr-2 h-5 w-5" />
+                          {isEnglish ? "Maximum Power Simulation" : "Maximale Leistung Simulation"}
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                )}
+                {product.tools.includes("line-thickness-simulation") && (
+                  <Card className="border-border/50 hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <Link href={isEnglish ? "/tools/line-thickness-simulation" : "/tools/liniendickensimulation"}>
+                        <Button className="w-full" variant="outline">
+                          <LineChart className="mr-2 h-5 w-5" />
+                          {isEnglish ? "Line Thickness Simulation" : "Liniendicken Simulation"}
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -200,17 +257,33 @@ export default function ProductDetail() {
           </h2>
           <Card className="border-border/50">
             <CardContent className="p-0">
-              <div className="divide-y divide-border">
-                {Object.entries(product.specifications).map(([key, value], idx) => (
-                  <div
-                    key={idx}
-                    className="grid md:grid-cols-2 gap-4 p-6 hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="font-semibold text-foreground">{key}</div>
-                    <div className="text-muted-foreground">{value}</div>
-                  </div>
-                ))}
-              </div>
+              {product.technicalPropertiesHtml ? (
+                <div className="p-6">
+                  {product.technicalPropertiesHtml
+                    .split("<!-- TECH_TABLE_SPLIT -->")
+                    .map((b) => b.trim())
+                    .filter(Boolean)
+                    .map((block, i) => (
+                      <div
+                        key={i}
+                        className="text-foreground [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm [&_table]:my-[61px] [&_th]:text-left [&_th]:font-semibold [&_th]:p-3 [&_th]:border-b [&_td]:p-3 [&_td]:border-b [&_tr:hover]:bg-muted/50 [&_caption]:text-left [&_caption]:text-muted-foreground [&_caption]:mb-2 [&_caption]:text-sm"
+                        dangerouslySetInnerHTML={{ __html: block }}
+                      />
+                    ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {Object.entries(product.specifications).map(([key, value], idx) => (
+                    <div
+                      key={idx}
+                      className="grid md:grid-cols-2 gap-4 p-6 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="font-semibold text-foreground">{key}</div>
+                      <div className="text-muted-foreground">{value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -224,14 +297,14 @@ export default function ProductDetail() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {product.applications.map((application, idx) => (
-              <Card key={idx} className="border-border/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3">
+              <Link key={idx} href="/technologie" className="h-full">
+                <Card className="border-border/50 hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
+                  <CardContent className="p-6 flex-1 flex items-center gap-3">
                     <div className="w-2 h-2 bg-secondary rounded-full flex-shrink-0" />
                     <p className="text-card-foreground font-medium">{application}</p>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
@@ -241,11 +314,24 @@ export default function ProductDetail() {
       <section className="py-12">
         <div className="container">
           <h2 className="text-3xl font-bold mb-8 text-foreground">
-            {isEnglish ? "Downloads" : "Downloads"}
+            {isEnglish ? "Datasheets" : "Datenblätter"}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {product.downloads.map((download, idx) => (
-              <Card key={idx} className="border-border/50 hover:shadow-lg transition-shadow group">
+            {product.downloads
+              .filter((download) => {
+                // GLB-Dateien ausblenden
+                const isGLB = 
+                  download.type?.toLowerCase() === "glb" ||
+                  download.name?.toLowerCase().includes(".glb") ||
+                  download.url?.toLowerCase().includes(".glb");
+                return !isGLB;
+              })
+              .map((download, idx) => (
+              <Card 
+                key={idx} 
+                className="border-border/50 hover:shadow-lg transition-shadow group cursor-pointer"
+                onClick={() => handleDownload(download)}
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -254,7 +340,16 @@ export default function ProductDetail() {
                         {download.name}
                       </h3>
                     </div>
-                    <Button size="icon" variant="ghost" className="flex-shrink-0">
+                    <Button 
+                      size="icon" 
+                      variant="ghost" 
+                      className="flex-shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(download);
+                      }}
+                      title={isEnglish ? `Download ${download.name}` : `${download.name} herunterladen`}
+                    >
                       <Download className="h-5 w-5" />
                     </Button>
                   </div>
