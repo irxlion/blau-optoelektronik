@@ -8,12 +8,10 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, ShoppingCart, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 import { APP_LOGO_HEADER } from "@/const";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/contexts/LanguageContext";
-import { useCart } from "@/contexts/CartContext";
 import {
   Sheet,
   SheetContent,
@@ -33,12 +31,10 @@ export default function Header() {
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [location, setLocation] = useLocation();
   const { language, setLanguage } = useLanguage();
-  const { getTotalItems } = useCart();
   const isEnglish = language === "en";
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const subDropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [menuItemsVisible, setMenuItemsVisible] = useState(false);
-  const cartItemCount = getTotalItems();
   const [productsData, setProductsData] = useState<{ de: Product[]; en: Product[] } | null>(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
@@ -179,7 +175,6 @@ export default function Header() {
           hasDropdown: true,
           dropdownItems: toolsCategories,
         },
-        { name: "Shop", href: "/shop" },
         { name: "Contact", href: "/kontakt" },
       ]
     : [
@@ -199,7 +194,6 @@ export default function Header() {
           hasDropdown: true,
           dropdownItems: toolsCategories,
         },
-        { name: "Shop", href: "/shop" },
         { name: "Kontakt", href: "/kontakt" },
       ];
 
@@ -418,7 +412,7 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* CTA Button + Cart + Language Switcher */}
+            {/* CTA Button + Language Switcher */}
             <div className="hidden lg:flex items-center gap-2 xl:gap-4 flex-shrink-0">
               {/* Language Switcher */}
               <div className="flex items-center gap-1 border border-border rounded-lg p-1">
@@ -435,21 +429,6 @@ export default function Header() {
                   </Button>
                 ))}
               </div>
-              {/* Warenkorb-Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/shop/cart")}
-                className="relative text-foreground hover:text-primary h-9 w-9 xl:h-10 xl:w-10"
-                aria-label={isEnglish ? "Shopping cart" : "Warenkorb"}
-              >
-                <ShoppingCart className="h-4 w-4 xl:h-5 xl:w-5" />
-                {cartItemCount > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 bg-primary text-primary-foreground text-[10px]">
-                    {cartItemCount > 99 ? "99+" : cartItemCount}
-                  </Badge>
-                )}
-              </Button>
               <Button
                 onClick={() => setIsContactDialogOpen(true)}
                 className="bg-secondary hover:bg-primary text-secondary-foreground hover:text-primary-foreground rounded-full px-3 xl:px-6 py-1.5 xl:py-2 text-xs xl:text-sm font-semibold uppercase tracking-wide transition-colors whitespace-nowrap"
@@ -547,23 +526,6 @@ export default function Header() {
                 )}
                 style={{ transitionDelay: "300ms" }}
               >
-                {/* Warenkorb-Button für Mobile */}
-                <Button
-                  variant="outline"
-                  className="w-full relative"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    setLocation("/shop/cart");
-                  }}
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {isEnglish ? "Shopping Cart" : "Warenkorb"}
-                  {cartItemCount > 0 && (
-                    <Badge className="ml-2 bg-primary text-primary-foreground">
-                      {cartItemCount > 99 ? "99+" : cartItemCount}
-                    </Badge>
-                  )}
-                </Button>
                 <Button
                   className="w-full bg-secondary hover:bg-primary text-secondary-foreground hover:text-primary-foreground rounded-full"
                   onClick={() => {

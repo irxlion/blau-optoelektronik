@@ -5,7 +5,6 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
-import { CartProvider } from "./contexts/CartContext";
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollProgress from "./components/ScrollProgress";
 import PrivacyBanner from "./components/PrivacyBanner";
@@ -30,12 +29,6 @@ import MaxPowerSimulation from "./pages/MaxPowerSimulation";
 import LineThicknessSimulation from "./pages/LineThicknessSimulation";
 import Careers from "./pages/Careers";
 
-// Shop-Seiten
-import Shop from "./pages/Shop";
-import ShopProductDetail from "./pages/ShopProductDetail";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import CheckoutSuccess from "./pages/CheckoutSuccess";
 
 function Router() {
   return (
@@ -61,12 +54,6 @@ function Router() {
       <Route path="/tools/maximum-power-simulation" component={MaxPowerSimulation} />
       <Route path="/tools/liniendickensimulation" component={LineThicknessSimulation} />
       <Route path="/tools/line-thickness-simulation" component={LineThicknessSimulation} />
-      {/* Shop-Routen */}
-      <Route path="/shop" component={Shop} />
-      <Route path="/shop/product/:id" component={ShopProductDetail} />
-      <Route path="/shop/cart" component={Cart} />
-      <Route path="/shop/checkout" component={Checkout} />
-      <Route path="/shop/checkout/success" component={CheckoutSuccess} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -87,15 +74,13 @@ function App() {
           defaultTheme="light"
         // switchable
         >
-          <CartProvider>
-            <TooltipProvider>
-              <Toaster />
-              <ScrollProgress />
-              <ScrollToTop />
-              <PrivacyBanner />
-              <Router />
-            </TooltipProvider>
-          </CartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <ScrollProgress />
+            <ScrollToTop />
+            <PrivacyBanner />
+            <Router />
+          </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>
     </ErrorBoundary>

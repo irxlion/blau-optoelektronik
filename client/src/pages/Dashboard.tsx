@@ -8,12 +8,10 @@ import { ProductForm } from "@/components/ProductForm";
 import { CustomerManagement } from "@/components/CustomerManagement";
 import { AdminManagement } from "@/components/AdminManagement";
 import { CareerForm } from "@/components/CareerForm";
-import { ShopProductManagement } from "@/components/ShopProductManagement";
 import { fetchCareers, saveCareers, deleteCareer, Career } from "@/lib/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase, ShoppingBag, ShoppingCart } from "lucide-react";
-import { OrderManagement } from "@/components/OrderManagement";
+import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Dashboard() {
@@ -272,16 +270,6 @@ export default function Dashboard() {
                                 <span className="hidden sm:inline">{isEnglish ? "Products" : "Produkte"}</span>
                                 <span className="sm:hidden">{isEnglish ? "Prod." : "Prod."}</span>
                             </TabsTrigger>
-                            <TabsTrigger value="shop-products" className="flex-shrink-0">
-                                <ShoppingBag className="mr-2 h-4 w-4" /> 
-                                <span className="hidden sm:inline">{isEnglish ? "Shop Products" : "Shop-Produkte"}</span>
-                                <span className="sm:hidden">{isEnglish ? "Shop" : "Shop"}</span>
-                            </TabsTrigger>
-                            <TabsTrigger value="orders" className="flex-shrink-0">
-                                <ShoppingCart className="mr-2 h-4 w-4" /> 
-                                <span className="hidden sm:inline">{isEnglish ? "Orders" : "Bestellungen"}</span>
-                                <span className="sm:hidden">{isEnglish ? "Orders" : "Best."}</span>
-                            </TabsTrigger>
                             <TabsTrigger value="customers" className="flex-shrink-0">
                                 <Users className="mr-2 h-4 w-4" /> 
                                 <span className="hidden sm:inline">{isEnglish ? "Customers" : "Kundenverwaltung"}</span>
@@ -402,14 +390,6 @@ export default function Dashboard() {
                     product={editingProduct}
                     onSave={handleSaveProduct}
                 />
-                    </TabsContent>
-
-                    <TabsContent value="shop-products" className="space-y-4">
-                        <ShopProductManagement />
-                    </TabsContent>
-
-                    <TabsContent value="orders" className="space-y-4">
-                        <OrderManagement />
                     </TabsContent>
 
                     <TabsContent value="customers" className="space-y-4">
