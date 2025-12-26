@@ -21,44 +21,10 @@ Ich habe diese Anwendung mit folgenden Technologien entwickelt:
 - pnpm (Package Manager)
 - Ein Supabase-Projekt mit konfigurierter Datenbank
 
-## Lokales Setup
 
-### 1. Repository klonen
 
-```bash
-git clone <repository-url>
-cd blau-optoelektronik
-```
+### 1. Entwicklungsserver starten
 
-### 2. Dependencies installieren
-
-```bash
-pnpm install
-```
-
-### 3. Umgebungsvariablen konfigurieren
-
-Erstelle eine `.env` Datei im Root-Verzeichnis mit folgenden Variablen:
-
-```env
-SUPABASE_URL=deine_supabase_url
-SUPABASE_ANON_KEY=dein_anon_key
-SUPABASE_SERVICE_ROLE_KEY=dein_service_role_key
-```
-
-**Wichtig**: Die `SUPABASE_SERVICE_ROLE_KEY` sollte niemals im Code committet werden und nur in Netlify als Umgebungsvariable gesetzt werden.
-
-### 4. Entwicklungsserver starten
-
-```bash
-pnpm dev
-```
-
-Dies startet Netlify Dev im Offline-Modus. Die Anwendung ist dann unter `http://localhost:8888` erreichbar.
-
-Alternativ:
-- `pnpm dev:online` - Startet Netlify Dev mit Online-Verbindung
-- `pnpm dev:client` - Startet nur den Vite Dev-Server (ohne Netlify Functions)
 
 ## Verfügbare Scripts
 
@@ -96,45 +62,12 @@ blau-optoelektronik/
 └── supabase-schema.sql    # Datenbankschema
 ```
 
-## Datenbank-Setup
-
-Die Datenbank-Schemas befinden sich in:
-- `supabase-schema.sql` - Hauptschema
-- `supabase-storage-setup.sql` - Storage-Konfiguration
-- `create-careers-table.sql` - Karriere-Tabelle
-
-Weitere Setup-Anweisungen für Storage-Buckets findest du in `STORAGE_BUCKET_SETUP.md`.
-
-## Deployment
-
-Das Projekt ist für das Deployment auf Netlify konfiguriert:
-
-1. Verbinde dein Repository mit Netlify
-2. Setze die Umgebungsvariablen im Netlify Dashboard:
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-3. Netlify erkennt automatisch die Build-Konfiguration aus `netlify.toml`
-
-Alternativ kannst du die Deployment-Skripte verwenden:
-- `deploy.sh` (Linux/Mac)
-- `deploy.ps1` (Windows PowerShell)
-- `setup-netlify.ps1` (Windows Setup-Skript)
-
 ## Features
 
 - **Produktkatalog**: Vollständige Präsentation der Optoelektronik-Produkte
-- **E-Commerce-Shop**: Warenkorb, Checkout und Bestellabwicklung
-- **Admin-Dashboard**: Verwaltung von Produkten, Kunden und Bestellungen
 - **Karriereseiten**: Stellenausschreibungen und Bewerbungsformular
 - **Mehrsprachigkeit**: Deutsch und Englisch
 - **Responsive Design**: Optimiert für alle Geräte
-- **Dark Mode**: Unterstützung für dunkles Theme
 
-## Lizenz
-
-MIT
-
----
 
 Entwickelt von **Ali**
