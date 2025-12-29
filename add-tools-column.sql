@@ -1,6 +1,3 @@
--- Migration: Füge fehlende Spalten zur products Tabelle hinzu
--- Führe dies in Supabase SQL Editor aus
-
 -- Tools Spalte hinzufügen
 ALTER TABLE products 
 ADD COLUMN IF NOT EXISTS tools JSONB DEFAULT '[]'::jsonb;

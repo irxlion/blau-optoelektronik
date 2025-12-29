@@ -4,7 +4,7 @@
   functions = "netlify/functions"
 
 [context.production]
-  site_id = "643d3f93-4e90-4ffa-b20d-d7f1e44d47e5"
+  site_id = "e088091e-2c01-4c33-a19d-4353bf4bc2c9"
 
 # Umgebungsvariablen sollten in Netlify Dashboard gesetzt werden
 # Diese Werte sind nur Fallbacks für lokale Entwicklung
