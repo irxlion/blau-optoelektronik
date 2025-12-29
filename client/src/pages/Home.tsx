@@ -266,7 +266,7 @@ export default function Home() {
           "Augensichere Lasermodule für Patientenumgebungen"
         ],
         products: ["MVpulse", "Punktlaser", "OEM Module"],
-        image: "/industry-medical-tech.jpg"
+        image: "/1.png"
       },
       {
         icon: Cog,
@@ -338,7 +338,7 @@ export default function Home() {
           "Eye-safe modules for patient environments"
         ],
         products: ["MVpulse", "Point lasers", "OEM modules"],
-        image: "/industry-medical-tech.jpg"
+        image: "/1.png"
       },
       {
         icon: Cog,
@@ -598,36 +598,39 @@ export default function Home() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Parallax */}
+      <section className="relative min-h-screen flex items-end justify-start overflow-hidden">
+        {/* Background Video with Parallax */}
         <ParallaxSection speed={0.3} className="absolute inset-0 z-0">
-          <img
-            src="/hero-laser-tech.jpg"
-            alt="Laser Technology"
+          <video
+            src="/hearo.mov"
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-primary/60" />
         </ParallaxSection>
 
         {/* Content */}
-        <div className="container relative z-10 text-primary-foreground py-32">
-          <div className="max-w-3xl">
-            <div className="inline-block px-4 py-2 bg-secondary/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
+        <div className="container relative z-10 text-primary-foreground pb-16 md:pb-24 pl-4 md:pl-8">
+          <div className="max-w-2xl">
+            <div className="inline-block px-3 py-1.5 bg-secondary/20 backdrop-blur-sm rounded-full text-xs font-medium mb-4">
               {heroCopy.label}
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="text-2xl md:text-3xl font-bold mb-3 leading-tight">
               {heroCopy.title}
             </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90 leading-relaxed">{heroCopy.description}</p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <p className="text-sm md:text-base mb-6 opacity-90 leading-relaxed">{heroCopy.description}</p>
+            <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/produkte">
-                <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-lg px-8">
+                <Button size="default" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground text-sm px-6">
                   {heroCopy.primaryCta}
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/kontakt">
-                <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 text-lg px-8">
+                <Button size="default" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 text-sm px-6">
                   {heroCopy.secondaryCta}
                 </Button>
               </Link>

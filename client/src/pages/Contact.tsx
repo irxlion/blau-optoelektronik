@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, ChevronRight } from "lucide-react";
+import { Mail, Phone, MapPin, Send, ChevronRight, Building2, AlertTriangle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -120,6 +121,59 @@ export default function Contact() {
                 <p className="text-primary font-medium">
                   {isEnglish ? "Germany" : "Deutschland"}
                 </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Distribution Partner Section */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-6 text-foreground">
+              {isEnglish ? "Distribution Partner" : "Vertriebspartner"}
+            </h2>
+            <Card className="border-border/50">
+              <CardContent className="p-8">
+                <div className="flex items-start gap-6">
+                  <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Building2 className="h-8 w-8 text-secondary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-muted-foreground mb-6">
+                      {isEnglish
+                        ? "Since 2010, we have been distributing a portion of our laser modules ourselves. You can obtain another portion of our products exclusively through our distribution partner Laser Components. We will be happy to provide you with the right contact person."
+                        : "Seit 2010 vertreiben wir einen Teil unserer Lasermodule selbst. Einen weiteren Teil unserer Produkte erhalten Sie exklusiv über unseren Vertriebspartner Laser Components. Wir nennen Ihnen gerne den richtigen Ansprechpartner."}
+                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2 text-card-foreground">
+                          Laser Components Germany GmbH
+                        </h3>
+                        <div className="space-y-2 text-muted-foreground">
+                          <p className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            Werner-von-Siemens-Str. 15, 82140 Olching, Deutschland
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            <a href="mailto:info@lasercomponents.com" className="text-primary hover:underline">
+                              info@lasercomponents.com
+                            </a>
+                          </p>
+                          <p className="flex items-center gap-2">
+                            <Phone className="h-4 w-4" />
+                            <a href="tel:+49814228640" className="text-primary hover:underline">
+                              +49 8142 2864-0
+                            </a>
+                          </p>
+                          <p>
+                            <a href="https://www.lasercomponents.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                              https://www.lasercomponents.com/
+                            </a>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -277,19 +331,6 @@ export default function Contact() {
                 <Card className="border-border/50">
                   <CardContent className="p-6">
                     <h3 className="font-semibold text-lg mb-2 text-card-foreground">
-                      {isEnglish ? "Custom solutions" : "Individuelle Lösungen"}
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {isEnglish
-                        ? "We develop customised products tailored to your requirements."
-                        : "Wir entwickeln kundenspezifische Produkte nach Ihren Anforderungen."}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-border/50">
-                  <CardContent className="p-6">
-                    <h3 className="font-semibold text-lg mb-2 text-card-foreground">
                       {isEnglish ? "Made in Germany" : "Made in Germany"}
                     </h3>
                     <p className="text-muted-foreground">
@@ -301,6 +342,68 @@ export default function Contact() {
                 </Card>
               </div>
             </div>
+          </div>
+
+          {/* Directions Warning Section */}
+          <div className="mt-16">
+            <h2 className="text-3xl font-bold mb-6 text-foreground">
+              {isEnglish ? "Important Directions Information" : "Wichtige Hinweise zur Anfahrt"}
+            </h2>
+            <Alert variant="destructive" className="mb-6">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle className="text-lg font-semibold mb-2">
+                {isEnglish ? "Important Notice" : "Wichtiger Hinweis"}
+              </AlertTitle>
+              <AlertDescription className="space-y-4">
+                <p>
+                  {isEnglish
+                    ? "Please note when arriving or delivering to Askaniaweg 4 that you will cross a third-party property for which we can only grant you passage."
+                    : "Bitte beachten Sie bei der Anfahrt oder Anlieferung zum Askaniaweg 4, dass Sie dabei ein fremdes Grundstück überqueren für das wir Ihnen lediglich die Durchfahrt gewähren dürfen."}
+                </p>
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 space-y-3">
+                  <p className="font-semibold">
+                    {isEnglish
+                      ? "According to the judgment of the Konstanz Regional Court of August 30, 2022, Case No. C4 O 332/21, our landlords have been ordered to refrain from:"
+                      : "Gem. Urteil des Landgerichts Konstanz vom 30.08.2022, Az: C4 O 332/21, sind unsere Vermieter verurteilt worden, es zu unterlassen:"}
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 ml-2">
+                    <li>
+                      {isEnglish
+                        ? "Stopping, parking, turning, or unloading on the plaintiff's property (Plot 2888/38)"
+                        : "Auf dem Grundstück der Kläger (Flurstück 2888/38) zu halten, zu parken, zu wenden, zu entladen oder dies ihren Mietern, Besuchern, Arbeitnehmern oder Lieferanten etc. zu gestatten."}
+                    </li>
+                    <li>
+                      {isEnglish
+                        ? "Allowing their tenants, visitors, employees, or suppliers to do the same"
+                        : "Dies ihren Mietern, Besuchern, Arbeitnehmern oder Lieferanten etc. zu gestatten"}
+                    </li>
+                  </ul>
+                  <p>
+                    {isEnglish
+                      ? "We/You may continue to drive across the plaintiff's property on the right of way, which results from the attached site plan. Nothing more."
+                      : "Wir/Sie dürfen weiterhin auf dem Geh- und Fahrrecht, welches sich aus dem beiliegenden Lageplan ergibt, das Grundstück der Kläger überfahren. Mehr aber auch nicht."}
+                  </p>
+                  <p className="font-semibold text-destructive">
+                    {isEnglish
+                      ? "The sanction against us in case of a violation is a fine of up to EUR 250,000 or alternatively imprisonment of up to 6 months."
+                      : "Die Sanktion gegen uns bei einem Verstoß ist ein Ordnungsgeld bis zu EUR 250.000 oder ersatzweise Ordnungshaft bis zu 6 Monate."}
+                  </p>
+                  <p>
+                    {isEnglish
+                      ? "We therefore urgently request that you only drive across the property in the area of the right of way and refrain from the above prohibited actions (stopping, parking, turning, unloading, or allowing tenants, visitors, employees, or suppliers to do so). If you do not comply with our request and violate the court injunction, we will hold you responsible for any resulting damage in the form of a recourse claim."
+                      : "Wir fordern Sie daher dringend auf, das Grundstück im Bereich des Geh- und Fahrrechts nur zu überfahren und die obigen verbotenen Handlungen (zu halten, zu parken, zu wenden, zu entladen oder dies Mietern, Besuchern, Arbeitnehmern oder Lieferanten zu gestatten) zu unterlassen. Sollten Sie unserer Bitte nicht nachkommen und gegen das gerichtliche Unterlassungsverbot verstoßen, machen wir Sie für den daraus entstehenden Schaden verantwortlich in Form des Regressanspruches."}
+                  </p>
+                  <p className="font-semibold">
+                    {isEnglish
+                      ? "We therefore urgently request your attention, also in your own interest."
+                      : "Wir bitten daher dringend um Beachtung auch in Ihrem eigenen Interesse."}
+                  </p>
+                </div>
+                <p className="mt-4">
+                  <strong>{isEnglish ? "Address:" : "Adresse:"}</strong> Askaniaweg 4
+                </p>
+              </AlertDescription>
+            </Alert>
           </div>
         </div>
       </section>
