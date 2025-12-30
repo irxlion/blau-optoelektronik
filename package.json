@@ -16,7 +16,6 @@
     "format": "prettier --write .",
     "test": "vitest",
     "test:run": "vitest run",
-    "migrate:products": "node migrate-products.js",
     "create:admin": "node create-admin.js"
   },
   "dependencies": {

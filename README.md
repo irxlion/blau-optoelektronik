@@ -37,7 +37,6 @@ Ich habe diese Anwendung mit folgenden Technologien entwickelt:
 - `pnpm test` - Startet Vitest im Watch-Modus
 - `pnpm test:run` - Führt Tests einmalig aus
 - `pnpm format` - Formatiert Code mit Prettier
-- `pnpm migrate:products` - Migriert Produkte von `server/products.json` nach Supabase
 - `pnpm create:admin` - Erstellt einen neuen Admin-Benutzer
 
 ## Projektstruktur
@@ -55,8 +54,6 @@ blau-optoelektronik/
 │   └── public/            # Statische Assets
 ├── netlify/
 │   └── functions/         # Netlify Serverless Functions
-├── server/                # Server-seitige Dateien
-│   └── products.json      # Produktdaten für Migration
 ├── shared/                # Geteilte Konstanten
 ├── patches/               # pnpm Patches
 └── supabase-schema.sql    # Datenbankschema
