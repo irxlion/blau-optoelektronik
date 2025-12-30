@@ -968,7 +968,14 @@ export default function Home() {
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
             {/* Connection Line */}
-            <div className="hidden lg:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-secondary/30 via-secondary/50 to-secondary/30 z-0" />
+            <motion.div
+              className="hidden lg:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-secondary/30 via-secondary/50 to-secondary/30 z-0"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              style={{ transformOrigin: "left" }}
+            />
             
             {process.map((item, index) => {
               const Icon = item.icon;

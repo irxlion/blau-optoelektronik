@@ -327,7 +327,7 @@ export default function Technology() {
 
             <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
               <img
-                src="/manufacturing-facility.jpg"
+                src="/1.png"
                 alt="Technologie und Fertigung"
                 className="w-full h-full object-cover"
               />
