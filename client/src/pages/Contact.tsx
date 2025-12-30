@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import ParallaxSection from "@/components/ParallaxSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Contact() {
@@ -51,8 +52,21 @@ export default function Contact() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-primary text-primary-foreground py-24 mt-20">
-        <div className="container">
+      <section className="relative bg-primary text-primary-foreground py-24 mt-20 overflow-hidden">
+        {/* Background Video with Parallax */}
+        <ParallaxSection speed={0.3} className="absolute inset-0 z-0">
+          <video
+            src="/hearo.mov"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-primary/60" />
+        </ParallaxSection>
+
+        <div className="container relative z-10">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 text-sm mb-4 opacity-90">
               <span>Home</span>

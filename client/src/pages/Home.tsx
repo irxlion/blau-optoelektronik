@@ -266,7 +266,7 @@ export default function Home() {
           "Augensichere Lasermodule für Patientenumgebungen"
         ],
         products: ["MVpulse", "Punktlaser", "OEM Module"],
-        image: "/1.png"
+        image: "/6.jpg"
       },
       {
         icon: Cog,
@@ -280,7 +280,7 @@ export default function Home() {
           "Oberflächeninspektion"
         ],
         products: ["Linienlaser", "Punktlaser", "OEM Module"],
-        image: "/manufacturing-facility.jpg"
+        image: "/7.jpg"
       },
       {
         icon: Factory,
@@ -322,7 +322,7 @@ export default function Home() {
           "Bonddraht-Inspektion"
         ],
         products: ["Machine Vision", "Punktlaser", "OEM Module"],
-        image: "/product-oem-module.jpg"
+        image: "/3.jpg"
       }
     ],
     en: [
@@ -338,7 +338,7 @@ export default function Home() {
           "Eye-safe modules for patient environments"
         ],
         products: ["MVpulse", "Point lasers", "OEM modules"],
-        image: "/1.png"
+        image: "/6.jpg"
       },
       {
         icon: Cog,
@@ -352,7 +352,7 @@ export default function Home() {
           "Surface inspection"
         ],
         products: ["Line lasers", "Point lasers", "OEM modules"],
-        image: "/manufacturing-facility.jpg"
+        image: "/7.jpg"
       },
       {
         icon: Factory,
@@ -394,7 +394,7 @@ export default function Home() {
           "Bond wire inspection"
         ],
         products: ["Machine Vision", "Point lasers", "OEM modules"],
-        image: "/product-oem-module.jpg"
+        image: "/3.jpg"
       }
     ],
   });
@@ -658,7 +658,7 @@ export default function Home() {
               transition={{ duration: 0.6 }}
             >
               <img
-                src="/product-machine-vision.jpg"
+                src="/start-seite.jpg"
                 alt="MVpulse Laser Module"
                 className="w-full h-full object-cover"
                 loading="lazy"

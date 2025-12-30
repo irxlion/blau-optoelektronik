@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ParallaxSection from "@/components/ParallaxSection";
 
 export default function Company() {
   const { language, t } = useLanguage();
@@ -142,8 +143,21 @@ export default function Company() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-primary text-primary-foreground py-24 mt-20">
-        <div className="container">
+      <section className="relative bg-primary text-primary-foreground py-24 mt-20 overflow-hidden">
+        {/* Background Video with Parallax */}
+        <ParallaxSection speed={0.3} className="absolute inset-0 z-0">
+          <video
+            src="/hearo.mov"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-primary/60" />
+        </ParallaxSection>
+
+        <div className="container relative z-10">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 text-sm mb-4 opacity-90">
               <span>Home</span>
@@ -202,7 +216,7 @@ export default function Company() {
             </div>
             <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl">
               <img
-                src="/manufacturing-facility.jpg"
+                src="/1.png"
                 alt="BLAU Optoelektronik Fertigungsstätte mit modernsten Fertigungsanlagen"
                 loading="lazy"
                 className="w-full h-full object-cover"

@@ -5,7 +5,8 @@ import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calculator, LineChart } from "lucide-react";
+import { Calculator, LineChart, LogOut } from "lucide-react";
+import ParallaxSection from "@/components/ParallaxSection";
 
 export default function Tools() {
   const [, setLocation] = useLocation();
@@ -74,15 +75,43 @@ export default function Tools() {
   const pageDescription = isEnglish
     ? "Select a tool to calculate laser parameters"
     : "Wählen Sie ein Tool aus, um Laserparameter zu berechnen";
+
+  const handleLogout = () => {
+    localStorage.removeItem("customerToken");
+    setLocation("/customer-login");
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative bg-primary text-primary-foreground py-24 mt-20">
-        <div className="container">
-          <div className="max-w-3xl">
+      <section className="relative bg-primary text-primary-foreground py-24 mt-20 overflow-hidden">
+        {/* Background Video with Parallax */}
+        <ParallaxSection speed={0.3} className="absolute inset-0 z-0">
+          <video
+            src="/hearo.mov"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-primary/60" />
+        </ParallaxSection>
+
+        <div className="container relative z-10">
+          <div className="max-w-3xl relative">
+            <div className="absolute top-0 right-0">
+              <Button
+                variant="outline"
+                onClick={handleLogout}
+                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground backdrop-blur-sm"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                {isEnglish ? "Logout" : "Abmelden"}
+              </Button>
+            </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
               {pageTitle}
             </h1>
