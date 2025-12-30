@@ -188,6 +188,11 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
     const [nextId, setNextId] = useState<string>("");
     const [technicalTableBlocks, setTechnicalTableBlocks] = useState<string[]>([""]);
     const [selectedTools, setSelectedTools] = useState<string[]>([]);
+    const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([
+        { question: "", answer: "" },
+        { question: "", answer: "" },
+        { question: "", answer: "" },
+    ]);
     const imageInputRef = useRef<HTMLInputElement>(null);
     const pdfInputRef = useRef<HTMLInputElement>(null);
 
@@ -277,6 +282,13 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                         path: d.url,
                     }))
             );
+            // Bestehende FAQs laden (max. 3)
+            const existingFaqs = (product.faqs || []).slice(0, 3);
+            setFaqs([
+                existingFaqs[0] || { question: "", answer: "" },
+                existingFaqs[1] || { question: "", answer: "" },
+                existingFaqs[2] || { question: "", answer: "" },
+            ]);
         } else {
             setFormData({
                 id: nextId || "",
@@ -298,6 +310,11 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
             setImagePaths([]);
             setPdfFiles([]);
             setSelectedTools([]);
+            setFaqs([
+                { question: "", answer: "" },
+                { question: "", answer: "" },
+                { question: "", answer: "" },
+            ]);
         }
     }, [product, open, nextId]);
 
@@ -469,6 +486,11 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
             .filter(Boolean)
             .join(`\n${TECH_TABLE_SPLIT_MARKER}\n`);
 
+        // FAQs filtern (nur die mit Frage UND Antwort)
+        const validFaqs = faqs
+            .filter((faq) => faq.question.trim() !== "" && faq.answer.trim() !== "")
+            .slice(0, 3);
+
         const updatedFormData = {
             ...formData,
             images: imageUrls,
@@ -483,6 +505,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
             ],
             tools: selectedTools.length > 0 ? selectedTools : undefined,
             technicalPropertiesHtml: technicalHtml,
+            faqs: validFaqs.length > 0 ? validFaqs : undefined,
         };
 
         onSave(updatedFormData as Product);
@@ -532,7 +555,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                                     onImageUpload={async (file) => {
                                         const e = {
                                             target: { files: [file] },
-                                        } as React.ChangeEvent<HTMLInputElement>;
+                                        } as unknown as React.ChangeEvent<HTMLInputElement>;
                                         await handleImageUpload(e);
                                     }}
                                     acceptPDFs={false}
@@ -607,7 +630,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                                     onPDFUpload={async (file) => {
                                         const e = {
                                             target: { files: [file] },
-                                        } as React.ChangeEvent<HTMLInputElement>;
+                                        } as unknown as React.ChangeEvent<HTMLInputElement>;
                                         await handlePDFUpload(e);
                                     }}
                                     acceptImages={false}
@@ -796,6 +819,47 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                             onChange={(e) => handleArrayChange(e, "features")}
                             rows={5}
                         />
+                    </div>
+
+                    <div className="space-y-4">
+                        <Label>FAQs (max. 3)</Label>
+                        <p className="text-xs text-muted-foreground">
+                            Sie können bis zu 3 FAQs für dieses Produkt hinzufügen. Diese werden auf der Produktseite zwischen Features und Technische Daten angezeigt.
+                        </p>
+                        {faqs.map((faq, index) => (
+                            <div key={index} className="space-y-2 p-4 border rounded-lg">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">FAQ {index + 1}</span>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`faq-question-${index}`}>Frage</Label>
+                                    <Input
+                                        id={`faq-question-${index}`}
+                                        value={faq.question}
+                                        onChange={(e) => {
+                                            const newFaqs = [...faqs];
+                                            newFaqs[index] = { ...newFaqs[index], question: e.target.value };
+                                            setFaqs(newFaqs);
+                                        }}
+                                        placeholder="z.B. Wie funktioniert dieses Produkt?"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`faq-answer-${index}`}>Antwort</Label>
+                                    <Textarea
+                                        id={`faq-answer-${index}`}
+                                        value={faq.answer}
+                                        onChange={(e) => {
+                                            const newFaqs = [...faqs];
+                                            newFaqs[index] = { ...newFaqs[index], answer: e.target.value };
+                                            setFaqs(newFaqs);
+                                        }}
+                                        placeholder="z.B. Dieses Produkt funktioniert durch..."
+                                        rows={3}
+                                    />
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
                     <div className="space-y-2">

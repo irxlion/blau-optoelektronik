@@ -76,6 +76,9 @@ CREATE TABLE IF NOT EXISTS products (
     -- Tools als JSON Array von Tool-IDs
     tools JSONB DEFAULT '[]'::jsonb, -- Format: ["max-power-simulation", "line-thickness-simulation"]
     
+    -- FAQs als JSON Array von Objekten
+    faqs JSONB DEFAULT '[]'::jsonb, -- Format: [{"question": "...", "answer": "..."}]
+    
     -- HTML-Inhalte
     technical_properties_html TEXT, -- HTML-Code für technische Daten Tabellen
     seo_head_html TEXT, -- HTML-Code für SEO Meta-Tags im <head> Bereich

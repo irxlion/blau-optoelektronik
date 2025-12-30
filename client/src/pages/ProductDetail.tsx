@@ -5,6 +5,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { fetchProducts } from "@/lib/api";
 import { Product } from "@/data/products";
 import SEO from "@/components/SEO";
@@ -248,6 +254,37 @@ export default function ProductDetail() {
           </div>
         </div>
       </section>
+
+      {/* FAQs */}
+      {product.faqs && product.faqs.length > 0 && (
+        <section className="py-12">
+          <div className="container">
+            <h2 className="text-3xl font-bold mb-8 text-foreground">
+              {isEnglish ? "Frequently Asked Questions" : "Häufig gestellte Fragen"}
+            </h2>
+            <Card className="border-border/50">
+              <CardContent className="p-6">
+                <Accordion type="single" collapsible className="space-y-4">
+                  {product.faqs.map((faq, index) => (
+                    <AccordionItem
+                      key={index}
+                      value={`faq-${index}`}
+                      className="border border-border rounded-lg px-6 bg-card"
+                    >
+                      <AccordionTrigger className="text-left hover:no-underline py-4">
+                        <span className="font-semibold text-card-foreground">{faq.question}</span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground pb-4 leading-relaxed">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
 
       {/* Technical Specifications */}
       <section className="py-12">

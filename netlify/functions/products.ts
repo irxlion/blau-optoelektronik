@@ -38,7 +38,8 @@ function dbProductToFrontendProduct(dbProduct: any) {
         applications: dbProduct.applications || [],
         downloads: dbProduct.downloads || [],
         seoHeadHtml: dbProduct.seo_head_html || '',
-        tools: dbProduct.tools || []
+        tools: dbProduct.tools || [],
+        faqs: dbProduct.faqs || []
     };
 }
 
@@ -60,6 +61,7 @@ function frontendProductToDbProduct(product: any, language: 'de' | 'en') {
         downloads: product.downloads || [],
         seo_head_html: product.seoHeadHtml || null,
         tools: product.tools || [],
+        faqs: product.faqs || [],
         is_active: true
     };
 }

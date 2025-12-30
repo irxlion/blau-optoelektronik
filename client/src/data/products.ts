@@ -15,6 +15,7 @@ export interface Product {
   seoHeadHtml?: string;
   technicalPropertiesHtml?: string;
   tools?: string[]; // Array von Tool-IDs (z.B. ["max-power-simulation", "line-thickness-simulation"])
+  faqs?: { question: string; answer: string }[]; // Array von FAQs (max. 3)
 }
 
 const productData: Record<Language, Product[]> = {
