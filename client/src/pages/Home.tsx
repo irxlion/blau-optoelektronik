@@ -280,7 +280,7 @@ export default function Home() {
           "Oberflächeninspektion"
         ],
         products: ["Linienlaser", "Punktlaser", "OEM Module"],
-        image: "/7.jpg"
+        image: "/7.png"
       },
       {
         icon: Factory,
@@ -308,7 +308,7 @@ export default function Home() {
           "Quantenoptik-Experimente"
         ],
         products: ["Punktlaser", "OEM Module", "Powelllinsen"],
-        image: "/technology-optical-sensors.jpg"
+        image: "/4.png"
       },
       {
         icon: Cpu,
@@ -322,7 +322,7 @@ export default function Home() {
           "Bonddraht-Inspektion"
         ],
         products: ["Machine Vision", "Punktlaser", "OEM Module"],
-        image: "/3.jpg"
+        image: "/3.png"
       }
     ],
     en: [
@@ -352,7 +352,7 @@ export default function Home() {
           "Surface inspection"
         ],
         products: ["Line lasers", "Point lasers", "OEM modules"],
-        image: "/7.jpg"
+        image: "/7.png"
       },
       {
         icon: Factory,
@@ -380,7 +380,7 @@ export default function Home() {
           "Quantum optics experiments"
         ],
         products: ["Point lasers", "OEM modules", "Powell lenses"],
-        image: "/technology-optical-sensors.jpg"
+        image: "/4.png"
       },
       {
         icon: Cpu,
@@ -394,7 +394,7 @@ export default function Home() {
           "Bond wire inspection"
         ],
         products: ["Machine Vision", "Point lasers", "OEM modules"],
-        image: "/3.jpg"
+        image: "/3.png"
       }
     ],
   });
