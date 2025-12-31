@@ -44,6 +44,8 @@ export default function Impressum() {
                       <strong className="text-foreground">BLAU Optoelektronik GmbH</strong>
                     </p>
                     <p className="leading-relaxed mb-2">
+                      Askaniaweg 4<br />
+                      78467 Konstanz<br />
                       Germany
                     </p>
                     <p className="leading-relaxed mb-2">
@@ -114,6 +116,8 @@ export default function Impressum() {
                       <strong className="text-foreground">BLAU Optoelektronik GmbH</strong>
                     </p>
                     <p className="leading-relaxed mb-2">
+                      Askaniaweg 4<br />
+                      78467 Konstanz<br />
                       Germany
                     </p>
                     <p className="leading-relaxed">
@@ -190,6 +194,8 @@ export default function Impressum() {
                       <strong className="text-foreground">BLAU Optoelektronik GmbH</strong>
                     </p>
                     <p className="leading-relaxed mb-2">
+                      Askaniaweg 4<br />
+                      78467 Konstanz<br />
                       Deutschland
                     </p>
                     <p className="leading-relaxed mb-2">
@@ -260,6 +266,8 @@ export default function Impressum() {
                       <strong className="text-foreground">BLAU Optoelektronik GmbH</strong>
                     </p>
                     <p className="leading-relaxed mb-2">
+                      Askaniaweg 4<br />
+                      78467 Konstanz<br />
                       Deutschland
                     </p>
                     <p className="leading-relaxed">

@@ -496,3 +496,92 @@ export async function deleteCareer(jobId: string): Promise<void> {
         throw new Error(data.error || "Failed to delete career");
     }
 }
+
+// FAQ-Verwaltung
+export interface FAQ {
+    id: string;
+    category: string;
+    question: string;
+    answer: string;
+    orderIndex?: number;
+}
+
+export interface FAQCategory {
+    category: string;
+    questions: FAQ[];
+}
+
+export async function fetchFAQs(): Promise<{ de: FAQCategory[]; en: FAQCategory[] }> {
+    try {
+        const response = await fetch("/api/faqs");
+        
+        const contentType = response.headers.get("content-type");
+        if (contentType && !contentType.includes("application/json")) {
+            const text = await response.text();
+            if (text.trim().startsWith("<!") || text.includes("<!doctype")) {
+                console.warn("⚠️ API-Route nicht verfügbar. Verwende leere Liste als Fallback.");
+                return { de: [], en: [] };
+            }
+        }
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            let errorMessage = "Failed to fetch FAQs";
+            try {
+                const errorData = JSON.parse(errorText);
+                errorMessage = errorData.error || errorData.details || errorMessage;
+            } catch {
+                errorMessage = errorText || `HTTP ${response.status}: ${response.statusText}`;
+            }
+            console.error("Error fetching FAQs:", errorMessage);
+            throw new Error(errorMessage);
+        }
+        
+        const data = await response.json();
+        console.log("Fetched FAQs data:", data); // Debug log
+        return data;
+    } catch (error: any) {
+        console.warn("⚠️ API nicht erreichbar oder Fehler:", error.message);
+        return { de: [], en: [] };
+    }
+}
+
+export async function saveFAQs(faqs: { de: FAQCategory[]; en: FAQCategory[] }): Promise<void> {
+    console.log("Saving FAQs:", faqs); // Debug log
+    const response = await fetch("/api/faqs", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getAuthToken()}`,
+        },
+        body: JSON.stringify(faqs),
+    });
+    
+    if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = "Failed to save FAQs";
+        try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorData.details || errorData.hint || errorMessage;
+            console.error("Error saving FAQs:", errorData);
+        } catch {
+            errorMessage = errorText || `HTTP ${response.status}: ${response.statusText}`;
+            console.error("Error saving FAQs (parse failed):", errorText);
+        }
+        throw new Error(errorMessage);
+    }
+}
+
+export async function deleteFAQ(faqId: string): Promise<void> {
+    const response = await fetch(`/api/faqs?faq_id=${encodeURIComponent(faqId)}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getAuthToken()}`,
+        },
+    });
+    if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to delete FAQ");
+    }
+}

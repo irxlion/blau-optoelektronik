@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,12 +9,38 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { fetchFAQs, FAQCategory } from "@/lib/api";
+import { Loader2 } from "lucide-react";
 
 export default function FAQ() {
   const { language, t } = useLanguage();
   const isEnglish = language === "en";
+  const [faqCategories, setFaqCategories] = useState<FAQCategory[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const faqCategories = t({
+  useEffect(() => {
+    loadFAQs();
+  }, [language, isEnglish]);
+
+  const loadFAQs = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchFAQs();
+      console.log("Loaded FAQ data:", data); // Debug
+      const faqsForLang = isEnglish ? data.en : data.de;
+      console.log("Selected FAQs for language:", language, faqsForLang); // Debug
+      setFaqCategories(faqsForLang || []);
+    } catch (error) {
+      console.error("Error loading FAQs:", error);
+      // Fallback zu leeren FAQs
+      setFaqCategories([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fallback-Daten für den Fall, dass keine FAQs geladen werden konnten
+  const fallbackFaqCategories = t({
     de: [
       {
         category: "Allgemeine Fragen",
@@ -230,6 +257,39 @@ export default function FAQ() {
     ]
   });
 
+  // Verwende geladene FAQs oder Fallback
+  const displayFaqCategories = faqCategories.length > 0 ? faqCategories : fallbackFaqCategories;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <section className="relative bg-primary text-primary-foreground py-24 mt-20">
+          <div className="container">
+            <div className="max-w-3xl">
+              <div className="flex items-center gap-2 text-sm mb-4 opacity-90">
+                <span>Home</span>
+                <ChevronRight className="h-4 w-4" />
+                <span>FAQ</span>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-bold mb-6">
+                {isEnglish ? "Frequently asked questions" : "Häufig gestellte Fragen"}
+              </h1>
+            </div>
+          </div>
+        </section>
+        <section className="py-16">
+          <div className="container max-w-4xl">
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -259,21 +319,21 @@ export default function FAQ() {
       <section className="py-16">
         <div className="container max-w-4xl">
           <div className="space-y-12">
-            {faqCategories.map((category, categoryIdx) => (
+            {displayFaqCategories.map((category, categoryIdx) => (
               <div key={categoryIdx}>
                 <h2 className="text-3xl font-bold mb-6 text-foreground">{category.category}</h2>
                 <Accordion type="single" collapsible className="space-y-4">
-                  {category.questions.map((faq, faqIdx) => (
+                  {category.questions && category.questions.map((faq, faqIdx) => (
                     <AccordionItem
                       key={faqIdx}
                       value={`${categoryIdx}-${faqIdx}`}
                       className="border border-border rounded-lg px-6 bg-card"
                     >
                       <AccordionTrigger className="text-left hover:no-underline py-4">
-                        <span className="font-semibold text-card-foreground">{faq.q}</span>
+                        <span className="font-semibold text-card-foreground">{faq.question || (faq as any).q}</span>
                       </AccordionTrigger>
                       <AccordionContent className="text-muted-foreground pb-4 leading-relaxed">
-                        {faq.a}
+                        {faq.answer || (faq as any).a}
                       </AccordionContent>
                     </AccordionItem>
                   ))}

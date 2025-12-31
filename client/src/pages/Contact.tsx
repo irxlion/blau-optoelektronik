@@ -23,6 +23,17 @@ export default function Contact() {
     message: "",
   });
 
+  // Adresse: Askaniaweg 4, Konstanz, Deutschland
+  const companyAddress = "Askaniaweg 4, 78467 Konstanz, Deutschland";
+  
+  // Google Maps Embed API URL (kostenlos und unbegrenzt)
+  // https://developers.google.com/maps/documentation/embed/get-started
+  // Falls kein API-Key vorhanden ist, verwende direkte Google Maps URL
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const googleMapsEmbedUrl = apiKey 
+    ? `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(companyAddress)}&zoom=15`
+    : `https://www.google.com/maps?q=${encodeURIComponent(companyAddress)}&output=embed&zoom=15`;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast.success(
@@ -133,7 +144,7 @@ export default function Contact() {
                 </h3>
                 <p className="text-muted-foreground mb-2">BLAU Optoelektronik GmbH</p>
                 <p className="text-primary font-medium">
-                  {isEnglish ? "Germany" : "Deutschland"}
+                  {companyAddress}
                 </p>
               </CardContent>
             </Card>
@@ -356,6 +367,48 @@ export default function Contact() {
                 </Card>
               </div>
             </div>
+          </div>
+
+          {/* Google Maps Section */}
+          <div className="mt-16 mb-16">
+            <h2 className="text-3xl font-bold mb-6 text-foreground">
+              {isEnglish ? "Find us" : "So finden Sie uns"}
+            </h2>
+            <Card className="border-border/50 overflow-hidden">
+              <CardContent className="p-0">
+                <iframe
+                  width="100%"
+                  height="350"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={googleMapsEmbedUrl}
+                  title={isEnglish ? "BLAU Optoelektronik Location" : "BLAU Optoelektronik Standort"}
+                  className="w-full"
+                />
+                <div className="p-4 bg-muted/50 border-t">
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-base mb-1 text-foreground">
+                        BLAU Optoelektronik GmbH
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-2">{companyAddress}</p>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(companyAddress)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline text-sm inline-flex items-center gap-1"
+                      >
+                        {isEnglish ? "Open in Google Maps" : "In Google Maps öffnen"}
+                        <ChevronRight className="h-3 w-3" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Directions Warning Section */}
