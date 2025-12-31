@@ -176,6 +176,7 @@ export default function Header() {
           dropdownItems: toolsCategories,
         },
         { name: "Contact", href: "/kontakt" },
+        { name: "Shop", href: "https://shop.blauoptoelektronik.de/de/", isExternal: true },
       ]
     : [
         { name: "Start", href: "/" },
@@ -195,6 +196,7 @@ export default function Header() {
           dropdownItems: toolsCategories,
         },
         { name: "Kontakt", href: "/kontakt" },
+        { name: "Shop", href: "https://shop.blauoptoelektronik.de/de/", isExternal: true },
       ];
 
   const desktopCta = isEnglish ? "Contact us" : "Kontakt Aufnehmen";
@@ -295,21 +297,35 @@ export default function Header() {
                     }
                   }}
                 >
-                  <Link href={item.href}>
-                    <button
+                  {item.isExternal ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={cn(
                         "text-xs xl:text-sm font-medium uppercase tracking-wide flex items-center gap-1 whitespace-nowrap",
                         getNavItemClass(item.href)
                       )}
-                      aria-expanded={item.hasDropdown && activeDropdown === item.name}
-                      aria-haspopup={item.hasDropdown}
                     >
                       {item.name}
-                      {item.hasDropdown && (
-                        <ChevronDown className="h-3 w-3 xl:h-4 xl:w-4" aria-hidden="true" />
-                      )}
-                    </button>
-                  </Link>
+                    </a>
+                  ) : (
+                    <Link href={item.href}>
+                      <button
+                        className={cn(
+                          "text-xs xl:text-sm font-medium uppercase tracking-wide flex items-center gap-1 whitespace-nowrap",
+                          getNavItemClass(item.href)
+                        )}
+                        aria-expanded={item.hasDropdown && activeDropdown === item.name}
+                        aria-haspopup={item.hasDropdown}
+                      >
+                        {item.name}
+                        {item.hasDropdown && (
+                          <ChevronDown className="h-3 w-3 xl:h-4 xl:w-4" aria-hidden="true" />
+                        )}
+                      </button>
+                    </Link>
+                  )}
 
                   {/* Invisible bridge to prevent gap */}
                   {item.hasDropdown && activeDropdown === item.name && (
@@ -562,6 +578,7 @@ function MobileNavItem({
     href: string;
     hasDropdown?: boolean;
     dropdownItems?: Array<any>;
+    isExternal?: boolean;
   };
   index: number;
   menuItemsVisible: boolean;
@@ -620,15 +637,27 @@ function MobileNavItem({
           )}
         </>
       ) : (
-                          <Link href={item.href}>
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
-                              onClick={onClose}
-                            >
-                              {item.name}
-                            </Button>
-                          </Link>
+        item.isExternal ? (
+          <a
+            href={item.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center px-3 py-2 rounded-md text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            {item.name}
+          </a>
+        ) : (
+          <Link href={item.href}>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
+              onClick={onClose}
+            >
+              {item.name}
+            </Button>
+          </Link>
+        )
       )}
     </div>
   );
