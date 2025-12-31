@@ -427,6 +427,15 @@ export default function Contact() {
                     ? "Please note when arriving or delivering to Askaniaweg 4 that you will cross a third-party property for which we can only grant you passage."
                     : "Bitte beachten Sie bei der Anfahrt oder Anlieferung zum Askaniaweg 4, dass Sie dabei ein fremdes Grundstück überqueren für das wir Ihnen lediglich die Durchfahrt gewähren dürfen."}
                 </p>
+                <div className="mt-4 mb-4">
+                  <img
+                    src="/durchfahrt.png"
+                    alt={isEnglish
+                      ? "Site plan showing the right of way and restricted areas for Askaniaweg 4"
+                      : "Lageplan mit Geh- und Fahrrecht sowie gesperrten Bereichen für Askaniaweg 4"}
+                    className="w-full h-auto rounded-lg max-w-2xl mx-auto"
+                  />
+                </div>
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 space-y-3">
                   <p className="font-semibold">
                     {isEnglish
