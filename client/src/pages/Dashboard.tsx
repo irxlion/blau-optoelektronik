@@ -9,10 +9,12 @@ import { CustomerManagement } from "@/components/CustomerManagement";
 import { AdminManagement } from "@/components/AdminManagement";
 import { CareerForm } from "@/components/CareerForm";
 import { FAQForm } from "@/components/FAQForm";
-import { fetchCareers, saveCareers, deleteCareer, Career, fetchFAQs, saveFAQs, deleteFAQ, FAQ, FAQCategory } from "@/lib/api";
+import { fetchCareers, saveCareers, deleteCareer, Career, fetchFAQs, saveFAQs, deleteFAQ, FAQ, FAQCategory, fetchSettings, saveSettings, Settings } from "@/lib/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase, HelpCircle } from "lucide-react";
+import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase, HelpCircle, Settings as SettingsIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Dashboard() {
@@ -21,6 +23,7 @@ export default function Dashboard() {
     const [products, setProducts] = useState<{ de: Product[]; en: Product[] } | null>(null);
     const [careers, setCareers] = useState<{ de: Career[]; en: Career[] } | null>(null);
     const [faqs, setFaqs] = useState<{ de: FAQCategory[]; en: FAQCategory[] } | null>(null);
+    const [settings, setSettings] = useState<Settings>({});
     const [loading, setLoading] = useState(true);
     const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
     const [editingCareer, setEditingCareer] = useState<Career | undefined>(undefined);
@@ -58,6 +61,7 @@ export default function Dashboard() {
         loadProducts();
         loadCareers();
         loadFAQs();
+        loadSettings();
     }, [setLocation]);
 
     useEffect(() => {
@@ -106,6 +110,27 @@ export default function Dashboard() {
             console.error("Error loading FAQs:", error);
             toast.error(isEnglish ? "Failed to load FAQs" : "Fehler beim Laden der FAQs");
             setFaqs({ de: [], en: [] });
+        }
+    };
+
+    const loadSettings = async () => {
+        try {
+            const data = await fetchSettings();
+            setSettings(data);
+        } catch (error: any) {
+            console.error("Error loading settings:", error);
+            toast.error(isEnglish ? "Failed to load settings" : "Fehler beim Laden der Einstellungen");
+            setSettings({ mvpulse_url: "/produkte/mvpulse" });
+        }
+    };
+
+    const handleSaveSettings = async () => {
+        try {
+            await saveSettings(settings);
+            toast.success(isEnglish ? "Settings saved successfully" : "Einstellungen erfolgreich gespeichert");
+        } catch (error: any) {
+            console.error("Error saving settings:", error);
+            toast.error(isEnglish ? "Failed to save settings" : "Fehler beim Speichern der Einstellungen");
         }
     };
 
@@ -427,6 +452,11 @@ export default function Dashboard() {
                                 <HelpCircle className="mr-2 h-4 w-4" /> 
                                 <span className="hidden sm:inline">{isEnglish ? "FAQs" : "FAQs"}</span>
                                 <span className="sm:hidden">{isEnglish ? "FAQs" : "FAQs"}</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="settings" className="flex-shrink-0">
+                                <SettingsIcon className="mr-2 h-4 w-4" /> 
+                                <span className="hidden sm:inline">{isEnglish ? "Settings" : "Einstellungen"}</span>
+                                <span className="sm:hidden">{isEnglish ? "Settings" : "Einstell."}</span>
                             </TabsTrigger>
                             {userRole === 'admin' && (
                                 <TabsTrigger value="admins" className="flex-shrink-0">
@@ -754,6 +784,33 @@ export default function Dashboard() {
                             faq={editingFAQ}
                             onSave={handleSaveFAQ}
                         />
+                    </TabsContent>
+
+                    <TabsContent value="settings" className="space-y-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-xl sm:text-2xl">{isEnglish ? "Settings" : "Einstellungen"}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="space-y-2">
+                                    <Label htmlFor="mvpulse_url">{isEnglish ? "MVpulse Button URL" : "MVpulse Button URL"}</Label>
+                                    <Input
+                                        id="mvpulse_url"
+                                        value={settings.mvpulse_url || "/produkte/mvpulse"}
+                                        onChange={(e) => setSettings({ ...settings, mvpulse_url: e.target.value })}
+                                        placeholder="/produkte/mvpulse"
+                                    />
+                                    <p className="text-sm text-muted-foreground">
+                                        {isEnglish 
+                                            ? "URL for the MVpulse button on the homepage" 
+                                            : "URL für den MVpulse Button auf der Startseite"}
+                                    </p>
+                                </div>
+                                <Button onClick={handleSaveSettings} className="w-full sm:w-auto">
+                                    {isEnglish ? "Save Settings" : "Einstellungen speichern"}
+                                </Button>
+                            </CardContent>
+                        </Card>
                     </TabsContent>
 
                     {userRole === 'admin' && (

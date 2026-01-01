@@ -590,3 +590,49 @@ export async function deleteFAQ(faqId: string): Promise<void> {
         throw new Error(data.error || "Failed to delete FAQ");
     }
 }
+
+// Settings-Verwaltung
+export interface Settings {
+    [key: string]: string;
+}
+
+export async function fetchSettings(): Promise<Settings> {
+    try {
+        const response = await fetch("/api/settings");
+        
+        const contentType = response.headers.get("content-type");
+        if (contentType && !contentType.includes("application/json")) {
+            const text = await response.text();
+            if (text.trim().startsWith("<!") || text.includes("<!doctype")) {
+                console.warn("⚠️ API-Route nicht verfügbar. Verwende Standardwerte als Fallback.");
+                return { mvpulse_url: "/produkte/mvpulse" };
+            }
+        }
+        
+        if (!response.ok) {
+            throw new Error("Failed to fetch settings");
+        }
+        
+        return response.json();
+    } catch (error: any) {
+        console.warn("⚠️ API nicht erreichbar. Verwende Standardwerte als Fallback.");
+        return { mvpulse_url: "/produkte/mvpulse" };
+    }
+}
+
+export async function saveSettings(settings: Settings): Promise<void> {
+    const response = await fetch("/api/settings", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getAuthToken()}`,
+        },
+        body: JSON.stringify({ settings }),
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || errorData.details || "Failed to save settings";
+        throw new Error(errorMessage);
+    }
+}

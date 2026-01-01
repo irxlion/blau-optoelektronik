@@ -11,7 +11,7 @@ import SEO from "@/components/SEO";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
-import { fetchProducts } from "@/lib/api";
+import { fetchProducts, fetchSettings } from "@/lib/api";
 import type { Product } from "@/data/products";
 
 export default function Home() {
@@ -22,6 +22,7 @@ export default function Home() {
   // Ziel: Startseite zeigt nur Produkte, die im Dashboard angelegt/hochgeladen wurden.
   const [productsByLang, setProductsByLang] = useState<{ de: Product[]; en: Product[] }>({ de: [], en: [] });
   const [productsLoading, setProductsLoading] = useState(true);
+  const [mvpulseUrl, setMvpulseUrl] = useState<string>("/produkte/mvpulse");
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +37,18 @@ export default function Home() {
         if (!cancelled) setProductsByLang({ de: [], en: [] });
       } finally {
         if (!cancelled) setProductsLoading(false);
+      }
+    })();
+
+    // Settings laden (für MVpulse URL)
+    (async () => {
+      try {
+        const settings = await fetchSettings();
+        if (!cancelled && settings.mvpulse_url) {
+          setMvpulseUrl(settings.mvpulse_url);
+        }
+      } catch (e) {
+        console.error("Fehler beim Laden der Settings:", e);
       }
     })();
 
@@ -678,7 +691,7 @@ export default function Home() {
               </h2>
               <h3 className="text-3xl font-bold text-secondary mb-6" style={{ color: 'oklch(0.98 0 0)' }}>{featuredCopy.subheading}</h3>
               <p className="text-lg text-muted-foreground mb-6">{featuredCopy.description}</p>
-              <Link href="/produkte/mvpulse">
+              <Link href={mvpulseUrl}>
                 <Button size="lg" className="bg-primary hover:bg-primary/90">
                   {featuredCopy.button}
                   <ArrowRight className="ml-2 h-5 w-5" />
