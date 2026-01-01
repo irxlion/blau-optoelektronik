@@ -203,6 +203,96 @@ export default function ProductDetail() {
         </div>
       </section>
 
+      {/* Technical Specifications */}
+      <section className="py-12">
+        <div className="container">
+          <h2 className="text-3xl font-bold mb-8 text-foreground">
+            {isEnglish ? "Technical specifications" : "Technische Daten"}
+          </h2>
+          <Card className="border-border/50">
+            <CardContent className="p-0">
+              {product.technicalPropertiesHtml ? (
+                <div className="p-6">
+                  {product.technicalPropertiesHtml
+                    .split("<!-- TECH_TABLE_SPLIT -->")
+                    .map((b) => b.trim())
+                    .filter(Boolean)
+                    .map((block, i) => (
+                      <div
+                        key={i}
+                        className="text-foreground [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm [&_table]:my-[61px] [&_th]:text-left [&_th]:font-semibold [&_th]:p-3 [&_th]:border-b [&_td]:p-3 [&_td]:border-b [&_tr:hover]:bg-muted/50 [&_caption]:text-left [&_caption]:text-muted-foreground [&_caption]:mb-2 [&_caption]:text-sm"
+                        dangerouslySetInnerHTML={{ __html: block }}
+                      />
+                    ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {Object.entries(product.specifications).map(([key, value], idx) => (
+                    <div
+                      key={idx}
+                      className="grid md:grid-cols-2 gap-4 p-6 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="font-semibold text-foreground">{key}</div>
+                      <div className="text-muted-foreground">{value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Downloads */}
+      <section className="py-12">
+        <div className="container">
+          <h2 className="text-3xl font-bold mb-8 text-foreground">
+            {isEnglish ? "Datasheets" : "Datenblätter"}
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {product.downloads
+              .filter((download) => {
+                // GLB-Dateien ausblenden
+                const isGLB = 
+                  download.type?.toLowerCase() === "glb" ||
+                  download.name?.toLowerCase().includes(".glb") ||
+                  download.url?.toLowerCase().includes(".glb");
+                return !isGLB;
+              })
+              .map((download, idx) => (
+              <Card 
+                key={idx} 
+                className="border-border/50 hover:shadow-lg transition-shadow group cursor-pointer"
+                onClick={() => handleDownload(download)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="text-sm text-secondary font-medium mb-1">{download.type}</div>
+                      <h3 className="font-semibold text-card-foreground group-hover:text-primary transition-colors">
+                        {download.name}
+                      </h3>
+                    </div>
+                    <Button 
+                      size="icon" 
+                      variant="ghost" 
+                      className="flex-shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(download);
+                      }}
+                      title={isEnglish ? `Download ${download.name}` : `${download.name} herunterladen`}
+                    >
+                      <Download className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section className="py-12 bg-muted">
         <div className="container">
@@ -286,46 +376,6 @@ export default function ProductDetail() {
         </section>
       )}
 
-      {/* Technical Specifications */}
-      <section className="py-12">
-        <div className="container">
-          <h2 className="text-3xl font-bold mb-8 text-foreground">
-            {isEnglish ? "Technical specifications" : "Technische Daten"}
-          </h2>
-          <Card className="border-border/50">
-            <CardContent className="p-0">
-              {product.technicalPropertiesHtml ? (
-                <div className="p-6">
-                  {product.technicalPropertiesHtml
-                    .split("<!-- TECH_TABLE_SPLIT -->")
-                    .map((b) => b.trim())
-                    .filter(Boolean)
-                    .map((block, i) => (
-                      <div
-                        key={i}
-                        className="text-foreground [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm [&_table]:my-[61px] [&_th]:text-left [&_th]:font-semibold [&_th]:p-3 [&_th]:border-b [&_td]:p-3 [&_td]:border-b [&_tr:hover]:bg-muted/50 [&_caption]:text-left [&_caption]:text-muted-foreground [&_caption]:mb-2 [&_caption]:text-sm"
-                        dangerouslySetInnerHTML={{ __html: block }}
-                      />
-                    ))}
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {Object.entries(product.specifications).map(([key, value], idx) => (
-                    <div
-                      key={idx}
-                      className="grid md:grid-cols-2 gap-4 p-6 hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="font-semibold text-foreground">{key}</div>
-                      <div className="text-muted-foreground">{value}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
       {/* Applications */}
       <section className="py-12 bg-muted">
         <div className="container">
@@ -342,56 +392,6 @@ export default function ProductDetail() {
                   </CardContent>
                 </Card>
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Downloads */}
-      <section className="py-12">
-        <div className="container">
-          <h2 className="text-3xl font-bold mb-8 text-foreground">
-            {isEnglish ? "Datasheets" : "Datenblätter"}
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {product.downloads
-              .filter((download) => {
-                // GLB-Dateien ausblenden
-                const isGLB = 
-                  download.type?.toLowerCase() === "glb" ||
-                  download.name?.toLowerCase().includes(".glb") ||
-                  download.url?.toLowerCase().includes(".glb");
-                return !isGLB;
-              })
-              .map((download, idx) => (
-              <Card 
-                key={idx} 
-                className="border-border/50 hover:shadow-lg transition-shadow group cursor-pointer"
-                onClick={() => handleDownload(download)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-sm text-secondary font-medium mb-1">{download.type}</div>
-                      <h3 className="font-semibold text-card-foreground group-hover:text-primary transition-colors">
-                        {download.name}
-                      </h3>
-                    </div>
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="flex-shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownload(download);
-                      }}
-                      title={isEnglish ? `Download ${download.name}` : `${download.name} herunterladen`}
-                    >
-                      <Download className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
             ))}
           </div>
         </div>
