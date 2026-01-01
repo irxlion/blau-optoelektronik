@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Product } from "@/data/products";
+import { Product, Feature, FeatureWithBackground } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import { uploadImage, deleteImage, uploadPDF, deletePDF, fetchProducts } from "@
 import { DragDropUpload } from "@/components/DragDropUpload";
 import { ImageManager } from "@/components/ImageManager";
 import { toast } from "sonner";
-import { Upload, X, FileText, Loader2, Check, ChevronsUpDown } from "lucide-react";
+import { Upload, X, FileText, Loader2, Check, ChevronsUpDown, Plus, Image as ImageIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
@@ -193,8 +193,11 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
         { question: "", answer: "" },
         { question: "", answer: "" },
     ]);
+    const [features, setFeatures] = useState<FeatureWithBackground[]>([]);
+    const [uploadingFeatureImages, setUploadingFeatureImages] = useState<{ [key: number]: boolean }>({});
     const imageInputRef = useRef<HTMLInputElement>(null);
     const pdfInputRef = useRef<HTMLInputElement>(null);
+    const featureImageInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
     // Lade Kategorien und generiere nächste ID
     useEffect(() => {
@@ -289,6 +292,14 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                 existingFaqs[1] || { question: "", answer: "" },
                 existingFaqs[2] || { question: "", answer: "" },
             ]);
+            // Bestehende Features laden - konvertiere Strings zu Objekten
+            const loadedFeatures = (product.features || []).map((feature): FeatureWithBackground => {
+                if (typeof feature === 'string') {
+                    return { text: feature };
+                }
+                return feature;
+            });
+            setFeatures(loadedFeatures);
         } else {
             setFormData({
                 id: nextId || "",
@@ -315,6 +326,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                 { question: "", answer: "" },
                 { question: "", answer: "" },
             ]);
+            setFeatures([]);
         }
     }, [product, open, nextId]);
 
@@ -326,6 +338,94 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
     const handleArrayChange = (e: React.ChangeEvent<HTMLTextAreaElement>, field: "features" | "applications") => {
         const values = e.target.value.split("\n").filter((line) => line.trim() !== "");
         setFormData((prev) => ({ ...prev, [field]: values }));
+    };
+
+    // Feature-Verwaltung
+    const handleFeatureTextChange = (index: number, text: string) => {
+        const newFeatures = [...features];
+        newFeatures[index] = { ...newFeatures[index], text };
+        setFeatures(newFeatures);
+    };
+
+    const handleAddFeature = () => {
+        setFeatures([...features, { text: "" }]);
+    };
+
+    const handleRemoveFeature = (index: number) => {
+        const newFeatures = features.filter((_, i) => i !== index);
+        setFeatures(newFeatures);
+    };
+
+    const handleFeatureImageUpload = async (index: number, file: File) => {
+        if (!formData.id) {
+            toast.error("Bitte geben Sie zuerst eine Produkt-ID ein");
+            return;
+        }
+
+        if (!file.type.match(/^image\/(png|jpeg|jpg)$/)) {
+            toast.error("Nur PNG und JPG Dateien sind erlaubt");
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("Datei ist zu groß. Maximum: 5 MB");
+            return;
+        }
+
+        setUploadingFeatureImages((prev) => ({ ...prev, [index]: true }));
+        try {
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                const base64 = reader.result as string;
+                const result = await uploadImage(
+                    formData.id!,
+                    base64,
+                    file.name,
+                    'feature-background',
+                    index
+                );
+
+                if (result.success && result.url) {
+                    const newFeatures = [...features];
+                    newFeatures[index] = { ...newFeatures[index], backgroundImage: result.url };
+                    setFeatures(newFeatures);
+                    toast.success("Hintergrundbild erfolgreich hochgeladen");
+                } else {
+                    toast.error(result.error || "Upload fehlgeschlagen");
+                }
+                setUploadingFeatureImages((prev) => ({ ...prev, [index]: false }));
+            };
+            reader.readAsDataURL(file);
+        } catch (error) {
+            toast.error("Fehler beim Upload");
+            setUploadingFeatureImages((prev) => ({ ...prev, [index]: false }));
+        }
+
+        if (featureImageInputRefs.current[index]) {
+            featureImageInputRefs.current[index]!.value = "";
+        }
+    };
+
+    const handleFeatureImageDelete = async (index: number) => {
+        const feature = features[index];
+        if (feature.backgroundImage && feature.backgroundImage.includes("products/")) {
+            try {
+                const path = feature.backgroundImage.includes("supabase.co")
+                    ? feature.backgroundImage.split("uploads/")[1]
+                    : feature.backgroundImage;
+                const result = await deleteImage(path);
+                if (!result.success) {
+                    toast.error(result.error || "Löschen fehlgeschlagen");
+                    return;
+                }
+            } catch (error) {
+                console.error("Fehler beim Löschen:", error);
+            }
+        }
+
+        const newFeatures = [...features];
+        newFeatures[index] = { ...newFeatures[index], backgroundImage: undefined };
+        setFeatures(newFeatures);
     };
 
     // Bild-Upload Handler
@@ -491,10 +591,23 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
             .filter((faq) => faq.question.trim() !== "" && faq.answer.trim() !== "")
             .slice(0, 3);
 
+        // Features filtern (nur die mit Text) und konvertieren
+        const validFeatures: Feature[] = features
+            .filter((f) => f.text.trim() !== "")
+            .map((f) => {
+                // Wenn kein Hintergrundbild, als String speichern (Rückwärtskompatibilität)
+                if (!f.backgroundImage) {
+                    return f.text;
+                }
+                // Mit Hintergrundbild als Objekt speichern
+                return { text: f.text, backgroundImage: f.backgroundImage };
+            });
+
         const updatedFormData = {
             ...formData,
             images: imageUrls,
             image: formData.image || imageUrls[0] || "",
+            features: validFeatures,
             downloads: [
                 ...pdfFiles.map((pdf) => ({
                     name: pdf.name,
@@ -812,13 +925,125 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="features">Features (one per line)</Label>
-                        <Textarea
-                            id="features"
-                            value={formData.features?.join("\n") || ""}
-                            onChange={(e) => handleArrayChange(e, "features")}
-                            rows={5}
-                        />
+                        <div className="flex items-center justify-between">
+                            <Label>Features</Label>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={handleAddFeature}
+                                className="h-8"
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Feature hinzufügen
+                            </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            Für jedes Feature können Sie optional ein Hintergrundbild hochladen.
+                        </p>
+                        <div className="space-y-3">
+                            {features.map((feature, index) => (
+                                <div key={index} className="p-4 border rounded-lg space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-medium text-muted-foreground">
+                                            Feature {index + 1}
+                                        </span>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleRemoveFeature(index)}
+                                            className="h-6 w-6"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor={`feature-text-${index}`}>Text</Label>
+                                        <Input
+                                            id={`feature-text-${index}`}
+                                            value={feature.text}
+                                            onChange={(e) => handleFeatureTextChange(index, e.target.value)}
+                                            placeholder="Feature-Text eingeben..."
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Hintergrundbild (optional)</Label>
+                                        {feature.backgroundImage ? (
+                                            <div className="relative">
+                                                <div className="relative aspect-video rounded-lg overflow-hidden border">
+                                                    <img
+                                                        src={feature.backgroundImage}
+                                                        alt={`Feature ${index + 1} Hintergrund`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/20" />
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => handleFeatureImageDelete(index)}
+                                                    className="mt-2"
+                                                >
+                                                    <X className="mr-2 h-4 w-4" />
+                                                    Bild entfernen
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                <input
+                                                    ref={(el) => {
+                                                        featureImageInputRefs.current[index] = el;
+                                                    }}
+                                                    type="file"
+                                                    accept="image/png,image/jpeg,image/jpg"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            handleFeatureImageUpload(index, file);
+                                                        }
+                                                    }}
+                                                    disabled={uploadingFeatureImages[index] || !formData.id}
+                                                    className="hidden"
+                                                    id={`feature-image-${index}`}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={() => featureImageInputRefs.current[index]?.click()}
+                                                    disabled={uploadingFeatureImages[index] || !formData.id}
+                                                    className="w-full"
+                                                >
+                                                    {uploadingFeatureImages[index] ? (
+                                                        <>
+                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            Upload...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <ImageIcon className="mr-2 h-4 w-4" />
+                                                            Hintergrundbild hochladen
+                                                        </>
+                                                    )}
+                                                </Button>
+                                                {!formData.id && (
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Bitte geben Sie zuerst eine Produkt-ID ein
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                            {features.length === 0 && (
+                                <div className="text-center py-8 text-muted-foreground border border-dashed rounded-lg">
+                                    <p>Noch keine Features hinzugefügt.</p>
+                                    <p className="text-sm mt-1">Klicken Sie auf "Feature hinzufügen" um zu beginnen.</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-4">

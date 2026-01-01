@@ -1,5 +1,12 @@
 import { Language } from "@/contexts/LanguageContext";
 
+export interface FeatureWithBackground {
+  text: string;
+  backgroundImage?: string;
+}
+
+export type Feature = string | FeatureWithBackground;
+
 export interface Product {
   id: string;
   name: string;
@@ -8,7 +15,7 @@ export interface Product {
   longDescription: string;
   image: string;
   images: string[];
-  features: string[];
+  features: Feature[]; // Array von Strings oder Feature-Objekten mit optionalem Hintergrundbild
   specifications: { [key: string]: string };
   applications: string[];
   downloads: { name: string; type: string; url: string }[];

@@ -8,13 +8,9 @@ const headers = {
     'Content-Type': 'application/json',
 };
 
-// Supabase Client initialisieren
 const supabaseUrl = process.env.SUPABASE_URL || 'https://xtuwjizliuthdgytloju.supabase.co';
-// WICHTIG: Service Role Key verwenden, nicht Anon Key!
-// Service Role Key umgeht RLS automatisch
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0dXdqaXpsaXV0aGRneXRsb2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2MTIwMjAsImV4cCI6MjA4MDE4ODAyMH0.U5iQhb_rDZedHFfAMl2tA85jn_kvAp2G6m35CyS0do4';
 
-// Supabase Client mit Service Role Key erstellen
 const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
         persistSession: false,
@@ -22,7 +18,6 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
     },
 });
 
-// Helper: Produkt aus DB-Format in Frontend-Format konvertieren
 function dbProductToFrontendProduct(dbProduct: any) {
     return {
         id: dbProduct.product_id,
@@ -43,7 +38,6 @@ function dbProductToFrontendProduct(dbProduct: any) {
     };
 }
 
-// Helper: Frontend-Produkt in DB-Format konvertieren
 function frontendProductToDbProduct(product: any, language: 'de' | 'en') {
     return {
         product_id: product.id,
@@ -67,7 +61,6 @@ function frontendProductToDbProduct(product: any, language: 'de' | 'en') {
 }
 
 export const handler: Handler = async (event) => {
-    // Handle CORS preflight
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
@@ -76,9 +69,8 @@ export const handler: Handler = async (event) => {
         };
     }
 
-    try {
+        try {
         if (event.httpMethod === 'GET') {
-            // Produkte aus Supabase abrufen
             const { data: products, error } = await supabase
                 .from('products')
                 .select('*')
@@ -95,7 +87,6 @@ export const handler: Handler = async (event) => {
                 };
             }
 
-            // Produkte nach Sprache gruppieren
             const productsByLang: { de: any[]; en: any[] } = { de: [], en: [] };
 
             products?.forEach((dbProduct) => {
@@ -113,7 +104,6 @@ export const handler: Handler = async (event) => {
                 body: JSON.stringify(productsByLang),
             };
         } else if (event.httpMethod === 'POST') {
-            // Authentifizierung prüfen für POST (Speichern)
             const authHeader = event.headers.authorization || event.headers.Authorization;
             if (!authHeader) {
                 return {
@@ -123,11 +113,9 @@ export const handler: Handler = async (event) => {
                 };
             }
 
-            // Token validieren
             try {
                 const token = authHeader.replace('Bearer ', '');
                 const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
-                // Admin und Mitarbeiter können Produkte speichern
                 if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
                     return {
                         statusCode: 403,
@@ -139,7 +127,6 @@ export const handler: Handler = async (event) => {
                 console.warn('Token validation failed:', e);
             }
 
-            // Produkte speichern
             const { de, en } = JSON.parse(event.body || '{}');
 
             if (!de || !en || !Array.isArray(de) || !Array.isArray(en)) {
@@ -150,7 +137,6 @@ export const handler: Handler = async (event) => {
                 };
             }
 
-            // Alle Produkte in DB-Format konvertieren
             const dbProducts: any[] = [];
 
             de.forEach((product: any) => {
@@ -161,7 +147,6 @@ export const handler: Handler = async (event) => {
                 dbProducts.push(frontendProductToDbProduct(product, 'en'));
             });
 
-            // Upsert alle Produkte (aktualisiert wenn product_id + language existiert, sonst erstellt)
             const { error } = await supabase
                 .from('products')
                 .upsert(dbProducts, {
@@ -184,7 +169,6 @@ export const handler: Handler = async (event) => {
                 body: JSON.stringify({ success: true }),
             };
         } else if (event.httpMethod === 'DELETE') {
-            // Authentifizierung prüfen für DELETE
             const authHeader = event.headers.authorization || event.headers.Authorization;
             if (!authHeader) {
                 return {
@@ -194,11 +178,9 @@ export const handler: Handler = async (event) => {
                 };
             }
 
-            // Token validieren
             try {
                 const token = authHeader.replace('Bearer ', '');
                 const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
-                // Admin und Mitarbeiter können Produkte löschen
                 if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
                     return {
                         statusCode: 403,
@@ -210,7 +192,6 @@ export const handler: Handler = async (event) => {
                 console.warn('Token validation failed:', e);
             }
 
-            // Produkt-ID aus Body extrahieren
             const { product_id } = JSON.parse(event.body || '{}');
 
             if (!product_id) {

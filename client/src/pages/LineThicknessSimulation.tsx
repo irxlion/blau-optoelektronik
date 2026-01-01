@@ -13,7 +13,6 @@ export default function LineThicknessSimulation() {
   const chartDiv2Ref = useRef<HTMLDivElement>(null);
   const scriptLoadedRef = useRef(false);
   
-  // Global variables stored in refs (matching original code)
   const globalsRef = useRef<{
     zeile: number;
     spalte: number;
@@ -32,7 +31,6 @@ export default function LineThicknessSimulation() {
     offset: 15,
   });
   
-  // Load Google Charts script (ohne Login-Schutz)
   useEffect(() => {
     if (scriptLoadedRef.current) return;
     
@@ -43,11 +41,9 @@ export default function LineThicknessSimulation() {
     
     script.onload = () => {
       scriptLoadedRef.current = true;
-      // Load Google Charts API
       if (window.google && window.google.charts) {
         window.google.charts.load('current', { 'packages': ['corechart'] });
         window.google.charts.setOnLoadCallback(() => {
-          // Charts are ready
         });
       }
     };
@@ -55,11 +51,9 @@ export default function LineThicknessSimulation() {
     document.head.appendChild(script);
     
     return () => {
-      // Cleanup if needed
     };
   }, []);
   
-  // Button Click Handler
   const buttonclick = () => {
     if (!window.google || !window.google.visualization) {
       alert('Google Charts is not loaded yet. Please wait a moment.');
@@ -75,7 +69,6 @@ export default function LineThicknessSimulation() {
     query.send(handleSampleDataQueryResponse);
   };
   
-  // Handle Query Response
   const handleSampleDataQueryResponse = (response: any) => {
     if (response.isError()) {
       alert('Error in query: ' + response.getMessage());
@@ -90,7 +83,6 @@ export default function LineThicknessSimulation() {
     drawplot();
   };
   
-  // Hauptplot
   const drawplot = () => {
     if (!window.google || !window.google.visualization) return;
     
@@ -134,7 +126,6 @@ export default function LineThicknessSimulation() {
     chart.draw(data3, options);
   };
   
-  // Fokus-Plot
   const drawfokuschart = (fokus: number, lw: number, ts: number) => {
     if (!window.google || !window.google.visualization) return;
     
@@ -169,7 +160,6 @@ export default function LineThicknessSimulation() {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      {/* Hero Section */}
       <section className="relative bg-primary text-primary-foreground py-24 mt-20">
         <div className="container">
           <div className="max-w-3xl">
@@ -190,7 +180,6 @@ export default function LineThicknessSimulation() {
         </div>
       </section>
       
-      {/* Tool Section */}
       <section className="py-16">
         <div className="container">
           <div className="max-w-4xl mx-auto">

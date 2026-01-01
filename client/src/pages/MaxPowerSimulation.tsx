@@ -13,7 +13,6 @@ export default function MaxPowerSimulation() {
   const chartDiv2Ref = useRef<HTMLDivElement>(null);
   const scriptLoadedRef = useRef(false);
   
-  // Global variables stored in refs (matching original code)
   const globalsRef = useRef<{
     zeile: number;
     spalte: number;
@@ -38,7 +37,6 @@ export default function MaxPowerSimulation() {
     pulse: 0,
   });
   
-  // Load Google Charts script (ohne Login-Schutz)
   useEffect(() => {
     if (scriptLoadedRef.current) return;
     
@@ -49,12 +47,10 @@ export default function MaxPowerSimulation() {
     
     script.onload = () => {
       scriptLoadedRef.current = true;
-      // Load Google Charts API
       if (window.google && window.google.charts) {
         window.google.charts.load('current', { 'packages': ['line', 'corechart'] });
         window.google.charts.load('current', { 'packages': ['table'] });
         window.google.charts.setOnLoadCallback(() => {
-          // Charts are ready
         });
       }
     };
@@ -62,11 +58,9 @@ export default function MaxPowerSimulation() {
     document.head.appendChild(script);
     
     return () => {
-      // Cleanup if needed
     };
   }, []);
   
-  // Button Click Handler
   const buttonclick4 = () => {
     if (!window.google || !window.google.visualization) {
       alert('Google Charts is not loaded yet. Please wait a moment.');
@@ -82,7 +76,6 @@ export default function MaxPowerSimulation() {
     query.send(handleSampleDataQueryResponse);
   };
   
-  // Handle Query Response
   const handleSampleDataQueryResponse = (response: any) => {
     if (response.isError()) {
       alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
@@ -103,18 +96,15 @@ export default function MaxPowerSimulation() {
     drawplot();
   };
   
-  // Draw Plot Function
   const drawplot = () => {
     if (!window.google || !window.google.visualization) return;
     
     const data3 = new window.google.visualization.DataTable();
     
-    // Add columns
     data3.addColumn('number', 'fan angle [deg]');
     data3.addColumn('number', 'Pmax LK 2[mW]');
     data3.addColumn('number', 'Pmax LK 3R [mW]');
     
-    // Add empty rows
     const anzahl = 7;
     data3.addRows(anzahl);
     
@@ -143,7 +133,6 @@ export default function MaxPowerSimulation() {
       data3.setCell(i, 2, Math.min(Math.round(pmax * 5), ldmax));
     }
     
-    // Create table
     if (tableDivRef.current) {
       const table = new window.google.visualization.Table(tableDivRef.current);
       
@@ -160,7 +149,6 @@ export default function MaxPowerSimulation() {
       table.draw(data3, { showRowNumber: false, width: tableWidth, height: 'auto' });
     }
     
-    // Show/hide pulse messages
     const p03 = document.getElementById("p03");
     const p04 = document.getElementById("p04");
     const chartDiv2 = document.getElementById("chart_div2");
@@ -176,13 +164,12 @@ export default function MaxPowerSimulation() {
     if (chartDiv2) chartDiv2.style.visibility = "hidden";
   };
   
-  // Draw Pulse Chart Function
   const drawpulsechart = (fan: number, pmax2: number, pmax3: number) => {
     if (!window.google || !window.google.charts) return;
     
     const { ldmax, pulse } = globalsRef.current;
     
-    const chartWidth = Math.min(window.innerWidth - 64, 900); // 64px for padding
+    const chartWidth = Math.min(window.innerWidth - 64, 900);
     const chartHeight = window.innerWidth < 640 ? 400 : 500;
     
     const options = {
@@ -210,7 +197,6 @@ export default function MaxPowerSimulation() {
     
     const data4 = new window.google.visualization.DataTable();
     
-    // Add columns
     data4.addColumn('number', 'pulse length[ms]');
     data4.addColumn('number', 'max power laser class 2');
     data4.addColumn('number', 'max duty cycle');
@@ -250,7 +236,6 @@ export default function MaxPowerSimulation() {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      {/* Hero Section */}
       <section className="relative bg-primary text-primary-foreground py-24 mt-20">
         <div className="container">
           <div className="max-w-3xl">
@@ -271,7 +256,6 @@ export default function MaxPowerSimulation() {
         </div>
       </section>
       
-      {/* Tool Section */}
       <section className="py-16">
         <div className="container">
           <div className="max-w-4xl mx-auto">
@@ -317,13 +301,11 @@ export default function MaxPowerSimulation() {
               </div>
             </div>
           
-            {/* Max Power Section */}
             <div className="mb-8">
               <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-foreground">Max Power</h1>
               <div id="table_div" ref={tableDivRef} className="w-full overflow-x-auto"></div>
             </div>
             
-            {/* Mvpulse Section */}
             <div className="mb-8">
               <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-foreground">Mvpulse</h1>
               <p id="p03" className="text-muted-foreground mb-2">

@@ -72,7 +72,7 @@ export const handler: Handler = async (event) => {
 
         if (event.httpMethod === 'POST') {
             // Bild-Upload
-            const { productId, imageBase64, fileName } = JSON.parse(event.body || '{}');
+            const { productId, imageBase64, fileName, uploadType, featureIndex } = JSON.parse(event.body || '{}');
 
             if (!productId || !imageBase64) {
                 return {
@@ -106,8 +106,16 @@ export const handler: Handler = async (event) => {
             const timestamp = Date.now();
             const extension = mimeType.split('/')[1];
             const sanitizedProductId = productId.replace(/[^a-zA-Z0-9-_]/g, '_');
-            const finalFileName = fileName || `${sanitizedProductId}_${timestamp}.${extension}`;
-            const filePath = `products/${sanitizedProductId}/images/${finalFileName}`;
+            
+            // Bestimme den Pfad basierend auf Upload-Typ
+            let filePath: string;
+            if (uploadType === 'feature-background' && featureIndex !== undefined) {
+                const finalFileName = fileName || `feature_${featureIndex}_${timestamp}.${extension}`;
+                filePath = `products/${sanitizedProductId}/feature-backgrounds/${finalFileName}`;
+            } else {
+                const finalFileName = fileName || `${sanitizedProductId}_${timestamp}.${extension}`;
+                filePath = `products/${sanitizedProductId}/images/${finalFileName}`;
+            }
 
             // Upload zu Supabase Storage
             const { data, error } = await supabase.storage

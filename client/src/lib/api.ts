@@ -28,12 +28,10 @@ export async function fetchProducts(): Promise<{ de: Product[]; en: Product[] }>
     try {
         const response = await fetch("/api/products");
         
-        // Prüfe ob die Antwort HTML ist (Fehler: Route nicht gefunden)
         const contentType = response.headers.get("content-type");
         if (contentType && !contentType.includes("application/json")) {
             const text = await response.text();
             if (text.trim().startsWith("<!") || text.includes("<!doctype")) {
-                // Fallback zu statischen Produktdaten für Development
                 console.warn("⚠️ API-Route nicht verfügbar. Verwende statische Produktdaten als Fallback.");
                 console.warn("💡 Tipp: Verwenden Sie 'pnpm dev' (netlify dev) für vollständige API-Funktionalität.");
                 return {
@@ -53,7 +51,6 @@ export async function fetchProducts(): Promise<{ de: Product[]; en: Product[] }>
                 errorMessage = errorText || `HTTP ${response.status}: ${response.statusText}`;
             }
             
-            // Bei Server-Fehlern (500, 503, etc.) oder wenn keine Produkte gefunden wurden, verwende Fallback
             if (response.status >= 500 || response.status === 404 || errorMessage.includes("Failed to fetch products")) {
                 console.warn(`⚠️ API-Fehler (${response.status}): ${errorMessage}`);
                 console.warn("💡 Verwende statische Produktdaten als Fallback.");
@@ -69,8 +66,6 @@ export async function fetchProducts(): Promise<{ de: Product[]; en: Product[] }>
         
         const data = (await response.json()) as { de?: Product[]; en?: Product[] };
         
-        // Wenn die Antwort leer ist, gebe leere Arrays zurück (kein Fallback mehr)
-        // Dies ermöglicht es, Produkte wirklich zu löschen ohne dass sie wieder erscheinen
         if (!data) {
             return { de: [], en: [] };
         }
@@ -80,7 +75,6 @@ export async function fetchProducts(): Promise<{ de: Product[]; en: Product[] }>
             en: (data.en || []).map((p) => normalizeMachineVisionLaserModuleCategory(p, "en")),
         };
     } catch (error: any) {
-        // Wenn es ein Netzwerkfehler ist (API nicht erreichbar), verwende Fallback
         if (error.name === "TypeError" || error.message?.includes("fetch") || error.message?.includes("Failed to fetch")) {
             console.warn("⚠️ API nicht erreichbar. Verwende statische Produktdaten als Fallback.");
             console.warn("💡 Tipp: Verwenden Sie 'pnpm dev' (netlify dev) für vollständige API-Funktionalität.");
@@ -90,7 +84,6 @@ export async function fetchProducts(): Promise<{ de: Product[]; en: Product[] }>
             };
         }
         
-        // Bei anderen Fehlern auch Fallback verwenden, damit die Seite funktioniert
         console.warn(`⚠️ Fehler beim Laden der Produkte: ${error.message || "Unbekannter Fehler"}`);
         console.warn("💡 Verwende statische Produktdaten als Fallback.");
         return {
@@ -168,14 +161,26 @@ function getAuthToken(): string {
     return localStorage.getItem("authToken") || "";
 }
 
-export async function uploadImage(productId: string, imageBase64: string, fileName?: string): Promise<{ success: boolean; url?: string; path?: string; error?: string }> {
+export async function uploadImage(
+    productId: string, 
+    imageBase64: string, 
+    fileName?: string,
+    uploadType?: 'normal' | 'feature-background',
+    featureIndex?: number
+): Promise<{ success: boolean; url?: string; path?: string; error?: string }> {
     const response = await fetch("/api/upload-image", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${getAuthToken()}`,
         },
-        body: JSON.stringify({ productId, imageBase64, fileName }),
+        body: JSON.stringify({ 
+            productId, 
+            imageBase64, 
+            fileName,
+            uploadType: uploadType || 'normal',
+            featureIndex
+        }),
     });
 
     if (!response.ok) {

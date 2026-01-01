@@ -12,7 +12,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { fetchProducts } from "@/lib/api";
-import { Product } from "@/data/products";
+import { Product, Feature, FeatureWithBackground } from "@/data/products";
 import SEO from "@/components/SEO";
 import NotFound from "./NotFound";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -300,18 +300,53 @@ export default function ProductDetail() {
             {isEnglish ? "All features" : "Alle Features"}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {product.features.map((feature, idx) => (
-              <Card key={idx} className="border-border/50">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Check className="h-5 w-5 text-secondary" />
+            {product.features.map((feature, idx) => {
+              // Unterstütze sowohl String-Features als auch Feature-Objekte
+              const featureText = typeof feature === 'string' ? feature : feature.text;
+              const backgroundImage = typeof feature === 'string' ? undefined : (feature as FeatureWithBackground).backgroundImage;
+              
+              return (
+                <Card 
+                  key={idx} 
+                  className="border-border/50 overflow-hidden relative"
+                  style={{
+                    backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  {/* Overlay für bessere Text-Lesbarkeit */}
+                  {backgroundImage && (
+                    <div 
+                      className="absolute inset-0 bg-black/40 mix-blend-multiply"
+                      style={{
+                        mixBlendMode: 'multiply',
+                      }}
+                    />
+                  )}
+                  <CardContent className="p-6 relative z-10">
+                    <div className="flex items-start gap-3">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        backgroundImage 
+                          ? 'bg-white/20 backdrop-blur-sm' 
+                          : 'bg-secondary/10'
+                      }`}>
+                        <Check className={`h-5 w-5 ${
+                          backgroundImage 
+                            ? 'text-white' 
+                            : 'text-secondary'
+                        }`} />
+                      </div>
+                      <p className={`${
+                        backgroundImage 
+                          ? 'text-white drop-shadow-lg' 
+                          : 'text-card-foreground'
+                      }`}>{featureText}</p>
                     </div>
-                    <p className="text-card-foreground">{feature}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
             {/* Tools Buttons */}
             {product.tools && product.tools.length > 0 && (
               <>
