@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Home } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function CustomerLogin() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [, setLocation] = useLocation();
+    const { language } = useLanguage();
+    const isEnglish = language === "en";
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -64,6 +68,17 @@ export default function CustomerLogin() {
                             {loading ? "Logging in..." : "Login"}
                         </Button>
                     </form>
+                    <div className="mt-4 pt-4 border-t">
+                        <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="w-full" 
+                            onClick={() => setLocation("/")}
+                        >
+                            <Home className="mr-2 h-4 w-4" />
+                            {isEnglish ? "Home" : "Zur Startseite"}
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
         </div>

@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation } from "wouter";
 import { ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,6 +9,21 @@ import { Button } from "@/components/ui/button";
 export default function MaxPowerSimulation() {
   const { language } = useLanguage();
   const isEnglish = language === "en";
+  const [, setLocation] = useLocation();
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  // Login-Schutz - prüft customerToken
+  useEffect(() => {
+    const token = localStorage.getItem("customerToken");
+    if (!token) {
+      setLocation("/customer-login");
+      return;
+    }
+    setIsAuthenticated(true);
+    setLoading(false);
+  }, [setLocation]);
   
   const tableDivRef = useRef<HTMLDivElement>(null);
   const chartDiv2Ref = useRef<HTMLDivElement>(null);
@@ -231,6 +247,20 @@ export default function MaxPowerSimulation() {
   const pageDescription = isEnglish
     ? "Calculate maximum laser power for different configurations"
     : "Berechnen Sie die maximale Laserleistung für verschiedene Konfigurationen";
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated) {
+    return null;
+  }
   
   return (
     <div className="min-h-screen flex flex-col">
