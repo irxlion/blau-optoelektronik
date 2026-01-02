@@ -25,7 +25,7 @@ export default function CustomerLogin() {
             if (result.success) {
                 localStorage.setItem("customerToken", result.token!);
                 toast.success("Login successful");
-                setLocation("/tools");
+                setLocation(isEnglish ? "/tools/maximum-power-simulation" : "/tools/maximale-leistung-simulation");
             } else {
                 toast.error(result.error || "Login failed");
             }

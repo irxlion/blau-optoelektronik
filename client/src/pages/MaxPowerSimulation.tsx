@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, LogOut } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -247,7 +247,12 @@ export default function MaxPowerSimulation() {
   const pageDescription = isEnglish
     ? "Calculate maximum laser power for different configurations"
     : "Berechnen Sie die maximale Laserleistung für verschiedene Konfigurationen";
-  
+
+  const handleLogout = () => {
+    localStorage.removeItem("customerToken");
+    setLocation("/customer-login");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -268,7 +273,17 @@ export default function MaxPowerSimulation() {
       
       <section className="relative bg-primary text-primary-foreground py-24 mt-20">
         <div className="container">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl relative">
+            <div className="absolute top-0 right-0">
+              <Button
+                variant="outline"
+                onClick={handleLogout}
+                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground backdrop-blur-sm"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                {isEnglish ? "Logout" : "Abmelden"}
+              </Button>
+            </div>
             <div className="flex flex-wrap items-center gap-2 text-sm mb-4 opacity-90">
               <span>{isEnglish ? "Home" : "Home"}</span>
               <ChevronRight className="h-4 w-4" />

@@ -1,45 +1,15 @@
-import { useEffect, useState } from "react";
-import { useLocation, Link } from "wouter";
+import { Link } from "wouter";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calculator, LineChart, LogOut } from "lucide-react";
+import { Calculator, LineChart } from "lucide-react";
 import ParallaxSection from "@/components/ParallaxSection";
 
 export default function Tools() {
-  const [, setLocation] = useLocation();
   const { language } = useLanguage();
   const isEnglish = language === "en";
-  
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  
-  // Login-Schutz - prüft customerToken
-  useEffect(() => {
-    const token = localStorage.getItem("customerToken");
-    if (!token) {
-      setLocation("/customer-login");
-      return;
-    }
-    setIsAuthenticated(true);
-    setLoading(false);
-  }, [setLocation]);
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
-  
-  if (!isAuthenticated) {
-    return null;
-  }
   
   const tools = isEnglish
     ? [
@@ -75,11 +45,6 @@ export default function Tools() {
   const pageDescription = isEnglish
     ? "Select a tool to calculate laser parameters"
     : "Wählen Sie ein Tool aus, um Laserparameter zu berechnen";
-
-  const handleLogout = () => {
-    localStorage.removeItem("customerToken");
-    setLocation("/customer-login");
-  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -101,17 +66,7 @@ export default function Tools() {
         </ParallaxSection>
 
         <div className="container relative z-10">
-          <div className="max-w-3xl relative">
-            <div className="absolute top-0 right-0">
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                className="bg-primary-foreground/10 hover:bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground backdrop-blur-sm"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                {isEnglish ? "Logout" : "Abmelden"}
-              </Button>
-            </div>
+          <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
               {pageTitle}
             </h1>
