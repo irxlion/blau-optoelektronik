@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { fetchProducts, saveProducts, deleteProduct } from "@/lib/api";
+import { fetchProducts, saveProducts, deleteProduct, linkProducts } from "@/lib/api";
 import { Product } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductForm } from "@/components/ProductForm";
+import { ProductLinkDialog } from "@/components/ProductLinkDialog";
 import { CustomerManagement } from "@/components/CustomerManagement";
 import { AdminManagement } from "@/components/AdminManagement";
 import { CareerForm } from "@/components/CareerForm";
@@ -12,10 +13,11 @@ import { FAQForm } from "@/components/FAQForm";
 import { fetchCareers, saveCareers, deleteCareer, Career, fetchFAQs, saveFAQs, deleteFAQ, FAQ, FAQCategory, fetchSettings, saveSettings, Settings } from "@/lib/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase, HelpCircle, Settings as SettingsIcon } from "lucide-react";
+import { Loader2, Plus, Pencil, LogOut, Trash2, Home, Package, Users, Shield, Briefcase, HelpCircle, Settings as SettingsIcon, Link2, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
     const { language } = useLanguage();
@@ -31,6 +33,8 @@ export default function Dashboard() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isCareerFormOpen, setIsCareerFormOpen] = useState(false);
     const [isFAQFormOpen, setIsFAQFormOpen] = useState(false);
+    const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+    const [linkingProduct, setLinkingProduct] = useState<Product | undefined>(undefined);
     const [currentLang, setCurrentLang] = useState<"de" | "en">("de");
     const [userRole, setUserRole] = useState<'admin' | 'mitarbeiter' | null>(null);
     const [, setLocation] = useLocation();
@@ -184,6 +188,33 @@ export default function Dashboard() {
     const handleAdd = () => {
         setEditingProduct(undefined);
         setIsFormOpen(true);
+    };
+
+    const handleLinkProduct = (product: Product) => {
+        setLinkingProduct(product);
+        setIsLinkDialogOpen(true);
+    };
+
+    const handleLinkProducts = async (targetProductId: string) => {
+        if (!linkingProduct || !products) return;
+
+        const targetLanguage = currentLang === "de" ? "en" : "de";
+        
+        try {
+            await linkProducts(linkingProduct.id, targetProductId, targetLanguage);
+            await loadProducts();
+            toast.success(isEnglish ? "Products linked successfully" : "Produkte erfolgreich verknüpft");
+        } catch (error: any) {
+            toast.error(error.message || (isEnglish ? "Failed to link products" : "Fehler beim Verknüpfen der Produkte"));
+            throw error;
+        }
+    };
+
+    // Hilfsfunktion: Prüft, ob ein Produkt bereits verknüpft ist
+    const getLinkedProduct = (product: Product): Product | undefined => {
+        if (!products) return undefined;
+        const otherLang = currentLang === "de" ? "en" : "de";
+        return products[otherLang]?.find((p) => p.id === product.id);
     };
 
     const handleSaveCareer = async (career: Career) => {
@@ -512,14 +543,36 @@ export default function Dashboard() {
                                                             />
                                                         )}
                                                         <div className="min-w-0 flex-1">
-                                                            <h3 className="font-semibold text-base sm:text-lg truncate">{product.name}</h3>
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <h3 className="font-semibold text-base sm:text-lg truncate">{product.name}</h3>
+                                                                {getLinkedProduct(product) && (
+                                                                    <Badge variant="outline" className="text-xs">
+                                                                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                                                                        {isEnglish ? "Linked" : "Verknüpft"}
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
                                                             <p className="text-sm text-gray-500 truncate">{product.category}</p>
                                                             {product.description && (
                                                                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.description}</p>
                                                             )}
+                                                            {getLinkedProduct(product) && (
+                                                                <p className="text-xs text-muted-foreground mt-1">
+                                                                    {isEnglish ? "Linked with" : "Verknüpft mit"}: {getLinkedProduct(product)?.name} ({currentLang === "de" ? "EN" : "DE"})
+                                                                </p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-2 justify-end sm:justify-start">
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            onClick={() => handleLinkProduct(product)}
+                                                            className="h-10 w-10"
+                                                            title={isEnglish ? "Link product" : "Produkt verknüpfen"}
+                                                        >
+                                                            <Link2 className="h-4 w-4" />
+                                                        </Button>
                                                         <Button 
                                                             variant="ghost" 
                                                             size="icon" 
@@ -568,6 +621,22 @@ export default function Dashboard() {
                     product={editingProduct}
                     onSave={handleSaveProduct}
                 />
+
+                {linkingProduct && products && (
+                    <ProductLinkDialog
+                        open={isLinkDialogOpen}
+                        onOpenChange={(open) => {
+                            setIsLinkDialogOpen(open);
+                            if (!open) {
+                                setLinkingProduct(undefined);
+                            }
+                        }}
+                        sourceProduct={linkingProduct}
+                        sourceLanguage={currentLang}
+                        availableProducts={products[currentLang === "de" ? "en" : "de"] || []}
+                        onLink={handleLinkProducts}
+                    />
+                )}
                     </TabsContent>
 
                     <TabsContent value="customers" className="space-y-4">

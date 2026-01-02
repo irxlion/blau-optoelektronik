@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, PATCH, OPTIONS',
     'Content-Type': 'application/json',
 };
 
@@ -221,6 +221,127 @@ export const handler: Handler = async (event) => {
                 statusCode: 200,
                 headers,
                 body: JSON.stringify({ success: true }),
+            };
+        } else if (event.httpMethod === 'PATCH') {
+            const authHeader = event.headers.authorization || event.headers.Authorization;
+            if (!authHeader) {
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({ error: 'Unauthorized' }),
+                };
+            }
+
+            try {
+                const token = authHeader.replace('Bearer ', '');
+                const tokenData = JSON.parse(Buffer.from(token, 'base64').toString());
+                if (tokenData.role !== 'admin' && tokenData.role !== 'mitarbeiter') {
+                    return {
+                        statusCode: 403,
+                        headers,
+                        body: JSON.stringify({ error: 'Forbidden - Nur Admins und Mitarbeiter können Produkte verknüpfen' }),
+                    };
+                }
+            } catch (e) {
+                console.warn('Token validation failed:', e);
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({ error: 'Invalid token' }),
+                };
+            }
+
+            const { sourceProductId, targetProductId, targetLanguage } = JSON.parse(event.body || '{}');
+
+            if (!sourceProductId || !targetProductId || !targetLanguage) {
+                return {
+                    statusCode: 400,
+                    headers,
+                    body: JSON.stringify({ error: 'sourceProductId, targetProductId und targetLanguage sind erforderlich' }),
+                };
+            }
+
+            if (targetLanguage !== 'de' && targetLanguage !== 'en') {
+                return {
+                    statusCode: 400,
+                    headers,
+                    body: JSON.stringify({ error: 'targetLanguage muss "de" oder "en" sein' }),
+                };
+            }
+
+            // Prüfe, ob das Quellprodukt existiert
+            const { data: sourceProduct, error: sourceError } = await supabase
+                .from('products')
+                .select('*')
+                .eq('product_id', sourceProductId)
+                .eq('is_active', true)
+                .single();
+
+            if (sourceError || !sourceProduct) {
+                return {
+                    statusCode: 404,
+                    headers,
+                    body: JSON.stringify({ error: `Quellprodukt mit ID "${sourceProductId}" nicht gefunden` }),
+                };
+            }
+
+            // Prüfe, ob das Zielprodukt existiert
+            const { data: targetProduct, error: targetError } = await supabase
+                .from('products')
+                .select('*')
+                .eq('product_id', targetProductId)
+                .eq('language', targetLanguage)
+                .eq('is_active', true)
+                .single();
+
+            if (targetError || !targetProduct) {
+                return {
+                    statusCode: 404,
+                    headers,
+                    body: JSON.stringify({ error: `Zielprodukt mit ID "${targetProductId}" und Sprache "${targetLanguage}" nicht gefunden` }),
+                };
+            }
+
+            // Prüfe, ob die Ziel-product_id bereits für die Zielsprache existiert (außer es ist das Zielprodukt selbst)
+            const { data: existingProduct, error: existingError } = await supabase
+                .from('products')
+                .select('*')
+                .eq('product_id', sourceProductId)
+                .eq('language', targetLanguage)
+                .eq('is_active', true)
+                .single();
+
+            if (existingProduct && existingProduct.id !== targetProduct.id) {
+                return {
+                    statusCode: 409,
+                    headers,
+                    body: JSON.stringify({ error: `Ein Produkt mit product_id "${sourceProductId}" und Sprache "${targetLanguage}" existiert bereits` }),
+                };
+            }
+
+            // Aktualisiere die product_id des Zielprodukts
+            const { error: updateError } = await supabase
+                .from('products')
+                .update({ product_id: sourceProductId, updated_at: new Date().toISOString() })
+                .eq('product_id', targetProductId)
+                .eq('language', targetLanguage);
+
+            if (updateError) {
+                console.error('Error linking products:', updateError);
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({ error: 'Fehler beim Verknüpfen der Produkte', details: updateError.message }),
+                };
+            }
+
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({ 
+                    success: true,
+                    message: `Produkt "${targetProduct.name}" wurde erfolgreich mit "${sourceProduct.name}" verknüpft`
+                }),
             };
         } else {
             return {
