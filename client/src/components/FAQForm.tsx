@@ -64,12 +64,12 @@ export function FAQForm({ open, onOpenChange, faq, onSave }: FAQFormProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                 <DialogHeader>
                     <DialogTitle>{faq ? (isEnglish ? "Edit FAQ" : "FAQ bearbeiten") : (isEnglish ? "Add New FAQ" : "Neue FAQ hinzufügen")}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="id">{isEnglish ? "FAQ ID *" : "FAQ-ID *"}</Label>
                             <Input
@@ -80,6 +80,7 @@ export function FAQForm({ open, onOpenChange, faq, onSave }: FAQFormProps) {
                                 required
                                 disabled={!!faq}
                                 placeholder={isEnglish ? "e.g. general-1" : "z.B. allgemein-1"}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                             <p className="text-xs text-muted-foreground">{isEnglish ? "Unique ID (only when creating)" : "Eindeutige ID (nur bei Erstellung)"}</p>
                         </div>
@@ -92,6 +93,7 @@ export function FAQForm({ open, onOpenChange, faq, onSave }: FAQFormProps) {
                                 onChange={handleChange}
                                 required
                                 placeholder={isEnglish ? "e.g. General questions" : "z.B. Allgemeine Fragen"}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                         </div>
                     </div>
@@ -105,6 +107,7 @@ export function FAQForm({ open, onOpenChange, faq, onSave }: FAQFormProps) {
                             onChange={handleChange}
                             required
                             placeholder={isEnglish ? "Enter the question" : "Geben Sie die Frage ein"}
+                            className="text-sm sm:text-base min-h-[44px]"
                         />
                     </div>
 
@@ -118,6 +121,7 @@ export function FAQForm({ open, onOpenChange, faq, onSave }: FAQFormProps) {
                             required
                             rows={8}
                             placeholder={isEnglish ? "Enter the answer" : "Geben Sie die Antwort ein"}
+                            className="text-sm sm:text-base"
                         />
                     </div>
 
@@ -130,15 +134,16 @@ export function FAQForm({ open, onOpenChange, faq, onSave }: FAQFormProps) {
                             value={formData.orderIndex || 0}
                             onChange={handleNumberChange}
                             placeholder="0"
+                            className="text-sm sm:text-base min-h-[44px]"
                         />
                         <p className="text-xs text-muted-foreground">{isEnglish ? "Lower numbers appear first within the same category" : "Niedrigere Zahlen erscheinen zuerst innerhalb derselben Kategorie"}</p>
                     </div>
 
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto min-h-[44px]">
                             {isEnglish ? "Cancel" : "Abbrechen"}
                         </Button>
-                        <Button type="submit">{isEnglish ? "Save" : "Speichern"}</Button>
+                        <Button type="submit" className="w-full sm:w-auto min-h-[44px]">{isEnglish ? "Save" : "Speichern"}</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

@@ -1,9 +1,107 @@
+import { useState, useEffect, useRef } from "react";
 import { ChevronRight, Target, Lightbulb, Award, Users, Factory, TrendingUp } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ParallaxSection from "@/components/ParallaxSection";
+
+// Counter Component für animierte Zahlen
+function Counter({ value, suffix = "", duration = 2000 }: { value: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (hasAnimated) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasAnimated) {
+            setHasAnimated(true);
+            const startTime = Date.now();
+            const startValue = 0;
+            const endValue = value;
+
+            const animate = () => {
+              const now = Date.now();
+              const elapsed = now - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              
+              // Easing function für smooth animation
+              const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+              const currentValue = Math.floor(startValue + (endValue - startValue) * easeOutQuart);
+              
+              setCount(currentValue);
+
+              if (progress < 1) {
+                requestAnimationFrame(animate);
+              } else {
+                setCount(endValue);
+              }
+            };
+
+            requestAnimationFrame(animate);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, [value, duration, hasAnimated]);
+
+  return (
+    <div ref={ref} className="text-4xl md:text-5xl font-bold text-primary mb-2">
+      {count}{suffix}
+    </div>
+  );
+}
+
+// Stats Counter Section Component
+function StatsCounter({ stats }: { stats: Array<{ number: string; label: string }> }) {
+  // Extrahiere Zahlen und Suffixe aus den stat strings
+  const parseStat = (statNumber: string) => {
+    if (statNumber.includes("%")) {
+      return { value: 100, suffix: "%" };
+    } else if (statNumber.includes("h")) {
+      return { value: 24, suffix: "h" };
+    } else {
+      const match = statNumber.match(/(\d+)(\+?)/);
+      if (match) {
+        return { value: parseInt(match[1]), suffix: match[2] || "" };
+      }
+      return { value: 0, suffix: "" };
+    }
+  };
+
+  return (
+    <section className="py-16 bg-accent">
+      <div className="container">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {stats.map((stat, idx) => {
+            const { value, suffix } = parseStat(stat.number);
+            return (
+              <div key={idx} className="text-center">
+                <Counter value={value} suffix={suffix} />
+                <div className="text-primary font-medium">{stat.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Company() {
   const { language, t } = useLanguage();
@@ -37,7 +135,7 @@ export default function Company() {
       description: "Einführung des revolutionären MVpulse-Lasermoduls mit Augensicherheit und hoher Leistung."
     },
     {
-      year: "2025",
+      year: "2026",
       title: "Zukunft",
       description: "Kontinuierliche Innovation und Entwicklung neuer optoelektronischer Lösungen."
     }
@@ -69,7 +167,7 @@ export default function Company() {
         description: "Introduction of the groundbreaking MVpulse laser module combining eye safety and high power."
       },
       {
-        year: "2025",
+        year: "2026",
         title: "Future",
         description: "Ongoing innovation and development of next-generation optoelectronic solutions."
       }
@@ -177,18 +275,7 @@ export default function Company() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-accent">
-        <div className="container">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, idx) => (
-              <div key={idx} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">{stat.number}</div>
-                <div className="text-primary font-medium">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <StatsCounter stats={stats} />
 
       {/* Mission Section */}
       <section className="py-20">

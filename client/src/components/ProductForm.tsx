@@ -98,7 +98,7 @@ function CategoryCombobox({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <div className="relative">
-                    <Input
+                        <Input
                         ref={inputRef}
                         id="category"
                         name="category"
@@ -114,7 +114,7 @@ function CategoryCombobox({
                         placeholder="Kategorie eingeben oder auswählen..."
                         autoComplete="off"
                         required
-                        className="pr-9"
+                        className="pr-9 text-sm sm:text-base min-h-[44px]"
                     />
                     <button
                         type="button"
@@ -626,7 +626,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                 <DialogHeader>
                     <DialogTitle>{product ? "Edit Product" : "Add Product"}</DialogTitle>
                 </DialogHeader>
@@ -642,12 +642,13 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                                 required 
                                 disabled={!!product}
                                 readOnly={!product}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                             {!product && <p className="text-xs text-muted-foreground">Automatisch generiert</p>}
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="name">Name</Label>
-                            <Input id="name" name="name" value={formData.name || ""} onChange={handleChange} required />
+                            <Input id="name" name="name" value={formData.name || ""} onChange={handleChange} required className="text-sm sm:text-base min-h-[44px]" />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="category">Category</Label>
@@ -807,7 +808,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
 
                     <div className="space-y-2">
                         <Label htmlFor="description">Short Description</Label>
-                        <Textarea id="description" name="description" value={formData.description || ""} onChange={handleChange} required />
+                        <Textarea id="description" name="description" value={formData.description || ""} onChange={handleChange} required className="text-sm sm:text-base" />
                     </div>
 
                     <div className="space-y-2">
@@ -819,7 +820,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                             onChange={handleChange} 
                             required 
                             rows={10}
-                            className="font-mono text-sm"
+                            className="font-mono text-xs sm:text-sm"
                         />
                         <p className="text-xs text-muted-foreground">Sie können HTML-Tags verwenden (z.B. &lt;p&gt;, &lt;h2&gt;, &lt;ul&gt;, etc.)</p>
                     </div>
@@ -832,7 +833,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                             value={formData.seoHeadHtml || ""} 
                             onChange={handleChange} 
                             rows={8}
-                            className="font-mono text-sm"
+                            className="font-mono text-xs sm:text-sm"
                             placeholder='z.B. &lt;meta name="description" content="..."&gt;&#10;&lt;meta name="keywords" content="..."&gt;'
                         />
                         <p className="text-xs text-muted-foreground">HTML-Code der in den &lt;head&gt; Bereich der Produktseite eingefügt wird</p>
@@ -858,7 +859,7 @@ export function ProductForm({ open, onOpenChange, product, onSave }: ProductForm
                                             });
                                         }}
                                         rows={10}
-                                        className="font-mono text-sm"
+                                        className="font-mono text-xs sm:text-sm"
                                         placeholder={'z.B. <table><tr><th>Wellenlänge</th><td>635 nm</td></tr></table>'}
                                     />
                                     {technicalTableBlocks.length > 1 && (

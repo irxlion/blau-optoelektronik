@@ -74,12 +74,12 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                 <DialogHeader>
                     <DialogTitle>{career ? (isEnglish ? "Edit Job Posting" : "Stelle bearbeiten") : (isEnglish ? "Add New Job Posting" : "Neue Stelle hinzufügen")}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="id">{isEnglish ? "Job ID *" : "Job-ID *"}</Label>
                             <Input
@@ -90,6 +90,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 required
                                 disabled={!!career}
                                 placeholder={isEnglish ? "e.g. software-engineer" : "z.B. software-engineer"}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                             <p className="text-xs text-muted-foreground">{isEnglish ? "Unique ID (only when creating)" : "Eindeutige ID (nur bei Erstellung)"}</p>
                         </div>
@@ -102,11 +103,12 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 onChange={handleChange}
                                 required
                                 placeholder={isEnglish ? "e.g. Software Engineer" : "z.B. Software Engineer"}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="department">{isEnglish ? "Department" : "Abteilung"}</Label>
                             <Input
@@ -115,6 +117,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 value={formData.department || ""}
                                 onChange={handleChange}
                                 placeholder={isEnglish ? "e.g. Development" : "z.B. Entwicklung"}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                         </div>
                         <div className="space-y-2">
@@ -125,6 +128,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 value={formData.location || ""}
                                 onChange={handleChange}
                                 placeholder={isEnglish ? "e.g. Munich" : "z.B. München"}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                         </div>
                         <div className="space-y-2">
@@ -135,6 +139,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 value={formData.employmentType || ""}
                                 onChange={handleChange}
                                 placeholder={isEnglish ? "e.g. Full-time" : "z.B. Vollzeit"}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                         </div>
                     </div>
@@ -148,6 +153,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                             onChange={handleChange}
                             rows={2}
                             placeholder={isEnglish ? "Brief description for overview" : "Kurze Beschreibung für die Übersicht"}
+                            className="text-sm sm:text-base"
                         />
                     </div>
 
@@ -161,10 +167,11 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                             required
                             rows={8}
                             placeholder={isEnglish ? "Detailed job description" : "Detaillierte Stellenbeschreibung"}
+                            className="text-sm sm:text-base"
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="requirements">{isEnglish ? "Requirements" : "Anforderungen"}</Label>
                             <Textarea
@@ -174,6 +181,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 onChange={handleChange}
                                 rows={6}
                                 placeholder={isEnglish ? "List of requirements" : "Aufzählung der Anforderungen"}
+                                className="text-sm sm:text-base"
                             />
                         </div>
                         <div className="space-y-2">
@@ -185,11 +193,12 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 onChange={handleChange}
                                 rows={6}
                                 placeholder={isEnglish ? "List of benefits" : "Aufzählung der Vorteile"}
+                                className="text-sm sm:text-base"
                             />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="salaryRange">{isEnglish ? "Salary Range" : "Gehaltsangabe"}</Label>
                             <Input
@@ -198,6 +207,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 value={formData.salaryRange || ""}
                                 onChange={handleChange}
                                 placeholder={isEnglish ? "e.g. 50,000 - 70,000 €" : "z.B. 50.000 - 70.000 €"}
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                         </div>
                         <div className="space-y-2">
@@ -209,6 +219,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                                 value={formData.applicationEmail || ""}
                                 onChange={handleChange}
                                 placeholder="karriere@blau-optoelektronik.de"
+                                className="text-sm sm:text-base min-h-[44px]"
                             />
                         </div>
                     </div>
@@ -222,6 +233,7 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                             value={formData.applicationUrl || ""}
                             onChange={handleChange}
                             placeholder="https://..."
+                            className="text-sm sm:text-base min-h-[44px]"
                         />
                     </div>
 
@@ -234,11 +246,11 @@ export function CareerForm({ open, onOpenChange, career, onSave }: CareerFormPro
                         <Label htmlFor="isPublished">{isEnglish ? "Published (visible on website)" : "Veröffentlicht (auf Website sichtbar)"}</Label>
                     </div>
 
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto min-h-[44px]">
                             {isEnglish ? "Cancel" : "Abbrechen"}
                         </Button>
-                        <Button type="submit">{isEnglish ? "Save" : "Speichern"}</Button>
+                        <Button type="submit" className="w-full sm:w-auto min-h-[44px]">{isEnglish ? "Save" : "Speichern"}</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

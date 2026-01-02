@@ -63,7 +63,7 @@ export default function Contact() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-primary text-primary-foreground py-24 mt-20 overflow-hidden">
+      <section className="relative bg-primary text-primary-foreground py-12 sm:py-16 lg:py-24 mt-20 overflow-hidden">
         {/* Background Video with Parallax */}
         <ParallaxSection speed={0.3} className="absolute inset-0 z-0">
           <video
@@ -79,15 +79,15 @@ export default function Contact() {
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 text-sm mb-4 opacity-90">
+            <div className="flex items-center gap-2 text-xs sm:text-sm mb-3 sm:mb-4 opacity-90">
               <span>Home</span>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               <span>{isEnglish ? "Contact" : "Kontakt"}</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6">
               {isEnglish ? "Get in touch" : "Kontaktieren Sie uns"}
             </h1>
-            <p className="text-xl opacity-90">
+            <p className="text-sm sm:text-base lg:text-xl opacity-90">
               {isEnglish
                 ? "We are looking forward to your enquiry and will gladly advise you on our products and solutions."
                 : "Wir freuen uns auf Ihre Anfrage und beraten Sie gerne zu unseren Produkten und Lösungen."}
@@ -97,15 +97,15 @@ export default function Contact() {
       </section>
 
       {/* Contact Info Cards */}
-      <section className="py-16">
+      <section className="py-8 sm:py-12 lg:py-16">
         <div className="container">
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
             <Card className="border-border/50 hover:shadow-lg transition-shadow">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Phone className="h-8 w-8 text-secondary" />
+              <CardContent className="p-6 sm:p-8 text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <Phone className="h-6 w-6 sm:h-8 sm:w-8 text-secondary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-card-foreground">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-card-foreground">
                   {isEnglish ? "Phone" : "Telefon"}
                 </h3>
                 <p className="text-muted-foreground mb-2">
@@ -118,11 +118,11 @@ export default function Contact() {
             </Card>
 
             <Card className="border-border/50 hover:shadow-lg transition-shadow">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="h-8 w-8 text-secondary" />
+              <CardContent className="p-6 sm:p-8 text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <Mail className="h-6 w-6 sm:h-8 sm:w-8 text-secondary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-card-foreground">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-card-foreground">
                   E-mail
                 </h3>
                 <p className="text-muted-foreground mb-2">
@@ -135,11 +135,11 @@ export default function Contact() {
             </Card>
 
             <Card className="border-border/50 hover:shadow-lg transition-shadow">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="h-8 w-8 text-secondary" />
+              <CardContent className="p-6 sm:p-8 text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <MapPin className="h-6 w-6 sm:h-8 sm:w-8 text-secondary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-card-foreground">
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-card-foreground">
                   {isEnglish ? "Location" : "Standort"}
                 </h3>
                 <p className="text-muted-foreground mb-2">BLAU Optoelektronik GmbH</p>
@@ -151,15 +151,15 @@ export default function Contact() {
           </div>
 
           {/* Distribution Partner Section */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold mb-6 text-foreground">
+          <div className="mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-foreground">
               {isEnglish ? "Distribution Partner" : "Vertriebspartner"}
             </h2>
             <Card className="border-border/50">
-              <CardContent className="p-8">
-                <div className="flex items-start gap-6">
-                  <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Building2 className="h-8 w-8 text-secondary" />
+              <CardContent className="p-6 sm:p-8">
+                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-secondary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-secondary" />
                   </div>
                   <div className="flex-1">
                     <p className="text-muted-foreground mb-6">
@@ -204,19 +204,19 @@ export default function Contact() {
           </div>
 
           {/* Contact Form */}
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
             <div>
-              <h2 className="text-3xl font-bold mb-4 text-foreground">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-foreground">
                 {isEnglish ? "Send us a message" : "Senden Sie uns eine Nachricht"}
               </h2>
-              <p className="text-muted-foreground mb-8">
+              <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
                 {isEnglish
                   ? "Fill out the form and we will get back to you as soon as possible. For urgent requests please call us directly."
                   : "Füllen Sie das Formular aus und wir melden uns schnellstmöglich bei Ihnen. Für dringende Anfragen rufen Sie uns bitte direkt an."}
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium mb-2 text-foreground">
                       {isEnglish ? "Name *" : "Name *"}
@@ -228,7 +228,7 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       placeholder={isEnglish ? "Your name" : "Ihr Name"}
-                      className="bg-background"
+                      className="bg-background text-sm sm:text-base min-h-[44px]"
                     />
                   </div>
                   <div>
@@ -243,12 +243,12 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       placeholder={isEnglish ? "your.email@example.com" : "ihre.email@beispiel.de"}
-                      className="bg-background"
+                      className="bg-background text-sm sm:text-base min-h-[44px]"
                     />
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
                     <label htmlFor="company" className="block text-sm font-medium mb-2 text-foreground">
                       {isEnglish ? "Company" : "Unternehmen"}
@@ -259,7 +259,7 @@ export default function Contact() {
                       value={formData.company}
                       onChange={handleChange}
                       placeholder={isEnglish ? "Your company" : "Ihr Unternehmen"}
-                      className="bg-background"
+                      className="bg-background text-sm sm:text-base min-h-[44px]"
                     />
                   </div>
                   <div>
@@ -273,7 +273,7 @@ export default function Contact() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+49 (0) 7551 93748-0"
-                      className="bg-background"
+                      className="bg-background text-sm sm:text-base min-h-[44px]"
                     />
                   </div>
                 </div>
@@ -289,7 +289,7 @@ export default function Contact() {
                     onChange={handleChange}
                     required
                       placeholder={isEnglish ? "What is it about?" : "Worum geht es?"}
-                    className="bg-background"
+                    className="bg-background text-sm sm:text-base min-h-[44px]"
                   />
                 </div>
 
@@ -305,11 +305,11 @@ export default function Contact() {
                     required
                     rows={6}
                       placeholder={isEnglish ? "Your message to us..." : "Ihre Nachricht an uns..."}
-                    className="bg-background resize-none"
+                    className="bg-background resize-none text-sm sm:text-base"
                   />
                 </div>
 
-                <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90">
+                <Button type="submit" size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 min-h-[44px]">
                   {isEnglish ? "Send message" : "Nachricht senden"}
                   <Send className="ml-2 h-5 w-5" />
                 </Button>
@@ -317,10 +317,10 @@ export default function Contact() {
             </div>
 
             <div>
-              <h2 className="text-3xl font-bold mb-4 text-foreground">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-foreground">
                 {isEnglish ? "Why BLAU Optoelektronik?" : "Warum BLAU Optoelektronik?"}
               </h2>
-              <p className="text-muted-foreground mb-8">
+              <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
                 {isEnglish
                   ? "With more than 30 years of experience in developing and manufacturing optoelectronics we are your reliable partner."
                   : "Mit über 30 Jahren Erfahrung in der Entwicklung und Fertigung von Optoelektronik sind wir Ihr zuverlässiger Partner."}
@@ -370,15 +370,16 @@ export default function Contact() {
           </div>
 
           {/* Google Maps Section */}
-          <div className="mt-16 mb-16">
-            <h2 className="text-3xl font-bold mb-6 text-foreground">
+          <div className="mt-12 sm:mt-16 mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-foreground">
               {isEnglish ? "Find us" : "So finden Sie uns"}
             </h2>
             <Card className="border-border/50 overflow-hidden">
               <CardContent className="p-0">
                 <iframe
                   width="100%"
-                  height="350"
+                  height="300"
+                  className="sm:h-[400px] lg:h-[500px]"
                   style={{ border: 0 }}
                   loading="lazy"
                   allowFullScreen
@@ -412,8 +413,8 @@ export default function Contact() {
           </div>
 
           {/* Directions Warning Section */}
-          <div className="mt-16">
-            <h2 className="text-3xl font-bold mb-6 text-foreground">
+          <div className="mt-12 sm:mt-16">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-foreground">
               {isEnglish ? "Important Directions Information" : "Wichtige Hinweise zur Anfahrt"}
             </h2>
             <Alert variant="destructive" className="mb-6">

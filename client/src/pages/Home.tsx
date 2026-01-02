@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowRight, Zap, Award, Users, Globe, Factory, Microscope, Cog, Shield, Clock, TrendingUp, CheckCircle2, Sparkles, Layers, Gauge, Rocket, Target, BarChart3, HeartHandshake, Heart, Cpu, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,67 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { fetchProducts, fetchSettings } from "@/lib/api";
 import type { Product } from "@/data/products";
+
+// Counter Component für animierte Zahlen
+function Counter({ value, suffix = "", duration = 2000 }: { value: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (hasAnimated) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasAnimated) {
+            setHasAnimated(true);
+            const startTime = Date.now();
+            const startValue = 0;
+            const endValue = value;
+
+            const animate = () => {
+              const now = Date.now();
+              const elapsed = now - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              
+              // Easing function für smooth animation
+              const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+              const currentValue = Math.floor(startValue + (endValue - startValue) * easeOutQuart);
+              
+              setCount(currentValue);
+
+              if (progress < 1) {
+                requestAnimationFrame(animate);
+              } else {
+                setCount(endValue);
+              }
+            };
+
+            requestAnimationFrame(animate);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, [value, duration, hasAnimated]);
+
+  return (
+    <div ref={ref} className="text-4xl md:text-5xl font-bold mb-2">
+      {count}{suffix}
+    </div>
+  );
+}
 
 export default function Home() {
   const { language, t } = useLanguage();
@@ -652,7 +713,7 @@ export default function Home() {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+        <div className="hidden sm:block absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
           <div className="w-6 h-10 border-2 border-primary-foreground/50 rounded-full flex items-start justify-center p-2">
             <div className="w-1 h-3 bg-primary-foreground/50 rounded-full" />
           </div>
@@ -662,7 +723,7 @@ export default function Home() {
       {/* Featured Product - MVpulse */}
       <section className="py-20 bg-accent">
         <div className="container">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-12 items-center">
             <motion.div
               className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl"
               initial={{ opacity: 0, x: -50 }}
@@ -729,7 +790,7 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 {homeProductCards.map((product, index) => (
                   <motion.div
                     key={product.href}
@@ -759,9 +820,24 @@ export default function Home() {
       {/* Stats Section */}
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="container">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
+              // Extrahiere Zahlen und Suffixe aus den stat strings
+              const parseStat = (statNumber: string) => {
+                if (statNumber.includes("%")) {
+                  return { value: 100, suffix: "%" };
+                } else if (statNumber.includes("h")) {
+                  return { value: 24, suffix: "h" };
+                } else {
+                  const match = statNumber.match(/(\d+)(\+?)/);
+                  if (match) {
+                    return { value: parseInt(match[1]), suffix: match[2] || "" };
+                  }
+                  return { value: 0, suffix: "" };
+                }
+              };
+              const { value, suffix } = parseStat(stat.number);
               return (
                 <motion.div
                   key={index}
@@ -776,7 +852,7 @@ export default function Home() {
                       <Icon className="h-8 w-8" />
                     </div>
                   </div>
-                  <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
+                  <Counter value={value} suffix={suffix} />
                   <div className="text-lg opacity-90">{stat.label}</div>
                 </motion.div>
               );
@@ -792,28 +868,29 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">{featuresSectionCopy.heading}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">{featuresSectionCopy.description}</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {features.map((feature, index) => {
               return (
-                <motion.div
-                  key={index}
-                  className="bg-card p-6 rounded-xl border border-border hover:shadow-lg transition-shadow"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
-                    <AnimatedIcon
-                      icon={feature.icon}
-                      size={24}
-                      animationType={index % 2 === 0 ? "pulse" : "float"}
-                      className="text-secondary"
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2 text-card-foreground">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </motion.div>
+                <Link href="/unternehmen" key={index}>
+                  <motion.div
+                    className="bg-card p-6 rounded-xl border border-border hover:shadow-lg transition-shadow cursor-pointer"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
+                      <AnimatedIcon
+                        icon={feature.icon}
+                        size={24}
+                        animationType={index % 2 === 0 ? "pulse" : "float"}
+                        className="text-secondary"
+                      />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2 text-card-foreground">{feature.title}</h3>
+                    <p className="text-muted-foreground">{feature.description}</p>
+                  </motion.div>
+                </Link>
               );
             })}
           </div>
@@ -854,13 +931,25 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
                   className="scroll-mt-20"
                 >
-                  <div className={`grid lg:grid-cols-2 gap-12 items-start ${!isEven ? 'lg:flex-row-reverse' : ''}`}>
-                    <div className={isEven ? '' : 'lg:order-2'}>
+                  <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-start ${!isEven ? 'lg:flex-row-reverse' : ''}`}>
+                    <div className={`order-1 ${isEven ? 'lg:order-1' : 'lg:order-2'}`}>
                       <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-6">
                         <Icon className="h-8 w-8 text-secondary" />
                       </div>
                       <h2 className="text-3xl font-bold mb-4 text-foreground">{industry.title}</h2>
                       <p className="text-lg text-muted-foreground mb-6">{industry.description}</p>
+
+                      {/* Bild für Mobile/Tablet - zwischen Beschreibung und Anwendungen */}
+                      <div className="mb-8 block lg:hidden">
+                        <div className="aspect-video rounded-xl overflow-hidden shadow-2xl">
+                          <img
+                            src={industry.image}
+                            alt={industry.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      </div>
 
                       {/* Applications */}
                       <div className="mb-8">
@@ -901,7 +990,8 @@ export default function Home() {
                       </Link>
                     </div>
 
-                    <div className={`relative ${isEven ? '' : 'lg:order-1'}`}>
+                    {/* Bild für Desktop - bleibt an der gleichen Stelle */}
+                    <div className={`relative order-2 hidden lg:block ${isEven ? 'lg:order-2' : 'lg:order-1'}`}>
                       <div className="aspect-video rounded-xl overflow-hidden shadow-2xl">
                         <img
                           src={industry.image}
@@ -937,24 +1027,25 @@ export default function Home() {
                 : "Unsere Kernkompetenzen und Fertigungsfähigkeiten"}
             </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
             {technologies.map((tech, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="flex gap-4 p-6 bg-card rounded-xl border border-border hover:shadow-lg transition-shadow"
-              >
-                <div className="flex-shrink-0 mt-1">
-                  <CheckCircle2 className="h-6 w-6 text-secondary" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-2 text-card-foreground">{tech.title}</h3>
-                  <p className="text-muted-foreground">{tech.description}</p>
-                </div>
-              </motion.div>
+              <Link href="/technologie" key={index}>
+                <motion.div
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="flex gap-4 p-6 bg-card rounded-xl border border-border hover:shadow-lg transition-shadow cursor-pointer"
+                >
+                  <div className="flex-shrink-0 mt-1">
+                    <CheckCircle2 className="h-6 w-6 text-secondary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2 text-card-foreground">{tech.title}</h3>
+                    <p className="text-muted-foreground">{tech.description}</p>
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>
@@ -992,6 +1083,23 @@ export default function Home() {
             
             {process.map((item, index) => {
               const Icon = item.icon;
+              // Mapping der Hintergrundbilder zu den Process-Schritten
+              const backgroundImages: Record<string, string> = {
+                "01": "/beratung.png",
+                "02": "/entwicklung.png",
+                "03": "/fertigung.png",
+                "04": "/support.png",
+              };
+              const backgroundImage = backgroundImages[item.step] || "";
+              
+              // Navigation basierend auf Schritt: 01 und 04 → /kontakt, 02 und 03 → /technologie
+              const getProcessHref = (step: string) => {
+                if (step === "01" || step === "04") {
+                  return "/kontakt";
+                }
+                return "/technologie";
+              };
+              
               return (
                 <motion.div
                   key={index}
@@ -1001,27 +1109,42 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: index * 0.15 }}
                   className="relative z-10"
                 >
-                  <Card className="h-full hover:shadow-2xl transition-all duration-300 border-2 hover:border-secondary/50 bg-card/50 backdrop-blur-sm">
+                  <Link href={getProcessHref(item.step)}>
+                    <Card className="h-full hover:shadow-2xl transition-all duration-300 border-2 hover:border-secondary/50 bg-card/50 backdrop-blur-sm overflow-hidden cursor-pointer">
                     <CardContent className="p-8 text-center relative">
-                      <motion.div
-                        className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg"
-                        whileHover={{ scale: 1.1, rotate: 360 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        {item.step}
-                      </motion.div>
-                      <div className="mt-8 mb-6 flex justify-center">
+                      {/* Hintergrundbild */}
+                      {backgroundImage && (
+                        <div 
+                          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50 transition-opacity duration-300 hover:opacity-60"
+                          style={{ backgroundImage: `url(${backgroundImage})` }}
+                        />
+                      )}
+                      {/* Overlay für bessere Lesbarkeit - leichter für bessere Sichtbarkeit des Bildes */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/50 to-background/70" />
+                      
+                      {/* Content mit relativer Positionierung */}
+                      <div className="relative z-10">
                         <motion.div
-                          className="w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center"
-                          whileHover={{ scale: 1.1, rotate: 5 }}
+                          className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg z-20"
+                          whileHover={{ scale: 1.1, rotate: 360 }}
+                          transition={{ duration: 0.5 }}
                         >
-                          <Icon className="h-8 w-8 text-secondary" />
+                          {item.step}
                         </motion.div>
+                        <div className="mt-8 mb-6 flex justify-center">
+                          <motion.div
+                            className="w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center"
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                          >
+                            <Icon className="h-8 w-8 text-secondary" />
+                          </motion.div>
+                        </div>
+                        <h3 className="text-xl font-bold mb-4 text-card-foreground drop-shadow-sm">{item.title}</h3>
+                        <p className="text-muted-foreground leading-relaxed drop-shadow-sm">{item.description}</p>
                       </div>
-                      <h3 className="text-xl font-bold mb-4 text-card-foreground">{item.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed">{item.description}</p>
                     </CardContent>
                   </Card>
+                  </Link>
                 </motion.div>
               );
             })}
@@ -1048,7 +1171,7 @@ export default function Home() {
                 : "Sechs Gründe, die uns zu Ihrem idealen Partner für optoelektronische Lösungen machen"}
             </p>
           </motion.div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {whyChooseUs.map((item, index) => {
               const Icon = item.icon;
               return (
@@ -1060,19 +1183,21 @@ export default function Home() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   whileHover={{ y: -5 }}
                 >
-                  <Card className="h-full border-2 hover:border-secondary/50 hover:shadow-xl transition-all duration-300 bg-card/80 backdrop-blur-sm">
-                    <CardContent className="p-6">
-                      <motion.div
-                        className="w-14 h-14 bg-secondary/10 rounded-xl flex items-center justify-center mb-4"
-                        whileHover={{ rotate: 360, scale: 1.1 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        <Icon className="h-7 w-7 text-secondary" />
-                      </motion.div>
-                      <h3 className="text-xl font-bold mb-3 text-card-foreground">{item.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed">{item.description}</p>
-                    </CardContent>
-                  </Card>
+                  <Link href="/unternehmen">
+                    <Card className="h-full border-2 hover:border-secondary/50 hover:shadow-xl transition-all duration-300 bg-card/80 backdrop-blur-sm cursor-pointer">
+                      <CardContent className="p-6">
+                        <motion.div
+                          className="w-14 h-14 bg-secondary/10 rounded-xl flex items-center justify-center mb-4"
+                          whileHover={{ rotate: 360, scale: 1.1 }}
+                          transition={{ duration: 0.5 }}
+                        >
+                          <Icon className="h-7 w-7 text-secondary" />
+                        </motion.div>
+                        <h3 className="text-xl font-bold mb-3 text-card-foreground">{item.title}</h3>
+                        <p className="text-muted-foreground leading-relaxed">{item.description}</p>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </motion.div>
               );
             })}
@@ -1163,7 +1288,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+            className="text-2xl sm:text-3xl lg:text-4xl xl:text-6xl 2xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight"
           >
             {ctaCopy.heading}
           </motion.h2>
@@ -1173,7 +1298,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl mb-12 opacity-90 max-w-3xl mx-auto leading-relaxed"
+            className="text-sm sm:text-base lg:text-xl xl:text-2xl mb-8 sm:mb-12 opacity-90 max-w-3xl mx-auto leading-relaxed"
           >
             {ctaCopy.description}
           </motion.p>

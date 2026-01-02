@@ -48,8 +48,8 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid md:grid-cols-2 gap-6">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <label htmlFor="dialog-name" className="block text-sm font-medium mb-2 text-foreground">
             {isEnglish ? "Name *" : "Name *"}
@@ -61,7 +61,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
             onChange={handleChange}
             required
             placeholder={isEnglish ? "Your name" : "Ihr Name"}
-            className="bg-background"
+            className="bg-background text-sm sm:text-base min-h-[44px]"
           />
         </div>
         <div>
@@ -76,12 +76,12 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
             onChange={handleChange}
             required
             placeholder={isEnglish ? "your.email@example.com" : "ihre.email@beispiel.de"}
-            className="bg-background"
+            className="bg-background text-sm sm:text-base min-h-[44px]"
           />
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <label htmlFor="dialog-company" className="block text-sm font-medium mb-2 text-foreground">
             {isEnglish ? "Company" : "Unternehmen"}
@@ -92,7 +92,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
             value={formData.company}
             onChange={handleChange}
             placeholder={isEnglish ? "Your company" : "Ihr Unternehmen"}
-            className="bg-background"
+            className="bg-background text-sm sm:text-base min-h-[44px]"
           />
         </div>
         <div>
@@ -106,7 +106,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
             value={formData.phone}
             onChange={handleChange}
             placeholder="+49 (0) 7551 93748-0"
-            className="bg-background"
+            className="bg-background text-sm sm:text-base min-h-[44px]"
           />
         </div>
       </div>
@@ -122,7 +122,7 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
           onChange={handleChange}
           required
           placeholder={isEnglish ? "What is it about?" : "Worum geht es?"}
-          className="bg-background"
+          className="bg-background text-sm sm:text-base min-h-[44px]"
         />
       </div>
 
@@ -138,11 +138,11 @@ export function ContactForm({ onSuccess }: ContactFormProps) {
           required
           rows={6}
           placeholder={isEnglish ? "Your message to us..." : "Ihre Nachricht an uns..."}
-          className="bg-background resize-none"
+          className="bg-background resize-none text-sm sm:text-base"
         />
       </div>
 
-      <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90">
+      <Button type="submit" size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 min-h-[44px]">
         {isEnglish ? "Send message" : "Nachricht senden"}
         <Send className="ml-2 h-5 w-5" />
       </Button>

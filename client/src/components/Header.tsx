@@ -277,11 +277,11 @@ export default function Header() {
               className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
               aria-label={isEnglish ? "Go to homepage" : "Zur Startseite"}
             >
-              <img src={APP_LOGO_HEADER} alt="BLAU Optoelektronik Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
+              <img src={APP_LOGO_HEADER} alt="BLAU Optoelektronik Logo" className="h-6 sm:h-7 lg:h-8 w-auto" />
             </Link>
 
             {/* Desktop Navigation */}
-            <nav role="navigation" aria-label={mainNavLabel} className="hidden lg:flex items-center gap-4 xl:gap-6 flex-1 justify-center">
+            <nav role="navigation" aria-label={mainNavLabel} className="hidden lg:flex items-center gap-2 sm:gap-3 md:gap-4 xl:gap-6 flex-1 justify-center">
               {navItems.map((item) => (
                 <div
                   key={item.name}
@@ -303,7 +303,7 @@ export default function Header() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className={cn(
-                        "text-xs xl:text-sm font-medium uppercase tracking-wide flex items-center gap-1 whitespace-nowrap",
+                        "text-xs lg:text-sm font-medium uppercase tracking-wide flex items-center gap-1 whitespace-nowrap",
                         getNavItemClass(item.href)
                       )}
                     >
@@ -313,7 +313,7 @@ export default function Header() {
                     <Link href={item.href}>
                       <button
                         className={cn(
-                          "text-xs xl:text-sm font-medium uppercase tracking-wide flex items-center gap-1 whitespace-nowrap",
+                          "text-xs lg:text-sm font-medium uppercase tracking-wide flex items-center gap-1 whitespace-nowrap",
                           getNavItemClass(item.href)
                         )}
                         aria-expanded={item.hasDropdown && activeDropdown === item.name}
@@ -455,7 +455,7 @@ export default function Header() {
 
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-2 text-foreground focus:outline-none flex-shrink-0"
+              className="lg:hidden p-2.5 sm:p-3 text-foreground focus:outline-none flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={
                 isMobileMenuOpen
@@ -480,7 +480,7 @@ export default function Header() {
 
         {/* Mobile Menu - Using Sheet Component */}
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetContent side="right" className="w-full sm:max-w-sm p-0">
+          <SheetContent side="right" className="w-full sm:max-w-sm p-0 overflow-y-auto">
             <SheetHeader className="px-6 pt-6 pb-4 border-b">
               <SheetTitle className="text-left">
                 {isEnglish ? "Menu" : "Menü"}
@@ -509,7 +509,7 @@ export default function Header() {
                         key={code}
                         variant={language === code ? "default" : "outline"}
                         size="sm"
-                        className="flex-1"
+                        className="flex-1 min-h-[44px]"
                         onClick={() => setLanguage(code)}
                         aria-pressed={language === code}
                         title={name}
@@ -543,7 +543,7 @@ export default function Header() {
                 style={{ transitionDelay: "300ms" }}
               >
                 <Button
-                  className="w-full bg-secondary hover:bg-primary text-secondary-foreground hover:text-primary-foreground rounded-full"
+                  className="w-full bg-secondary hover:bg-primary text-secondary-foreground hover:text-primary-foreground rounded-full min-h-[44px]"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     setIsContactDialogOpen(true);
@@ -599,7 +599,7 @@ function MobileNavItem({
       {item.hasDropdown ? (
         <>
                             <button
-                              className="w-full flex items-center justify-between px-3 py-2 rounded-md text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
+                              className="w-full flex items-center justify-between px-3 py-3 sm:py-2 rounded-md text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors min-h-[44px]"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             <span>{item.name}</span>
@@ -624,7 +624,7 @@ function MobileNavItem({
                                         <Button
                                           variant="ghost"
                                           size="sm"
-                                          className="w-full justify-start text-left text-sm text-muted-foreground hover:text-primary"
+                                          className="w-full justify-start text-left text-sm text-muted-foreground hover:text-primary min-h-[44px]"
                                           onClick={onClose}
                                         >
                                           {dropdownItem.name}
@@ -638,11 +638,11 @@ function MobileNavItem({
         </>
       ) : (
         item.isExternal ? (
-          <a
+            <a
             href={item.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center px-3 py-2 rounded-md text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
+            className="w-full flex items-center px-3 py-3 sm:py-2 rounded-md text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors min-h-[44px]"
             onClick={onClose}
           >
             {item.name}
@@ -651,7 +651,7 @@ function MobileNavItem({
           <Link href={item.href}>
             <Button
               variant="ghost"
-              className="w-full justify-start text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors"
+              className="w-full justify-start text-left font-medium text-foreground hover:bg-muted hover:text-primary transition-colors min-h-[44px]"
               onClick={onClose}
             >
               {item.name}
@@ -685,7 +685,7 @@ function MobileSubDropdown({
   return (
     <div>
       <button
-        className="w-full flex items-center justify-between px-3 py-2 rounded-md text-left text-sm text-muted-foreground hover:bg-muted hover:text-primary transition-colors"
+        className="w-full flex items-center justify-between px-3 py-3 sm:py-2 rounded-md text-left text-sm text-muted-foreground hover:bg-muted hover:text-primary transition-colors min-h-[44px]"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <span>{item.name}</span>
@@ -703,7 +703,7 @@ function MobileSubDropdown({
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-start text-left text-xs text-muted-foreground hover:text-primary"
+                className="w-full justify-start text-left text-xs text-muted-foreground hover:text-primary min-h-[44px]"
                 onClick={onClose}
               >
                 {subItem.name}

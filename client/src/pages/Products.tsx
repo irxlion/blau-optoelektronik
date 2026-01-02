@@ -98,7 +98,7 @@ export default function Products() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-primary text-primary-foreground py-24 mt-20 overflow-hidden">
+      <section className="relative bg-primary text-primary-foreground py-12 sm:py-16 lg:py-24 mt-20 overflow-hidden">
         {/* Background Video with Parallax */}
         <ParallaxSection speed={0.3} className="absolute inset-0 z-0">
           <video
@@ -114,15 +114,15 @@ export default function Products() {
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
-            <div className="flex items-center gap-2 text-sm mb-4 opacity-90">
+            <div className="flex items-center gap-2 text-xs sm:text-sm mb-3 sm:mb-4 opacity-90">
               <span>Home</span>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               <span>{isEnglish ? "Products" : "Produkte"}</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6">
               {isEnglish ? "Our products" : "Unsere Produkte"}
             </h1>
-            <p className="text-xl opacity-90">
+            <p className="text-sm sm:text-base lg:text-xl opacity-90">
               {isEnglish
                 ? "High-precision optoelectronic components and systems for demanding applications in industry, medical technology and research."
                 : "Hochpräzise optoelektronische Komponenten und Systeme für anspruchsvolle Anwendungen in Industrie, Medizintechnik und Forschung."}
@@ -132,9 +132,9 @@ export default function Products() {
       </section>
 
       {/* Search and Category Filter */}
-      <section className="py-8 bg-muted border-b border-border">
+      <section className="py-6 sm:py-8 bg-muted border-b border-border">
         <div className="container">
-          <div className="mb-6 max-w-md mx-auto">
+          <div className="mb-4 sm:mb-6 max-w-md mx-auto">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -142,15 +142,16 @@ export default function Products() {
                 placeholder={isEnglish ? "Search products..." : "Produkte durchsuchen..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm sm:text-base min-h-[44px]"
               />
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
               onClick={() => setSelectedCategory("all")}
               className={selectedCategory === "all" ? "bg-primary" : ""}
+              size="sm"
             >
               {isEnglish ? "All" : "Alle"}
             </Button>
@@ -160,6 +161,7 @@ export default function Products() {
                 variant={selectedCategory === category ? "default" : "outline"}
                 onClick={() => setSelectedCategory(category)}
                 className={selectedCategory === category ? "bg-primary" : ""}
+                size="sm"
               >
                 {category}
               </Button>
@@ -169,14 +171,14 @@ export default function Products() {
       </section>
 
       {/* Products Grid */}
-      <section className="py-16">
+      <section className="py-8 sm:py-12 lg:py-16">
         <div className="container">
           {error && (
-            <div className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <p className="text-destructive font-semibold mb-2">
+            <div className="mb-6 sm:mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-destructive font-semibold mb-2 text-sm sm:text-base">
                 {isEnglish ? "Error loading products" : "Fehler beim Laden der Produkte"}
               </p>
-              <p className="text-sm text-muted-foreground">{error}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">{error}</p>
               <p className="text-xs text-muted-foreground mt-2">
                 {isEnglish 
                   ? "Please check the browser console for more details or contact support." 
@@ -185,7 +187,7 @@ export default function Products() {
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
@@ -198,8 +200,8 @@ export default function Products() {
           </div>
 
           {!error && filteredProducts.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-xl text-muted-foreground">
+            <div className="text-center py-12 sm:py-16">
+              <p className="text-lg sm:text-xl text-muted-foreground">
                 {isEnglish ? "No products found." : "Keine Produkte gefunden."}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
@@ -213,17 +215,17 @@ export default function Products() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-accent">
+      <section className="py-12 sm:py-16 bg-accent">
         <div className="container text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-accent-foreground">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 text-accent-foreground">
             {isEnglish ? "Can't find the product you need?" : "Finden Sie nicht das passende Produkt?"}
           </h2>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto">
             {isEnglish
               ? "We also design custom solutions. Contact us for personalised consulting."
               : "Wir entwickeln auch kundenspezifische Lösungen. Kontaktieren Sie uns für eine individuelle Beratung."}
           </p>
-          <Button size="lg" className="bg-primary hover:bg-primary/90">
+          <Button size="lg" className="bg-primary hover:bg-primary/90 min-h-[44px]">
             {isEnglish ? "Request custom quote" : "Individuelle Anfrage stellen"}
           </Button>
         </div>
