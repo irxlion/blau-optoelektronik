@@ -122,6 +122,25 @@ export async function deleteProduct(productId: string): Promise<void> {
     }
 }
 
+export async function linkProducts(sourceProductId: string, targetProductId: string, targetLanguage: "de" | "en"): Promise<void> {
+    const response = await fetch("/api/products", {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${getAuthToken()}`,
+        },
+        body: JSON.stringify({
+            sourceProductId,
+            targetProductId,
+            targetLanguage,
+        }),
+    });
+    if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to link products");
+    }
+}
+
 export async function login(username: string, password: string): Promise<{ success: boolean; token?: string; error?: string }> {
     const response = await fetch("/api/login", {
         method: "POST",

@@ -103,16 +103,6 @@ export function ProductLinkDialog({
                         </Alert>
                     )}
 
-                    {/* Warnung über URL-Änderung */}
-                    <Alert variant="destructive">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertDescription>
-                            {isEnglish
-                                ? "Warning: Linking products will change the URL of the target product. The old URL will no longer work."
-                                : "Warnung: Das Verknüpfen von Produkten ändert die URL des Zielprodukts. Die alte URL funktioniert nicht mehr."}
-                        </AlertDescription>
-                    </Alert>
-
                     {/* Fehleranzeige */}
                     {error && (
                         <Alert variant="destructive">
